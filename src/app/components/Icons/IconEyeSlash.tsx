@@ -1,7 +1,7 @@
 export const IconEyeSlash = ({ classes } : { classes: string }) => (
     <svg
         className={classes}
-        fill="white"
+        fill="none"
         stroke="currentColor"
         strokeWidth={1.5} 
         viewBox="0 0 24 24" 
