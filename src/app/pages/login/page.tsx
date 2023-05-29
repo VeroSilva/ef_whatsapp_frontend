@@ -1,6 +1,23 @@
+"use client"
+
+import { useEffect } from 'react'
+import { parseCookies } from 'nookies';
+import { useRouter } from 'next/navigation';
 import { LoginForm } from "@/app/components/LoginForm"
+import useUser from "../../hooks/user/useUser";
 
 const Login = () => {
+    const router = useRouter();
+    const cookies = parseCookies();
+    // @ts-ignore
+    const { userState } = useUser();
+
+    useEffect(() => {
+        if (userState && userState.token || cookies.remember_token) {
+            router.push('./pages/chat')
+        }
+    }, [userState])
+
     return (
         <div className="w-full min-h-screen p-5 md:p-20 flex items-center justify-center bg-teal-100">
             <div className="w-96 intro-y">

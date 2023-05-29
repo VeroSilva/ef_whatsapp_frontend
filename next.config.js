@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const { env } = require('./env-config');
+
+const nextConfig = {
+    env,
+}
 
 module.exports = nextConfig
