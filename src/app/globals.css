@@ -16,12 +16,12 @@
   }
 }
 
-body {
-  /* color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)); */
+
+/* Custom classes */
+.message-sticker-container { 
+  @apply border border-slate-200/60 mt-1 rounded-md p-1 
+}
+
+.messages-container { 
+  @apply border border-slate-200/60 px-4 py-2 my-2 text-slate-500 rounded-md relative
 }
