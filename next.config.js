@@ -1,20 +1,30 @@
 /** @type {import('next').NextConfig} */
-const { env } = require('./env-config');
+const { env } = require("./env-config");
 
 const nextConfig = {
-    env,
-    webpack: (config) => {
-        config.module.rules.push({
-            test: /\.scss$/,
-            use: [
-                'style-loader',
-                'css-loader',
-                'sass-loader'
-            ]
-        });
-    
-        return config;
-    }
-}
+  env,
+  reactStrictMode: true,
+  swcMinify: true,
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/pages/login",
+      },
+    ];
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+        test: /\.scss$/,
+        use: [
+            'style-loader',
+            'css-loader',
+            'sass-loader'
+        ]
+    });
 
-module.exports = nextConfig
+    return config;
+  }
+};
+
+module.exports = nextConfig;

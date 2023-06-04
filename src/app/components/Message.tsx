@@ -12,6 +12,7 @@ import { getMedia } from "../services/api";
 import useUser from "../hooks/user/useUser"
 import { Reaction } from "../interfaces/reactions";
 import { ActiveConversationSkeleton } from "./Skeleton/ActiveConversation";
+import { validateBase64 } from "../utils/validateBase64";
 
 export const Message = ({ message, reaction, handleOpenModal, setModalImage }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function }) => {
     // @ts-ignore
@@ -39,6 +40,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                             setContent(media)
                             setLoadingContent(false)
                         })
+
                 } catch (error) {
                     console.error("Error fetching media:", error);
                 }
@@ -53,7 +55,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
 
     return (
         <>
-            <div className={"flex items-end w-10/12 " + (isFromClient ? "float-left justify-start" : "float-right justify-end")}>
+            <div className={"flex items-end " + (isFromClient ? "float-left justify-start" : "float-right justify-end")}>
                 <div className={
                     (message.message_type !== "sticker" ?
                         "messages-container " +
@@ -71,7 +73,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                             loadingContent ?
                                 <ActiveConversationSkeleton /> :
                                 <Image
-                                    src={content}
+                                    src={validateBase64(content) ? content : ''}
                                     width={message.message_type === "image" ? 250 : 150}
                                     height={message.message_type === "image" ? 250 : 150}
                                     alt="Imagen de mensaje"
@@ -80,6 +82,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                         setModalImage(content)
                                         handleOpenModal(true)
                                     }}
+                                    key={message.id}
                                 />
                             : message.message_type === "video" ?
                                 <ReactPlayer
@@ -96,7 +99,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                         <a href={content} target="_blank" download={message.message.filename}>{message.message.filename}</a>
                                         : message.message_type === "location" ?
                                             <iframe src={`https://www.google.com/maps?q=${message.message.latitude},${message.message.longitude}&hl=es&output=embed`} width="300px" />
-                                            : <></>
+                                            : <>{message.message_type}</>
                     )}
 
                     {/* text reaction image audio document sticker video location */}
