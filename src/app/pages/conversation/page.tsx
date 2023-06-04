@@ -16,6 +16,7 @@ import { ActiveConversation } from '@/app/components/ActiveConversation'
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
+import "./styles.scss";
 
 const Conversation = (): JSX.Element => {
     const router = useRouter()
@@ -160,7 +161,7 @@ const Conversation = (): JSX.Element => {
 
             <div className="grid grid-cols-12 gap-5 w-[1800px] h-[780px] mt-5 drop-shadow-md">
                 {/* BEGIN: Chat Side Menu */}
-                <div className="col-span-12 xl:col-span-4 2xl:col-span-3">
+                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3">
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
                         <div className="flex items-center px-5 pt-5">
                             <IconEdit classes="w-6 h-6 text-slate-500 ml-auto" />
