@@ -49,16 +49,17 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
         <div className="h-full flex flex-col">
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
-                    {/* <div className="w-16 h-16 flex-none relative">
-                        {generateInitialsImage(contact !== undefined ? contact : "C")}
+                    <div className="w-16 h-16 flex-none relative">
+                        {/* {generateInitialsImage(contact !== undefined ? contact : "C")} */}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">
                             <div className="font-medium text-base">
-                                {contact}
+                                {/* {contact} */}
+                                PRUEBA
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
                 <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
                     <a href="#" className="w-5 h-5 text-slate-500">
@@ -90,8 +91,7 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                     </div>
                 </div>
             </div>
-
-            <div ref={messagesContainerRef} className="overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
+            <div ref={messagesContainerRef} className="flex flex-col-reverse overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
                 {messages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp)

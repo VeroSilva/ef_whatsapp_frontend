@@ -1,8 +1,18 @@
 /** @type {import('next').NextConfig} */
-const { env } = require('./env-config');
+const { env } = require("./env-config");
 
 const nextConfig = {
-    env,
-}
+  env,
+  reactStrictMode: true,
+  swcMinify: true,
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/pages/login",
+      },
+    ];
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

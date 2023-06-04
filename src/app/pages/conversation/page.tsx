@@ -59,7 +59,7 @@ const Conversation = (): JSX.Element => {
             const unreadMessages = [...messages].filter((message) => !message.read).map((message) => message.id);
 
             if (!!unreadMessages.length) {
-                markAsRead(userState.token, unreadMessages).then((res) => console.log(res));
+                markAsRead(userState.token, unreadMessages).then((res) => res);
             }
         }
     }, [messages])
@@ -72,6 +72,7 @@ const Conversation = (): JSX.Element => {
 
             // Escuchar la notificación de cambio de tabla
             socketRef.current.on('table_change_notification', (payload) => {
+
                 if (payload.table === "messages" && payload.action === "insert") {
                     const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
 
@@ -82,7 +83,10 @@ const Conversation = (): JSX.Element => {
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
 
-                    if (activeConversation === payload.data.conversation.id) setMessages([...messages, payload.data.message])
+                    if (activeConversation == payload.data.conversation.id) {
+                        const newMessages = [...messages, payload.data.message].sort((a, b) => Number(b.id) - Number(a.id))
+                        setMessages(newMessages);
+                    }
                 } else if (payload.table === "messages" && payload.action === "update") {
                     const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
 
@@ -141,7 +145,7 @@ const Conversation = (): JSX.Element => {
 
         getMessagesByConversation(id, 50, userState.token)
             .then((res) => {
-                setMessages(res.reverse())
+                setMessages(res)
                 setLoadingMessages(false)
                 setCookie(null, 'conversationId', `${id}`, {
                     maxAge: 30 * 24 * 60 * 60
@@ -175,7 +179,7 @@ const Conversation = (): JSX.Element => {
                         </div>
                         <div className="h-[642px] overflow-y-auto scrollbar-hidden">
                             {!loadingConversations ?
-                                conversations.map((conversation, index) => (
+                                ([...conversations] ?? []).map((conversation, index) => (
                                     <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} />
                                 )) :
                                 [...Array(8)].map((n, index) => (
