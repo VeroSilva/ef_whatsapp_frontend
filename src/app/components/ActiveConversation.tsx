@@ -5,20 +5,33 @@ import { Modal } from 'flowbite-react';
 import Image from "next/image"
 import { IconUserPlus } from "@/app/components/Icons/IconUserPlus"
 import { IconEllipsisVertical } from "@/app/components/Icons/IconEllipsisVertical"
-import { IconPaperClip } from "@/app/components/Icons/IconPaperClip"
-import { IconSend } from "@/app/components/Icons/IconSend"
 import { IconSearch } from "@/app/components/Icons/IconSearch"
-import { Message as IMessage } from "../interfaces/conversations"
+import { Message as IMessage, Contact } from "../interfaces/conversations"
 import { Reaction } from "../interfaces/reactions"
 import generateInitialsImage from "../utils/generateUserImage"
 import { Message } from "./Message"
 import { IconX } from "./Icons/IconX";
+import { ConversationBottomSection } from "./ConversationBottomSection/ConversationBottomSection";
+import { ConversationPreview } from "./ConversationPreview/ConversationPreview";
+import { useMessage } from "../hooks/useMessage";
+import { getFileType } from "../utils/fileType";
 
-export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
-    const [reactions, setReactions] = useState<Reaction[]>([]);
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [modalImage, setModalImage] = useState<string>("");
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
+export const ActiveConversation = ({ messages, conversationId, activeContact }: { messages: IMessage[], conversationId: number, activeContact: Contact }) => {
+    const [reactions, setReactions] = useState<Reaction[]>([])
+    const [showModal, setShowModal] = useState<boolean>(false)
+    const [modalImage, setModalImage] = useState<string>("")
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const { sendMessage, isLoading } = useMessage()
+
+    console.log(messages)
+
+    useEffect(() => {
+        if (isScrolledToBottom) {
+            scrollToBottom();
+        }
+    }, [isScrolledToBottom, messages])
 
     useEffect(() => {
         setReactions([])
@@ -33,16 +46,44 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
             })
 
         scrollToBottom();
-    }, [messages]);
+    }, [])
+
+    useEffect(() => {
+        if (!isLoading) {
+            setSelectedFile(null)
+        }
+    }, [isLoading])
+
+    const handleScroll = () => {
+        const container = messagesContainerRef.current
+        if (container) {
+            const { scrollTop, scrollHeight, clientHeight } = container
+
+            const isAtBottom = scrollHeight - scrollTop === clientHeight
+
+            setIsScrolledToBottom(isAtBottom);
+        }
+    }
 
     const scrollToBottom = () => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    };
+        messagesContainerRef.current?.lastElementChild?.scrollIntoView();
+    }
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show)
+    }
+
+    const handleSendMessage = (type: string, data: any) => {
+        sendMessage({ type, data, conversationId })
+    }
+
+    const handleAccept = () => {
+        const type = getFileType(selectedFile?.type)
+        handleSendMessage(type, selectedFile)
+    }
+
+    const handleCancel = () => {
+        setSelectedFile(null)
     }
 
     return (
@@ -50,13 +91,12 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
-                        {/* {generateInitialsImage(contact !== undefined ? contact : "C")} */}
+                        {generateInitialsImage(activeContact.name)}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">
                             <div className="font-medium text-base">
-                                {/* {contact} */}
-                                PRUEBA
+                                {activeContact.name}
                             </div>
                         </div>
                     </div>
@@ -91,7 +131,7 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                     </div>
                 </div>
             </div>
-            <div ref={messagesContainerRef} className="flex flex-col-reverse overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
+            <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
                 {messages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp)
@@ -103,30 +143,16 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                 })}
             </div>
 
-            <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400">
-                <textarea
-                    className="h-[56px] mx-3 w-full form-control h-16 resize-none border-transparent px-5 py-3 shadow-none focus:border-transparent focus:ring-0"
-                    rows={1}
-                    placeholder="Type your message..."
-                ></textarea>
-                <div className="flex absolute sm:static left-0 bottom-0 ml-5 sm:ml-0 mb-5 sm:mb-0">
+            {selectedFile !== null &&
+                <ConversationPreview
+                    handleAccept={handleAccept}
+                    handleCancel={handleCancel}
+                    selectedFile={selectedFile}
+                    isLoading={isLoading}
+                />
+            }
 
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 relative text-slate-500 mr-3 sm:mr-5">
-                        <IconPaperClip classes="w-full h-full text-gray-600" />
-                        <input
-                            type="file"
-                            className="w-full h-full top-0 left-0 absolute opacity-0"
-                        />
-                    </div>
-                </div>
-
-                <a
-                    href="#"
-                    className="w-8 h-8 block bg-primary text-white rounded-full flex-none flex items-center justify-center"
-                >
-                    <IconSend classes="w-8 h-8 text-teal-600" />
-                </a>
-            </div>
+            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} />
 
             <Modal
                 size="md"

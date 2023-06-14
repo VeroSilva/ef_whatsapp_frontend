@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image"
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player'
@@ -9,47 +9,36 @@ import { IconDoubleCheck } from "./Icons/IconDoubleCheck";
 import { IconExclamationCircle } from "./Icons/IconExclamationCircle";
 import { Message as IMessage } from "../interfaces/conversations"
 import { getMedia } from "../services/api";
-import useUser from "../hooks/user/useUser"
+import useUser from "../hooks/useUser"
 import { Reaction } from "../interfaces/reactions";
 import { ActiveConversationSkeleton } from "./Skeleton/ActiveConversation";
 import { validateBase64 } from "../utils/validateBase64";
+import { IconDocument } from "./Icons/IconDocument";
 
 export const Message = ({ message, reaction, handleOpenModal, setModalImage }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function }) => {
     // @ts-ignore
     const { userState } = useUser()
-    const [content, setContent] = useState("")
+    const [content, setContent] = useState<string | undefined>("")
     const [loadingContent, setLoadingContent] = useState<boolean>(false)
     const isFromClient = message.status === "client"
 
     useEffect(() => {
-        switch (message.message_type) {
-            case "text":
-                setContent(message.message.body);
-                break;
+        if (message.message_type === "text") {
+            setContent(message.message.body);
+        } else if (['image', 'audio', 'document', 'video', 'sticker'].includes(message.message_type)) {
+            setLoadingContent(true);
 
-            case "image":
-            case "audio":
-            case "document":
-            case "video":
-            case "sticker":
-                try {
-                    setLoadingContent(true)
-
-                    getMedia(userState.token, message.message.url)
-                        .then((media) => {
-                            setContent(media)
-                            setLoadingContent(false)
-                        })
-
-                } catch (error) {
+            getMedia(userState.token, message.message.url)
+                .then((media) => {
+                    setContent(media);
+                    setLoadingContent(false);
+                })
+                .catch((error) => {
                     console.error("Error fetching media:", error);
-                }
-                break;
-
-            default:
-                break;
+                    setLoadingContent(false);
+                });
         }
-    }, [message]);
+    }, []);
 
     //Validar cuando es una imagen con texto!
 
@@ -59,8 +48,9 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                 <div className={
                     (message.message_type !== "sticker" ?
                         "messages-container " +
-                        (isFromClient ? "bg-slate-100" : "bg-emerald-100")
-                        : "")
+                        (isFromClient ? "bg-slate-100 " : "bg-emerald-100 ") +
+                        (message.message_type === "image" ? "h-[270px]" : "")
+                        : "h-[200px]")
                 }>
                     {!!reaction.length &&
                         <span role="img" className={"reaction absolute -bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
@@ -73,11 +63,11 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                             loadingContent ?
                                 <ActiveConversationSkeleton /> :
                                 <Image
-                                    src={validateBase64(content) ? content : ''}
+                                    src={content ? (validateBase64(content) ? content : '') : ""}
                                     width={message.message_type === "image" ? 250 : 150}
                                     height={message.message_type === "image" ? 250 : 150}
                                     alt="Imagen de mensaje"
-                                    className="object-cover rounded-md cursor-pointer"
+                                    className={"object-cover rounded-md cursor-pointer " + (message.message_type === "image" ? "h-[230px]" : "h-[160px]")}
                                     onClick={() => {
                                         setModalImage(content)
                                         handleOpenModal(true)
@@ -96,7 +86,10 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                         controls
                                     />
                                     : message.message_type === "document" ?
-                                        <a href={content} target="_blank" download={message.message.filename}>{message.message.filename}</a>
+                                        <a href={content} target="_blank" download={message.message.filename} className="bg-slate-100 rounded p-5 text-teal-500 border border-slate-200 flex gap-2 items-center text-sm">
+                                            <IconDocument classes="w-6 h-6 text-teal-600" />
+                                            {message.message.filename}
+                                        </a>
                                         : message.message_type === "location" ?
                                             <iframe src={`https://www.google.com/maps?q=${message.message.latitude},${message.message.longitude}&hl=es&output=embed`} width="300px" />
                                             : <>{message.message_type}</>

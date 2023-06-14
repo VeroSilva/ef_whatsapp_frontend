@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useEffect, useState } from 'react';
 import generateInitialsImage from '../utils/generateUserImage';
@@ -15,12 +15,12 @@ import { IconVideoCamera } from './Icons/IconVideoCamera';
 import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
 
-export const ItemListConversation = ({ conversation, handleOpenConversation }: { conversation: any, handleOpenConversation: Function }) => {
+export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function }) => {
     const [unreadCount, setUnreadCount] = useState(false)
 
     useEffect(() => {
-        setUnreadCount(Number(conversation.unread_count) > 0)
-    }, [])
+        setUnreadCount(parseInt(conversation.unread_count) > 0)
+    }, [conversation])
 
     return (
         <div
@@ -30,16 +30,18 @@ export const ItemListConversation = ({ conversation, handleOpenConversation }: {
             }
             onClick={() => {
                 handleOpenConversation(conversation.id)
+                setActiveContact(conversation.contact)
                 setUnreadCount(false)
+                localStorage.setItem("activeContact", JSON.stringify(conversation.contact));
             }}
         >
             <div className="w-14 h-14 flex-none image-fit mr-1">
-                {generateInitialsImage(conversation.contact !== null ? conversation.contact : "C")}
+                {generateInitialsImage(conversation.contact.name)}
             </div>
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">
                     <a href="#" className="font-medium">
-                        {conversation.contact ?? "Sin nombre"}
+                        {conversation.contact.name}
                     </a>
                     <div className="text-xs text-slate-500 ml-auto ">
                         <span className={(unreadCount ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</span>
@@ -47,7 +49,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation }: {
                 </div>
                 {conversation.phone !== null &&
                     <div className="w-full truncate text-xs text-slate-500 mt-0.5">
-                        {formatPhoneNumber(conversation.phone)}
+                        {formatPhoneNumber(conversation.contact.phone)}
                     </div>
                 }
                 <div className="flex mt-2">

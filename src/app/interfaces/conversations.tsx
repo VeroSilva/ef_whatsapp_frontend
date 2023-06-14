@@ -1,11 +1,19 @@
+export interface Contact {
+    country: string,
+    email: string,
+    name: string,
+    phone: string,
+    tag_id: string,
+}
+
 export interface Conversation {
-    contact: string,
+    contact: Contact,
+    contact_id: number,
     id: number,
     last_message: string,
     message_created_at: string,
     message_type: string,
     status: string,
-    phone: string
     last_message_time: string
 }
 

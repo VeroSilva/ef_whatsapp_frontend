@@ -3,8 +3,8 @@ const { env } = require("./env-config");
 
 const nextConfig = {
   env,
-  reactStrictMode: true,
-  swcMinify: true,
+  // reactStrictMode: true,
+  // swcMinify: true,
   async rewrites() {
     return [
       {
@@ -13,18 +13,18 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config) => {
-    config.module.rules.push({
-        test: /\.scss$/,
-        use: [
-            'style-loader',
-            'css-loader',
-            'sass-loader'
-        ]
-    });
+  // webpack: (config) => {
+  //   config.module.rules.push({
+  //       test: /\.scss$/,
+  //       use: [
+  //           'style-loader',
+  //           'css-loader',
+  //           'sass-loader'
+  //       ]
+  //   });
 
-    return config;
-  }
+  //   return config;
+  // }
 };
 
 module.exports = nextConfig;

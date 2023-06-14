@@ -51,6 +51,25 @@ export const getMessagesByConversation = async (id, limit, token) => {
     return response;
 }
 
+export const sendMessage = async (id, data, token) => {
+    const response = await fetch(
+        `${process.env.API_URL}/conversation/${id}/messages`,
+        { 
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                Accept: '*/*',
+                Authorization: token,
+                'Content-Type': 'application/json',
+                'x-ef-perfumes': process.env.API_CUSTOM_HEADER
+            }
+        }
+    )
+        .then((res) => res.json())
+
+    return response;
+}
+
 export const getMedia = async (token, url) => {
     const response = await fetch(
         `${process.env.API_URL}/message/downloadMedia`,
@@ -65,9 +84,8 @@ export const getMedia = async (token, url) => {
             }
         }
     )
-        .then((res) => res.text())
 
-    return response;
+    return response.text();
 }
 
 export const markAsRead = async (token, ids) => {
@@ -85,6 +103,23 @@ export const markAsRead = async (token, ids) => {
         }
     )
         .then((res) => res.text())
+
+    return response;
+}
+
+export const getContact = async (id, token) => {
+    const response = await fetch(
+        `${process.env.API_URL}/contact/${id}`,
+        { 
+            method: 'GET',
+            headers: {
+                Accept: '*/*',
+                Authorization: token,
+                'Content-Type': 'application/json',
+                'x-ef-perfumes': process.env.API_CUSTOM_HEADER
+            }
+        }
+    )
 
     return response;
 }
