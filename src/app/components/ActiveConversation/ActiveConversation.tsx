@@ -8,7 +8,7 @@ import { IconEllipsisVertical } from "@/app/components/Icons/IconEllipsisVertica
 import { IconSearch } from "@/app/components/Icons/IconSearch"
 import { Message as IMessage, Contact } from "../../interfaces/conversations"
 import { Reaction } from "../../interfaces/reactions"
-import generateInitialsImage from "../../utils/generateUserImage"
+import GenerateInitialsImage from "../../utils/generateUserImage"
 import { Message } from "../Message"
 import { IconX } from "../Icons/IconX";
 import { ConversationBottomSection } from "./ConversationBottomSection/ConversationBottomSection";
@@ -131,7 +131,7 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
-                        {generateInitialsImage(activeContact.name)}
+                        {GenerateInitialsImage(activeContact.name)}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">

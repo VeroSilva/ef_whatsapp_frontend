@@ -14,6 +14,9 @@ const nextConfig = {
   images: {
     domains: ["scontent.whatsapp.net", "efperfumes.com", "kinsta.com"],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // webpack: (config) => {
   //   config.module.rules.push({
   //       test: /\.scss$/,

@@ -28,16 +28,14 @@
     "sass-loader": "^13.3.1",
     "socket.io-client": "^4.6.1",
     "tw-elements": "^1.0.0-beta2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
     "@types/recorder-js": "^1.0.2",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.7",
-    "utf-8-validate": "^5.0.10"
   }
 }

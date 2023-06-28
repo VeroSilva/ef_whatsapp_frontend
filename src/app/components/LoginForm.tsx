@@ -22,6 +22,8 @@ export const LoginForm = () => {
         password: ""
     })
 
+    console.log(process.env.API_URL)
+
     useEffect(() => {
         if (credentials.username === "" && credentials.password === "") setDisabled(true)
         else setDisabled(false)
