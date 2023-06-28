@@ -35,7 +35,8 @@ interface MessageDetail {
     reacted_message_id?: string,
     template?: any,
     response_to?: string,
-    text?: string
+    text?: string,
+    caption?: string
 }
 
 export interface Message {
