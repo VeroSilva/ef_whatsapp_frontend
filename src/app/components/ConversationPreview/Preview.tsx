@@ -2,43 +2,52 @@ import Image from "next/image"
 import ReactPlayer from 'react-player'
 import ReactAudioPlayer from 'react-audio-player';
 import { IconDocument } from "../Icons/IconDocument";
+import { PreviewActions } from "./PreviewActions";
+import { getFileType } from "../../utils/fileType";
 
-export const Preview = ({ file }: { file: File }) => {
-    if (file.type.startsWith('image/')) {
-        return (
-            <Image
-                src={URL.createObjectURL(file)}
-                alt="Imagen seleccionada"
-                width={350}
-                height={300}
-                className="object-cover rounded-md m-auto"
-            />
-        )
-    } else if (file.type.startsWith('video/')) {
-        return (
-            <ReactPlayer
-                url={URL.createObjectURL(file)}
-                controls
-                height="90%"
-            />
-        )
-    } else if (file.type.startsWith('audio/')) {
-        return (
-            <div className="w-full h-full flex items-center justify-center">
-                <ReactAudioPlayer
-                    src={URL.createObjectURL(file)}
-                    controls
-                />
-            </div>
-        )
+export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: { file: File, handleSendMessage: Function, isLoading: boolean, setShowPreview: Function }) => {
+    const handleAccept = () => {
+        const type = getFileType(file?.type)
+        handleSendMessage(type, file).finally(() => handleCancel())
+    }
+
+    const handleCancel = () => {
+        setShowPreview(false)
     }
 
     return (
-        <div className="w-full h-full flex items-center justify-center">
-            <div className="document-card bg-slate-100 rounded-md shadow flex items-center p-5 w-auto">
-                <IconDocument classes="w-8 h-8 text-teal-600" />
-                <span className="text-teal-600">{file.name}</span>
-            </div>
-        </div>
+        <>
+            {file.type.startsWith('image/') ?
+                <Image
+                    src={URL.createObjectURL(file)}
+                    alt="Imagen seleccionada"
+                    width={350}
+                    height={300}
+                    className="object-cover rounded-md m-auto"
+                /> :
+                file.type.startsWith('video/') ?
+                    <ReactPlayer
+                        url={URL.createObjectURL(file)}
+                        controls
+                        height="90%"
+                    /> :
+                    file.type.startsWith('audio/') ?
+                        <div className="w-full h-full flex items-center justify-center">
+                            <ReactAudioPlayer
+                                src={URL.createObjectURL(file)}
+                                controls
+                            />
+                        </div>
+                        :
+                        <div className="w-full h-full flex items-center justify-center">
+                            <div className="document-card bg-slate-100 rounded-md shadow flex items-center p-5 w-auto">
+                                <IconDocument classes="w-8 h-8 text-teal-600" />
+                                <span className="text-teal-600">{file.name}</span>
+                            </div>
+                        </div>
+            }
+
+            <PreviewActions handleAccept={handleAccept} handleCancel={handleCancel} isLoading={isLoading} isReadyToSend={true} />
+        </>
     )
 }

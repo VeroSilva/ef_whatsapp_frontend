@@ -33,6 +33,9 @@ interface MessageDetail {
     voice?: string,
     animated?: string,
     reacted_message_id?: string,
+    template?: any,
+    response_to?: string,
+    text?: string
 }
 
 export interface Message {
@@ -42,5 +45,6 @@ export interface Message {
     message: MessageDetail,
     message_type: string,
     read: boolean,
-    status: string
+    status: string,
+    replied_message?: Message | null
 }

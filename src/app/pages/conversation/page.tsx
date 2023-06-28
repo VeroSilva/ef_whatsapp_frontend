@@ -12,7 +12,7 @@ import useUser from "../../hooks/useUser"
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api'
 import { IconLogout } from '@/app/components/Icons/IconLogout'
 import { ItemListConversation } from '@/app/components/ItemListConversation'
-import { ActiveConversation } from '@/app/components/ActiveConversation'
+import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation'
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
@@ -97,6 +97,7 @@ const Conversation = (): JSX.Element => {
 
             // Escuchar la notificación de cambio de tabla
             socketRef.current.on('table_change_notification', (payload) => {
+                console.log(payload)
                 if (payload.table === "messages" && payload.action === "insert") {
                     const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
 

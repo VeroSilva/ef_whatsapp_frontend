@@ -1,13 +1,13 @@
 import { useState, ChangeEvent, useRef, useEffect } from "react"
 import { Dropdown, Spinner } from "flowbite-react"
-import { IconSend } from "../Icons/IconSend"
-import { IconTrash } from "../Icons/IconTrash"
+import { IconSend } from "../../Icons/IconSend"
+import { IconTrash } from "../../Icons/IconTrash"
 import { AudioRecorder } from "./AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
 import { ConversationDropdown } from "../ConversationDropdown/ConversationDropdown"
 import { ConversationEmojis } from "../ConversationEmojis/ConversationEmojis"
 
-export const ConversationBottomSection = ({ conversationId, setSelectedFile }: { conversationId: number, setSelectedFile: Function }) => {
+export const ConversationBottomSection = ({ conversationId, setSelectedFile, setTemplates }: { conversationId: number, setSelectedFile: Function, setTemplates: Function }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
     const [audio, setAudio] = useState<Blob | null>(null)
     // @ts-ignore
@@ -21,7 +21,7 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile }: {
         <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400 transition-opacity duration-300">
             {/* <ConversationEmojis /> */}
 
-            <ConversationDropdown setSelectedFile={setSelectedFile} />
+            <ConversationDropdown setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
 
             {audio ? (
                 <div className="audio-container w-full flex items-center border border-gray-200 px-2 bg-gray-100 rounded-lg">

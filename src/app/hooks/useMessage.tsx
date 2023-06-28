@@ -10,42 +10,46 @@ export const useMessage = () => {
 
     const sendMessage = async ({ type, data, conversationId }: { type: string, data: any, conversationId: number }) => {
         //types: text, documento, imagen, audio, template, reactions
-        let dataTransformed;
+        try {
+            let dataTransformed;
+            setIsLoading(true);
 
-        setIsLoading(true)
-
-        if (type !== "text") {
-            dataTransformed = await blobToBase64(data)
-        } else {
-            dataTransformed = data
-        }
-
-        const dataToSend: any = {
-            type: type,
-            [type]: {
-            },
-        };
-
-        if (type !== "text") {
-            const mimeType = dataURLtoMimeType(dataTransformed);
-
-            if (mimeType) {
-                dataToSend[type].mime_type = mimeType;
+            if (type !== "text" && type !== "template") {
+                dataTransformed = await blobToBase64(data);
+            } else {
+                dataTransformed = data;
             }
 
-            dataToSend[type].data = dataTransformed
-        } else {
-            dataToSend[type].body = dataTransformed
-        }
+            const dataToSend = {
+                type: type,
+                [type]: {} as any,
+            };
 
-        if (type === "document") {
-            dataToSend[type].filename = data.name;
-        }
+            if (type !== "text" && type !== "template") {
+                const mimeType = dataURLtoMimeType(dataTransformed);
 
-        apiSendMessage(conversationId, {
-            messageData: dataToSend,
-        }, userState.token)
-            .finally(() => setIsLoading(false))
+                if (mimeType) {
+                    dataToSend[type].mime_type = mimeType;
+                }
+
+                dataToSend[type].data = dataTransformed;
+            } else if (type === "text") {
+                dataToSend[type].body = dataTransformed;
+            } else if (type === "template") {
+                dataToSend[type] = dataTransformed;
+            } else if (type === "document") {
+                dataToSend[type].filename = data.name;
+            }
+
+            await apiSendMessage(conversationId, {
+                messageData: dataToSend,
+            }, userState.token);
+        } catch (error) {
+            console.error("Error al enviar el mensaje:", error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return {

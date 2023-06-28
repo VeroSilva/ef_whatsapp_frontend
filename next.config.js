@@ -3,8 +3,6 @@ const { env } = require("./env-config");
 
 const nextConfig = {
   env,
-  // reactStrictMode: true,
-  // swcMinify: true,
   async rewrites() {
     return [
       {
@@ -12,6 +10,9 @@ const nextConfig = {
         destination: "/pages/login",
       },
     ];
+  },
+  images: {
+    domains: ["scontent.whatsapp.net", "efperfumes.com", "kinsta.com"],
   },
   // webpack: (config) => {
   //   config.module.rules.push({

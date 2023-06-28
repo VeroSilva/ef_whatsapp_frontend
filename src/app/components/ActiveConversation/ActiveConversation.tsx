@@ -6,15 +6,14 @@ import Image from "next/image"
 import { IconUserPlus } from "@/app/components/Icons/IconUserPlus"
 import { IconEllipsisVertical } from "@/app/components/Icons/IconEllipsisVertical"
 import { IconSearch } from "@/app/components/Icons/IconSearch"
-import { Message as IMessage, Contact } from "../interfaces/conversations"
-import { Reaction } from "../interfaces/reactions"
-import generateInitialsImage from "../utils/generateUserImage"
-import { Message } from "./Message"
-import { IconX } from "./Icons/IconX";
+import { Message as IMessage, Contact } from "../../interfaces/conversations"
+import { Reaction } from "../../interfaces/reactions"
+import generateInitialsImage from "../../utils/generateUserImage"
+import { Message } from "../Message"
+import { IconX } from "../Icons/IconX";
 import { ConversationBottomSection } from "./ConversationBottomSection/ConversationBottomSection";
-import { ConversationPreview } from "./ConversationPreview/ConversationPreview";
-import { useMessage } from "../hooks/useMessage";
-import { getFileType } from "../utils/fileType";
+import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
+import { Template } from "../../interfaces/template";
 
 export const ActiveConversation = ({ messages, conversationId, activeContact }: { messages: IMessage[], conversationId: number, activeContact: Contact }) => {
     const [reactions, setReactions] = useState<Reaction[]>([])
@@ -22,16 +21,21 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
     const [modalImage, setModalImage] = useState<string>("")
     const messagesContainerRef = useRef<HTMLDivElement>(null)
     const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const { sendMessage, isLoading } = useMessage()
-
-    console.log(messages)
+    const [showPreview, setShowPreview] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [templates, setTemplates] = useState<Template[]>([])
+    const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([])
+    const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([])
 
     useEffect(() => {
         if (isScrolledToBottom) {
             scrollToBottom();
         }
-    }, [isScrolledToBottom, messages])
+    }, [isScrolledToBottom, updatedMessages])
+
+    useEffect(() => {
+        if (messagesContainerRef.current?.lastElementChild !== null) scrollToBottom()
+    }, [messagesContainerRef.current?.lastElementChild])
 
     useEffect(() => {
         setReactions([])
@@ -45,17 +49,66 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
                 }])
             })
 
-        scrollToBottom();
-    }, [])
+        const newArray = [...messages].map(itemA => {
+            if (itemA.message.response_to !== null) {
+                const repliedMessage = messages.find(itemB => itemA.message.response_to === itemB.message.id_whatsapp);
+                if (repliedMessage) {
+                    return {
+                        ...itemA,
+                        replied_message: repliedMessage
+                    };
+                }
+            }
+            return {
+                ...itemA,
+                replied_message: null // Asigna null cuando no hay coincidencia
+            };
+        })
+
+        setUpdatedMessages(newArray)
+    }, [messages])
 
     useEffect(() => {
-        if (!isLoading) {
-            setSelectedFile(null)
+        if (!!templates.length) {
+            setClassifiedTemplates([])
+
+            templates.forEach(item => {
+                setClassifiedTemplates(prevTemplate => {
+                    const isCategoryExist = prevTemplate.some(template => template.category === item.category);
+
+                    if (isCategoryExist) {
+                        const updatedArray = prevTemplate.map(template =>
+                            template.category === item.category ? { ...template, data: [...template.data, item] } : template
+                        );
+                        return updatedArray;
+                    } else {
+                        const newCategoryData = {
+                            category: item.category,
+                            data: [item]
+                        };
+                        return [...prevTemplate, newCategoryData];
+                    }
+                });
+            });
         }
-    }, [isLoading])
+    }, [templates])
+
+    useEffect(() => {
+        if (selectedFile !== null || !!templates.length) {
+            setShowPreview(true)
+        }
+    }, [selectedFile, templates])
+
+    useEffect(() => {
+        if (!showPreview) {
+            setSelectedFile(null)
+            setTemplates([])
+        }
+    }, [showPreview])
 
     const handleScroll = () => {
         const container = messagesContainerRef.current
+
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container
 
@@ -71,19 +124,6 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show)
-    }
-
-    const handleSendMessage = (type: string, data: any) => {
-        sendMessage({ type, data, conversationId })
-    }
-
-    const handleAccept = () => {
-        const type = getFileType(selectedFile?.type)
-        handleSendMessage(type, selectedFile)
-    }
-
-    const handleCancel = () => {
-        setSelectedFile(null)
     }
 
     return (
@@ -132,7 +172,7 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
                 </div>
             </div>
             <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
-                {messages.map((message, index) => {
+                {updatedMessages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp)
 
@@ -143,16 +183,11 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
                 })}
             </div>
 
-            {selectedFile !== null &&
-                <ConversationPreview
-                    handleAccept={handleAccept}
-                    handleCancel={handleCancel}
-                    selectedFile={selectedFile}
-                    isLoading={isLoading}
-                />
+            {showPreview &&
+                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} />
             }
 
-            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} />
+            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
 
             <Modal
                 size="md"

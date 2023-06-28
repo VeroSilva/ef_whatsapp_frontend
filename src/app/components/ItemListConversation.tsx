@@ -14,6 +14,8 @@ import { IconSticker } from './Icons/IconSticker';
 import { IconVideoCamera } from './Icons/IconVideoCamera';
 import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
+import { IconTemplates } from './Icons/IconTemplates';
+import { IconReply } from './Icons/IconReply';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function }) => {
     const [unreadCount, setUnreadCount] = useState(false)
@@ -82,9 +84,13 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, set
                                                 conversation.message_type === "reaction" ?
                                                     (conversation.status === "client" ? "Reaccionó " : "Reaccionaste ") + conversation.last_message + " a un mensaje" :
                                                     conversation.message_type === "location" ?
-                                                        <><IconLocation classes="w-5 h-5 text-slate-500 inline-block" /> Ubicación</> : //location
-                                                        <></>
-                            //falta template contact 
+                                                        <><IconLocation classes="w-5 h-5 text-slate-500 inline-block" /> Ubicación</> :
+                                                        conversation.message_type === "template" ?
+                                                            <><IconTemplates classes='w-5 h-5 text-slate-500 inline-block' /> Template</> :
+                                                            conversation.message_type === "button" ?
+                                                                <><IconReply classes='w-5 h-5 text-slate-500 inline-block' /> Respuesta template</> :
+                                                                <></>
+                            //falta contact 
                         }
                     </div>
                     {unreadCount && (

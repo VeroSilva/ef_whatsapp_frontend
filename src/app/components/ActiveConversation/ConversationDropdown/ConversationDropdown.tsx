@@ -1,14 +1,20 @@
 import { ChangeEvent, useRef, useState } from "react";
-import { IconDocument } from "../Icons/IconDocument";
-import { IconImage } from "../Icons/IconImage";
-import { IconPaperClip } from "../Icons/IconPaperClip";
+import { IconDocument } from "../../Icons/IconDocument";
+import { IconImage } from "../../Icons/IconImage";
+import { IconPaperClip } from "../../Icons/IconPaperClip";
+import { IconTemplates } from "../../Icons/IconTemplates";
+import { getTemplates } from "@/app/services/api";
+import useUser from "../../../hooks/useUser";
 
-export const ConversationDropdown = ({ setSelectedFile }: { setSelectedFile: Function }) => {
+export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFile: Function, setTemplates: Function }) => {
     const imageInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showImageSpan, setShowImageSpan] = useState<boolean>(false)
     const [showDocumentSpan, setShowDocumentSpan] = useState<boolean>(false)
+    const [showTemplatesSpan, setShowTemplatesSpan] = useState<boolean>(false)
+    // @ts-ignore
+    const { userState } = useUser()
 
     const handleImageIconClick = () => {
         if (imageInputRef.current) {
@@ -30,6 +36,10 @@ export const ConversationDropdown = ({ setSelectedFile }: { setSelectedFile: Fun
         }
     };
 
+    const handleClickTemplates = () => {
+        getTemplates(userState.token).then((res) => setTemplates(res.templates))
+    }
+
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
     }
@@ -50,6 +60,14 @@ export const ConversationDropdown = ({ setSelectedFile }: { setSelectedFile: Fun
         setShowDocumentSpan(false);
     };
 
+    const handleTemplatesIconHover = () => {
+        setShowTemplatesSpan(true);
+    };
+
+    const handleTemplatesIconLeave = () => {
+        setShowTemplatesSpan(false);
+    };
+
     return (
         <div className="relative">
             <button onClick={handleOpenDropdown}>
@@ -58,6 +76,25 @@ export const ConversationDropdown = ({ setSelectedFile }: { setSelectedFile: Fun
 
             {showDropdown &&
                 <ul className="absolute bottom-0 mb-14">
+                    <li className="my-2">
+                        <label htmlFor="file-input" id="file-label-2" className="flex">
+                            <button
+                                className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 shadow p-2 cursor-pointer"
+                                onMouseEnter={handleTemplatesIconHover}
+                                onMouseLeave={handleTemplatesIconLeave}
+                                onClick={handleClickTemplates}
+                            >
+                                <IconTemplates classes="w-8 h-8 text-slate-100" />
+                            </button>
+
+                            {showTemplatesSpan && (
+                                <span className="flex items-center justify-center bg-slate-100 p-2 block rounded shadow float-left w-[150px] ml-3">
+                                    Templates
+                                </span>
+                            )}
+                        </label>
+                    </li>
+
                     <li className="my-2">
                         <label htmlFor="file-input-image" id="file-label" className="flex">
                             <button
@@ -84,6 +121,7 @@ export const ConversationDropdown = ({ setSelectedFile }: { setSelectedFile: Fun
                             onChange={handleFileChange}
                         />
                     </li>
+
                     <li className="my-2">
                         <label htmlFor="file-input" id="file-label-2" className="flex">
                             <button
