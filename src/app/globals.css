@@ -16,7 +16,6 @@
   }
 }
 
-
 /* Custom classes */
 .message-sticker-container { 
   @apply border border-slate-200/60 mt-1 rounded-md p-1 

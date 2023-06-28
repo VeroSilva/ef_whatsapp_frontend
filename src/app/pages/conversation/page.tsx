@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
 import { Button } from 'flowbite-react'
 import Image from "next/image"
-import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
+import { Contact, Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
 import { IconEdit } from "@/app/components/Icons/IconEdit"
 import { IconSearch } from "@/app/components/Icons/IconSearch"
-import useUser from "../../hooks/user/useUser"
+import useUser from "../../hooks/useUser"
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api'
 import { IconLogout } from '@/app/components/Icons/IconLogout'
 import { ItemListConversation } from '@/app/components/ItemListConversation'
-import { ActiveConversation } from '@/app/components/ActiveConversation'
+import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation'
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
@@ -24,6 +24,13 @@ const Conversation = (): JSX.Element => {
     const [conversations, setConversations] = useState<IConversation[]>([])
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false)
     const [activeConversation, setActiveConversation] = useState<number>(0)
+    const [activeContact, setActiveContact] = useState<Contact>({
+        country: "",
+        email: "",
+        name: "",
+        phone: "",
+        tag_id: "",
+    })
     const [messages, setMessages] = useState<IMessage[]>([])
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
     const socketRef = useRef<Socket | null>(null);
@@ -34,23 +41,42 @@ const Conversation = (): JSX.Element => {
     useEffect(() => {
         if (!userState || userState.token === "") {
             router.push('./pages/login')
+        } else {
+            setLoadingConversations(true)
+
+            getConversations(0, 100, userState.token).then((res) => {
+                setConversations(res)
+                setLoadingConversations(false)
+            })
         }
-
-        setLoadingConversations(true)
-
-        getConversations(0, 100, userState.token).then((res) => {
-            setConversations(res)
-            setLoadingConversations(false)
-        })
     }, [userState])
 
     useEffect(() => {
         if (cookies.conversationId) {
             handleOpenConversation(cookies.conversationId);
+
+            if (localStorage.getItem("activeContact")) {
+                const contactData = JSON.parse(localStorage.getItem("activeContact") ?? "")
+
+                setActiveContact(contactData)
+            }
         }
+
+        const handleEscKeyPress = (event: any) => {
+            if (event.key === 'Escape') {
+                setActiveConversation(0)
+
+                setMessages([])
+
+                destroyCookie(null, 'conversationId')
+            }
+        };
+
+        document.addEventListener('keydown', handleEscKeyPress);
 
         return () => {
             destroyCookie(null, 'conversationId')
+            document.removeEventListener('keydown', handleEscKeyPress);
         }
     }, [])
 
@@ -64,7 +90,6 @@ const Conversation = (): JSX.Element => {
         }
     }, [messages])
 
-
     useEffect(() => {
         if (!socketRef.current) {
             const apiUrl: string = process.env.API_URL ?? ""
@@ -72,7 +97,7 @@ const Conversation = (): JSX.Element => {
 
             // Escuchar la notificación de cambio de tabla
             socketRef.current.on('table_change_notification', (payload) => {
-
+                console.log(payload)
                 if (payload.table === "messages" && payload.action === "insert") {
                     const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
 
@@ -84,17 +109,29 @@ const Conversation = (): JSX.Element => {
                     }
 
                     if (activeConversation == payload.data.conversation.id) {
-                        const newMessages = [...messages, payload.data.message].sort((a, b) => Number(b.id) - Number(a.id))
-                        setMessages(newMessages);
+                        setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
-                    const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
+                    const messageIndex = messages.findIndex((message) => message.id === payload.data.message.id);
 
                     if (messageIndex !== -1) {
-                        const updatedArray = [...messages];
-                        updatedArray[messageIndex].status = payload.data.message.status;
+                        const message = messages[messageIndex];
+                        console.log(message.status, payload.data.message.status)
+                        if (
+                            (message.status === "read") ||
+                            (message.status === "delivered" &&
+                                (payload.data.message.status === "failed" ||
+                                    payload.data.message.status === "trying" ||
+                                    payload.data.message.status === "sent")) ||
+                            (message.status === "sent" &&
+                                (payload.data.message.status === "failed" ||
+                                    payload.data.message.status === "trying"))
+                        ) {
+                            return;
+                        }
 
-                        setMessages(updatedArray);
+                        message.status = payload.data.message.status;
+                        setMessages([...messages]);
                     }
 
                     const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
@@ -120,24 +157,6 @@ const Conversation = (): JSX.Element => {
         }
     }, [conversations, messages])
 
-    useEffect(() => {
-        const handleEscKeyPress = (event: any) => {
-            if (event.key === 'Escape') {
-                setActiveConversation(0)
-
-                setMessages([])
-
-                destroyCookie(null, 'conversationId')
-            }
-        };
-
-        document.addEventListener('keydown', handleEscKeyPress);
-
-        return () => {
-            document.removeEventListener('keydown', handleEscKeyPress);
-        };
-    }, []);
-
     const handleOpenConversation = (id: number) => {
         setActiveConversation(id)
         setMessages([])
@@ -145,7 +164,7 @@ const Conversation = (): JSX.Element => {
 
         getMessagesByConversation(id, 50, userState.token)
             .then((res) => {
-                setMessages(res)
+                setMessages(res.reverse())
                 setLoadingMessages(false)
                 setCookie(null, 'conversationId', `${id}`, {
                     maxAge: 30 * 24 * 60 * 60
@@ -164,7 +183,7 @@ const Conversation = (): JSX.Element => {
 
             <div className="grid grid-cols-12 gap-5 w-[1800px] h-[780px] mt-5 drop-shadow-md">
                 {/* BEGIN: Chat Side Menu */}
-                <div className="col-span-12 xl:col-span-4 2xl:col-span-3">
+                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3">
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
                         <div className="flex items-center px-5 pt-5">
                             <IconEdit classes="w-6 h-6 text-slate-500 ml-auto" />
@@ -179,8 +198,8 @@ const Conversation = (): JSX.Element => {
                         </div>
                         <div className="h-[642px] overflow-y-auto scrollbar-hidden">
                             {!loadingConversations ?
-                                ([...conversations] ?? []).map((conversation, index) => (
-                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} />
+                                conversations.map((conversation, index) => (
+                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} setActiveContact={setActiveContact} />
                                 )) :
                                 [...Array(8)].map((n, index) => (
                                     <ConversationSkeleton key={index} />
@@ -197,7 +216,7 @@ const Conversation = (): JSX.Element => {
                         {loadingMessages ?
                             <ActiveConversationSkeleton /> :
                             activeConversation !== 0 ?
-                                <ActiveConversation messages={messages} /> :
+                                <ActiveConversation messages={messages} conversationId={activeConversation} activeContact={activeContact} /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image
                                         src="/images/home-messages.jpg"

@@ -1,5 +1,5 @@
 'use client';
-import {useState, useEffect} from "react"
+import { useState, useEffect } from "react"
 import { setCookie } from 'nookies';
 import { IconUser } from "./Icons/IconUser";
 import { IconEye } from "./Icons/IconEye";
@@ -7,40 +7,40 @@ import { IconEyeSlash } from "./Icons/IconEyeSlash";
 import { IconExclamationCircle } from "./Icons/IconExclamationCircle";
 import { IconLoading } from "./Icons/IconLoading";
 import { login } from "../services/api";
-import useUser from "../hooks/user/useUser";
+import useUser from "../hooks/useUser";
 
 export const LoginForm = () => {
     // @ts-ignore
     const { userState, loginUser } = useUser();
-    const [ showPassword, setShowPassword ] = useState(true)
+    const [showPassword, setShowPassword] = useState(false)
     const [rememberMe, setRememberMe] = useState(false)
     const [disabled, setDisabled] = useState(false)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [ credentials, setCredentials ] = useState({
+    const [credentials, setCredentials] = useState({
         username: "",
         password: ""
     })
 
     useEffect(() => {
-        if(credentials.username === "" && credentials.password === "") setDisabled(true)
+        if (credentials.username === "" && credentials.password === "") setDisabled(true)
         else setDisabled(false)
     }, [credentials])
-    
+
     const handleLogin = () => {
         setLoading(true)
 
         login(credentials)
             .then((res) => {
                 if (res.status === 200) {
-                    const data : any = res.json()
+                    const data: any = res.json()
 
                     data.then((d: any) => {
                         loginUser({
                             username: credentials.username,
                             token: d.token
                         })
-    
+
                         if (rememberMe) {
                             setCookie(null, 'remember_token', d.token, {
                                 maxAge: 604800,
@@ -48,7 +48,7 @@ export const LoginForm = () => {
                                 secure: true,
                             })
                         }
-    
+
                         setLoading(false)
                     })
                 } else {
@@ -59,9 +59,9 @@ export const LoginForm = () => {
 
     return (
         <>
-            {error && 
+            {error &&
                 <div className="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-gray-800 dark:text-red-400" role="alert">
-                    <IconExclamationCircle classes="flex-shrink-0 inline w-5 h-5 mr-3"/>
+                    <IconExclamationCircle classes="flex-shrink-0 inline w-5 h-5 mr-3" />
                     <span className="sr-only">Info</span>
                     <div>
                         <span className="font-medium font-semibold	">Algo salió mal</span>, verifica los datos.

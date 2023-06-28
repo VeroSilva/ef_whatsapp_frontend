@@ -5,20 +5,37 @@ import { Modal } from 'flowbite-react';
 import Image from "next/image"
 import { IconUserPlus } from "@/app/components/Icons/IconUserPlus"
 import { IconEllipsisVertical } from "@/app/components/Icons/IconEllipsisVertical"
-import { IconPaperClip } from "@/app/components/Icons/IconPaperClip"
-import { IconSend } from "@/app/components/Icons/IconSend"
 import { IconSearch } from "@/app/components/Icons/IconSearch"
-import { Message as IMessage } from "../interfaces/conversations"
-import { Reaction } from "../interfaces/reactions"
-import generateInitialsImage from "../utils/generateUserImage"
-import { Message } from "./Message"
-import { IconX } from "./Icons/IconX";
+import { Message as IMessage, Contact } from "../../interfaces/conversations"
+import { Reaction } from "../../interfaces/reactions"
+import generateInitialsImage from "../../utils/generateUserImage"
+import { Message } from "../Message"
+import { IconX } from "../Icons/IconX";
+import { ConversationBottomSection } from "./ConversationBottomSection/ConversationBottomSection";
+import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
+import { Template } from "../../interfaces/template";
 
-export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
-    const [reactions, setReactions] = useState<Reaction[]>([]);
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [modalImage, setModalImage] = useState<string>("");
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
+export const ActiveConversation = ({ messages, conversationId, activeContact }: { messages: IMessage[], conversationId: number, activeContact: Contact }) => {
+    const [reactions, setReactions] = useState<Reaction[]>([])
+    const [showModal, setShowModal] = useState<boolean>(false)
+    const [modalImage, setModalImage] = useState<string>("")
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
+    const [showPreview, setShowPreview] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [templates, setTemplates] = useState<Template[]>([])
+    const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([])
+    const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([])
+
+    useEffect(() => {
+        if (isScrolledToBottom) {
+            scrollToBottom();
+        }
+    }, [isScrolledToBottom, updatedMessages])
+
+    useEffect(() => {
+        if (messagesContainerRef.current?.lastElementChild !== null) scrollToBottom()
+    }, [messagesContainerRef.current?.lastElementChild])
 
     useEffect(() => {
         setReactions([])
@@ -32,14 +49,78 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                 }])
             })
 
-        scrollToBottom();
-    }, [messages]);
+        const newArray = [...messages].map(itemA => {
+            if (itemA.message.response_to !== null) {
+                const repliedMessage = messages.find(itemB => itemA.message.response_to === itemB.message.id_whatsapp);
+                if (repliedMessage) {
+                    return {
+                        ...itemA,
+                        replied_message: repliedMessage
+                    };
+                }
+            }
+            return {
+                ...itemA,
+                replied_message: null // Asigna null cuando no hay coincidencia
+            };
+        })
+
+        setUpdatedMessages(newArray)
+    }, [messages])
+
+    useEffect(() => {
+        if (!!templates.length) {
+            setClassifiedTemplates([])
+
+            templates.forEach(item => {
+                setClassifiedTemplates(prevTemplate => {
+                    const isCategoryExist = prevTemplate.some(template => template.category === item.category);
+
+                    if (isCategoryExist) {
+                        const updatedArray = prevTemplate.map(template =>
+                            template.category === item.category ? { ...template, data: [...template.data, item] } : template
+                        );
+                        return updatedArray;
+                    } else {
+                        const newCategoryData = {
+                            category: item.category,
+                            data: [item]
+                        };
+                        return [...prevTemplate, newCategoryData];
+                    }
+                });
+            });
+        }
+    }, [templates])
+
+    useEffect(() => {
+        if (selectedFile !== null || !!templates.length) {
+            setShowPreview(true)
+        }
+    }, [selectedFile, templates])
+
+    useEffect(() => {
+        if (!showPreview) {
+            setSelectedFile(null)
+            setTemplates([])
+        }
+    }, [showPreview])
+
+    const handleScroll = () => {
+        const container = messagesContainerRef.current
+
+        if (container) {
+            const { scrollTop, scrollHeight, clientHeight } = container
+
+            const isAtBottom = scrollHeight - scrollTop === clientHeight
+
+            setIsScrolledToBottom(isAtBottom);
+        }
+    }
 
     const scrollToBottom = () => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    };
+        messagesContainerRef.current?.lastElementChild?.scrollIntoView();
+    }
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show)
@@ -50,13 +131,12 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
-                        {/* {generateInitialsImage(contact !== undefined ? contact : "C")} */}
+                        {generateInitialsImage(activeContact.name)}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">
                             <div className="font-medium text-base">
-                                {/* {contact} */}
-                                PRUEBA
+                                {activeContact.name}
                             </div>
                         </div>
                     </div>
@@ -91,8 +171,8 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                     </div>
                 </div>
             </div>
-            <div ref={messagesContainerRef} className="flex flex-col-reverse overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
-                {messages.map((message, index) => {
+            <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
+                {updatedMessages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp)
 
@@ -103,30 +183,11 @@ export const ActiveConversation = ({ messages }: { messages: IMessage[] }) => {
                 })}
             </div>
 
-            <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400">
-                <textarea
-                    className="h-[56px] mx-3 w-full form-control h-16 resize-none border-transparent px-5 py-3 shadow-none focus:border-transparent focus:ring-0"
-                    rows={1}
-                    placeholder="Type your message..."
-                ></textarea>
-                <div className="flex absolute sm:static left-0 bottom-0 ml-5 sm:ml-0 mb-5 sm:mb-0">
+            {showPreview &&
+                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} />
+            }
 
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 relative text-slate-500 mr-3 sm:mr-5">
-                        <IconPaperClip classes="w-full h-full text-gray-600" />
-                        <input
-                            type="file"
-                            className="w-full h-full top-0 left-0 absolute opacity-0"
-                        />
-                    </div>
-                </div>
-
-                <a
-                    href="#"
-                    className="w-8 h-8 block bg-primary text-white rounded-full flex-none flex items-center justify-center"
-                >
-                    <IconSend classes="w-8 h-8 text-teal-600" />
-                </a>
-            </div>
+            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
 
             <Modal
                 size="md"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image"
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player'
@@ -9,75 +9,155 @@ import { IconDoubleCheck } from "./Icons/IconDoubleCheck";
 import { IconExclamationCircle } from "./Icons/IconExclamationCircle";
 import { Message as IMessage } from "../interfaces/conversations"
 import { getMedia } from "../services/api";
-import useUser from "../hooks/user/useUser"
+import useUser from "../hooks/useUser"
 import { Reaction } from "../interfaces/reactions";
 import { ActiveConversationSkeleton } from "./Skeleton/ActiveConversation";
 import { validateBase64 } from "../utils/validateBase64";
+import { IconDocument } from "./Icons/IconDocument";
+import { IconLink } from "./Icons/IconLink";
 
 export const Message = ({ message, reaction, handleOpenModal, setModalImage }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function }) => {
     // @ts-ignore
     const { userState } = useUser()
-    const [content, setContent] = useState("")
+    const [content, setContent] = useState<string | undefined>("")
     const [loadingContent, setLoadingContent] = useState<boolean>(false)
     const isFromClient = message.status === "client"
 
     useEffect(() => {
-        switch (message.message_type) {
-            case "text":
-                setContent(message.message.body);
-                break;
+        if (message.message_type === "text") {
+            setContent(message.message.body);
+        } else if (['image', 'audio', 'document', 'video', 'sticker'].includes(message.message_type)) {
+            setLoadingContent(true);
 
-            case "image":
-            case "audio":
-            case "document":
-            case "video":
-            case "sticker":
-                try {
-                    setLoadingContent(true)
-
-                    getMedia(userState.token, message.message.url)
-                        .then((media) => {
-                            setContent(media)
-                            setLoadingContent(false)
-                        })
-
-                } catch (error) {
+            getMedia(userState.token, message.message.url)
+                .then((media) => {
+                    setContent(media);
+                    setLoadingContent(false);
+                })
+                .catch((error) => {
                     console.error("Error fetching media:", error);
-                }
-                break;
-
-            default:
-                break;
+                    setLoadingContent(false);
+                });
         }
-    }, [message]);
+    }, []);
 
     //Validar cuando es una imagen con texto!
+
+    const TemplateMessage = ({ message }: { message: any }) => {
+        return (
+            <div className="w-[300px]">
+                {message.header !== "" &&
+                    message.header.type === "text" ?
+                    <h2>{message.data}</h2> :
+                    message.header.type === "image" ?
+                        <div className="relative h-[180px]">
+                            <Image
+                                src={message.header.data} //aquí va useState variable para que sea editable
+                                width={300}
+                                height={300}
+                                alt="Imagen de template"
+                                className="object-cover rounded-md w-full h-full"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                        </div>
+                        : null
+                }
+
+                {message.body !== "" && <p className="my-2 text-slate-800">{message.body}</p>}
+                {message.footer !== "" && <p className="my-2 text-slate-500">{message.footer}</p>}
+
+                {!!message.buttons.length &&
+                    <div className="flex flex-wrap justify-around gap-2 border-t-2 border-slate-400 pt-2">
+                        {message.buttons.map((button: any, index: number) => (
+                            <button key={`btn-template-${index}`} className="button text-sky-500">
+                                {button.url && <IconLink classes="w-6 h-6 w-6 h-6 mr-1 float-left" />}
+                                {button.text}
+                            </button>
+                        ))}
+                    </div>
+                }
+            </div>
+        )
+    }
+
+    const TemplateReply = ({ template }: { template: any }) => {
+        const { body, footer, header } = template;
+
+        const renderHeader = () => {
+            if (header && header.type !== "") {
+                if (header.type === "image") {
+                    return <img src={header.data} alt="Header Image" />;
+                } else if (header.type === "text") {
+                    return <h2 className="font-semibold text-sm">{header.data}</h2>;
+                }
+            }
+            return null;
+        };
+
+        const renderContent = () => {
+            if (body !== "") {
+                return <p className="line-clamp-2 text-sm">{body}</p>;
+            } else if (footer !== "") {
+                return <p className="line-clamp-2 text-sm">{footer}</p>;
+            }
+            return null;
+        };
+
+        const renderLayout = () => {
+            if (header && header.type === "image") {
+                return (
+                    <div className="grid grid-cols-2">
+                        <div className="col-span-7/10">{renderContent()}</div>
+                        <div className="col-span-3/10">{renderHeader()}</div>
+                    </div>
+                );
+            } else {
+                return <>{renderHeader()} {renderContent()}</>;
+            }
+        };
+
+        return <>{renderLayout()}</>;
+    };
 
     return (
         <>
             <div className={"flex items-end " + (isFromClient ? "float-left justify-start" : "float-right justify-end")}>
                 <div className={
+                    "max-w-xl " +
                     (message.message_type !== "sticker" ?
                         "messages-container " +
-                        (isFromClient ? "bg-slate-100" : "bg-emerald-100")
-                        : "")
+                        (isFromClient ? "bg-slate-100 " : "bg-emerald-100 ") +
+                        (message.message_type === "image" ? "h-[270px]" : "")
+                        : "h-[200px]")
                 }>
                     {!!reaction.length &&
                         <span role="img" className={"reaction absolute -bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
                     }
 
-                    {message.message_type === "text" ? (
+                    {(message.message.response_to) &&
+                        <div className={
+                            "reply my-4 p-2 border-2 border-teal-200 rounded-md " +
+                            (isFromClient ? "border-l-teal-500 bg-slate-200" : "border-r-teal-500 bg-green-300")
+                        }>
+                            {message.replied_message?.message_type === "template" ?
+                                <TemplateReply template={message.replied_message?.message.template} />
+                                : null
+                            }
+                        </div>
+                    }
+
+                    {message.message_type === "text" ?
                         <span>{content}</span>
-                    ) : (
-                        (message.message_type === "image" || message.message_type === "sticker") ?
+                        : (message.message_type === "image" || message.message_type === "sticker") ?
                             loadingContent ?
                                 <ActiveConversationSkeleton /> :
                                 <Image
-                                    src={validateBase64(content) ? content : ''}
+                                    src={content ? (validateBase64(content) ? content : '') : ""}
                                     width={message.message_type === "image" ? 250 : 150}
                                     height={message.message_type === "image" ? 250 : 150}
                                     alt="Imagen de mensaje"
-                                    className="object-cover rounded-md cursor-pointer"
+                                    className={"object-cover rounded-md cursor-pointer " + (message.message_type === "image" ? "h-[230px]" : "h-[160px]")}
                                     onClick={() => {
                                         setModalImage(content)
                                         handleOpenModal(true)
@@ -96,11 +176,18 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                         controls
                                     />
                                     : message.message_type === "document" ?
-                                        <a href={content} target="_blank" download={message.message.filename}>{message.message.filename}</a>
+                                        <a href={content} target="_blank" download={message.message.filename} className="bg-slate-100 rounded p-5 text-teal-500 border border-slate-200 flex gap-2 items-center text-sm">
+                                            <IconDocument classes="w-6 h-6 text-teal-600" />
+                                            {message.message.filename}
+                                        </a>
                                         : message.message_type === "location" ?
                                             <iframe src={`https://www.google.com/maps?q=${message.message.latitude},${message.message.longitude}&hl=es&output=embed`} width="300px" />
-                                            : <>{message.message_type}</>
-                    )}
+                                            : message.message_type === "template" ?
+                                                <TemplateMessage message={message.message.template} />
+                                                : message.message_type === "button" ?
+                                                    <p>{message.message.text}</p>
+                                                    : <>{message.message_type}</>
+                    }
 
                     {/* text reaction image audio document sticker video location */}
 

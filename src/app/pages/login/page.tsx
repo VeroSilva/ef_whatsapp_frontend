@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { parseCookies } from 'nookies';
 import { useRouter } from 'next/navigation';
 import { LoginForm } from "@/app/components/LoginForm"
-import useUser from "../../hooks/user/useUser";
+import useUser from "../../hooks/useUser";
 
 const Login = () => {
     const router = useRouter();
