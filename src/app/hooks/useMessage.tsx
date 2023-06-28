@@ -33,7 +33,9 @@ export const useMessage = () => {
                 }
 
                 dataToSend[type].data = dataTransformed;
-            } else if (type === "text") {
+            }
+
+            if (type === "text") {
                 dataToSend[type].body = dataTransformed;
             } else if (type === "template") {
                 dataToSend[type] = dataTransformed;
