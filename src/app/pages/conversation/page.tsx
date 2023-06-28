@@ -199,7 +199,7 @@ const Conversation = (): JSX.Element => {
                         <div className="h-[642px] overflow-y-auto scrollbar-hidden">
                             {!loadingConversations ?
                                 conversations.map((conversation, index) => (
-                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} setActiveContact={setActiveContact} />
+                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} setActiveContact={setActiveContact} activeConversation={activeConversation} />
                                 )) :
                                 [...Array(8)].map((n, index) => (
                                     <ConversationSkeleton key={index} />

@@ -17,12 +17,22 @@ import { formatPhoneNumber } from '../utils/formatPhone';
 import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
 
-export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function }) => {
+export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact, activeConversation }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function, activeConversation: number }) => {
     const [unreadCount, setUnreadCount] = useState(false)
 
     useEffect(() => {
         setUnreadCount(parseInt(conversation.unread_count) > 0)
     }, [conversation])
+
+    const handleClick = () => {
+        if (activeConversation !== conversation.id) {
+            handleOpenConversation(conversation.id)
+            setActiveContact(conversation.contact)
+            localStorage.setItem("activeContact", JSON.stringify(conversation.contact));
+        }
+
+        setUnreadCount(false)
+    }
 
     return (
         <div
@@ -30,12 +40,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, set
                 "cursor-pointer flex items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
                 (unreadCount ? "bg-teal-100" : "hover:bg-slate-100")
             }
-            onClick={() => {
-                handleOpenConversation(conversation.id)
-                setActiveContact(conversation.contact)
-                setUnreadCount(false)
-                localStorage.setItem("activeContact", JSON.stringify(conversation.contact));
-            }}
+            onClick={handleClick}
         >
             <div className="w-14 h-14 flex-none image-fit mr-1">
                 {generateInitialsImage(conversation.contact.name)}
