@@ -29,6 +29,14 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
         }
     }
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            handleSendMessage("text", messageToSend, () => { })
+            setMessageToSend("")
+        }
+    };
+
     return (
         <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400 transition-opacity duration-300">
             {/* <ConversationEmojis /> */}
@@ -60,6 +68,7 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
                     placeholder="Type your message..."
                     value={messageToSend}
                     onChange={(e) => setMessageToSend(e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e)}
                 ></textarea>
             )}
 
