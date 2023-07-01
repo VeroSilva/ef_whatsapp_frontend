@@ -43,7 +43,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, set
             onClick={handleClick}
         >
             <div className="w-14 h-14 flex-none image-fit mr-1">
-                {GenerateInitialsImage(conversation.contact.name)}
+                {GenerateInitialsImage(conversation.contact.name ?? "")}
             </div>
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">
