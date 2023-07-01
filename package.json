@@ -28,7 +28,9 @@
     "sass-loader": "^13.3.1",
     "socket.io-client": "^4.6.1",
     "tw-elements": "^1.0.0-beta2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
     "@types/recorder-js": "^1.0.2",

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const generateInitialsImage = (name: string) => {
+const GenerateInitialsImage = (name: string) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -54,4 +54,4 @@ const generateInitialsImage = (name: string) => {
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />;
 };
 
-export default generateInitialsImage;
+export default GenerateInitialsImage;

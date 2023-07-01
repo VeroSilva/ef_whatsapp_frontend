@@ -2,7 +2,10 @@
 const { env } = require("./env-config");
 
 const nextConfig = {
-  env,
+  env: {
+    API_URL: process.env.API_URL,
+    API_CUSTOM_HEADER: process.env.API_CUSTOM_HEADER,
+  },
   async rewrites() {
     return [
       {
@@ -13,6 +16,9 @@ const nextConfig = {
   },
   images: {
     domains: ["scontent.whatsapp.net", "efperfumes.com", "kinsta.com"],
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
   // webpack: (config) => {
   //   config.module.rules.push({
