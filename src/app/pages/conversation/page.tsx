@@ -5,41 +5,32 @@ import { useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
 import { Button } from 'flowbite-react'
 import Image from "next/image"
-import { Contact, Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
+import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
 import { IconSearch } from "@/app/components/Icons/IconSearch"
 import useUser from "../../hooks/useUser"
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api'
 import { IconLogout } from '@/app/components/Icons/IconLogout'
 import { ItemListConversation } from '@/app/components/ItemListConversation'
 import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation'
-import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
 import { IconMessage } from '@/app/components/Icons/IconMessage'
 import { Modal } from '@/app/components/Modal/Modal'
+import useActiveConversation from "../../hooks/useActiveConversation";
 
 const Conversation = (): JSX.Element => {
     const router = useRouter()
     // @ts-ignore
     const { userState, logoutUser } = useUser()
+    // @ts-ignore
+    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation()
     const [conversations, setConversations] = useState<IConversation[]>([])
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false)
-    const [activeConversation, setActiveConversation] = useState<number>(0)
-    const [activeContact, setActiveContact] = useState<Contact>({
-        country: "",
-        email: "",
-        name: "",
-        phone: "",
-        tag_id: "",
-    })
     const [messages, setMessages] = useState<IMessage[]>([])
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
     const socketRef = useRef<Socket | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false)
     const [newPhone, setNewPhone] = useState<string>("")
-
-    // @ts-ignore
-    const cookies: any = parseCookies()
 
     useEffect(() => {
         if (!userState || userState.token === "") {
@@ -55,30 +46,20 @@ const Conversation = (): JSX.Element => {
     }, [userState])
 
     useEffect(() => {
-        if (cookies.conversationId) {
-            handleOpenConversation(cookies.conversationId);
-
-            if (localStorage.getItem("activeContact")) {
-                const contactData = JSON.parse(localStorage.getItem("activeContact") ?? "")
-
-                setActiveContact(contactData)
-            }
+        if (activeConversationState.id !== 0) {
+            handleOpenConversation(activeConversationState.id)
         }
 
         const handleEscKeyPress = (event: any) => {
             if (event.key === 'Escape') {
-                setActiveConversation(0)
-
+                resetActiveConversation()
                 setMessages([])
-
-                destroyCookie(null, 'conversationId')
             }
         };
 
         document.addEventListener('keydown', handleEscKeyPress);
 
         return () => {
-            destroyCookie(null, 'conversationId')
             document.removeEventListener('keydown', handleEscKeyPress);
         }
     }, [])
@@ -111,7 +92,7 @@ const Conversation = (): JSX.Element => {
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
 
-                    if (activeConversation == payload.data.conversation.id) {
+                    if (activeConversationState.id == payload.data.conversation.id) {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
@@ -161,7 +142,6 @@ const Conversation = (): JSX.Element => {
     }, [conversations, messages])
 
     const handleOpenConversation = (id: number) => {
-        setActiveConversation(id)
         setMessages([])
         setLoadingMessages(true)
 
@@ -169,9 +149,6 @@ const Conversation = (): JSX.Element => {
             .then((res) => {
                 setMessages(res.reverse())
                 setLoadingMessages(false)
-                setCookie(null, 'conversationId', `${id}`, {
-                    maxAge: 30 * 24 * 60 * 60
-                })
             })
     }
 
@@ -180,14 +157,18 @@ const Conversation = (): JSX.Element => {
     }
 
     const handleCreateConversation = () => {
-        setActiveConversation(-1)
-        setActiveContact({
-            country: "",
-            email: "",
-            name: "",
-            phone: newPhone,
-            tag_id: "",
+        setActiveConversation({
+            contact: {
+                country: "",
+                email: "",
+                name: "",
+                phone: newPhone,
+                tag_id: "",
+                id: 0
+            },
+            id: -1
         })
+
         setMessages([])
         setShowModal(false)
     }
@@ -240,7 +221,7 @@ const Conversation = (): JSX.Element => {
                         <div>
                             {!loadingConversations ?
                                 conversations.map((conversation, index) => (
-                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} setActiveContact={setActiveContact} activeConversation={activeConversation} />
+                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} activeConversation={activeConversationState.id} />
                                 )) :
                                 [...Array(8)].map((n, index) => (
                                     <ConversationSkeleton key={index} />
@@ -256,8 +237,8 @@ const Conversation = (): JSX.Element => {
                         {/* BEGIN: Chat Active */}
                         {loadingMessages ?
                             <ActiveConversationSkeleton /> :
-                            activeConversation !== 0 ?
-                                <ActiveConversation messages={messages} conversationId={activeConversation} activeContact={activeContact} /> :
+                            activeConversationState.id !== 0 ?
+                                <ActiveConversation messages={messages} conversationId={activeConversationState.id} activeContact={activeConversationState.contact} /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image
                                         src="/images/home-messages.jpg"

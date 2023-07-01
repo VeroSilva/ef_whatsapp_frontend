@@ -16,9 +16,12 @@ import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
 import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
+import useActiveConversation from "../hooks/useActiveConversation";
 
-export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact, activeConversation }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function, activeConversation: number }) => {
+export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation }: { conversation: any, handleOpenConversation: Function, activeConversation: number }) => {
     const [unreadCount, setUnreadCount] = useState(false)
+    // @ts-ignore
+    const { setActiveConversation } = useActiveConversation()
 
     useEffect(() => {
         setUnreadCount(parseInt(conversation.unread_count) > 0)
@@ -26,9 +29,11 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, set
 
     const handleClick = () => {
         if (activeConversation !== conversation.id) {
+            setActiveConversation({
+                contact: conversation.contact,
+                id: conversation.id
+            })
             handleOpenConversation(conversation.id)
-            setActiveContact(conversation.contact)
-            localStorage.setItem("activeContact", JSON.stringify(conversation.contact));
         }
 
         setUnreadCount(false)
