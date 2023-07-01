@@ -4,8 +4,6 @@ import { IconChevron } from "../../Icons/IconChevron";
 import { IconLink } from "../../Icons/IconLink";
 import Image from "next/image"
 import { getVariables } from "@/app/utils/fileType";
-import { useMessage } from "@/app/hooks/useMessage";
-import { PreviewActions } from "../../ConversationPreview/PreviewActions";
 
 export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend, setTemplateToSend }: { template: Template, setSelectedTemplate: Function, setIsReadyToSend: Function, setTemplateToSend: Function }) => {
     const [inputsBodyVariables, setInputsBodyVariables] = useState([]);
@@ -21,7 +19,6 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
     const templateIsEditable = headerData && headerData.example ||
         bodyData && bodyData.example ||
         buttonsData && !!buttonsUrl.length
-    const { sendMessage } = useMessage()
 
     const handleInputHeaderChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputHeaderVariable(e.target.value)
@@ -44,12 +41,6 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
     const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSelectedImageSrc(e.target.value)
     };
-
-    const handleAccept = () => {
-
-
-        // sendMessage({ type: "template", data: templateToSend, conversationId: 2 })
-    }
 
     const areInputsFilled = () => {
         // Verificar los inputs necesarios para tu validación
