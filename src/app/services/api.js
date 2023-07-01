@@ -41,7 +41,26 @@ export const getMessagesByConversation = async (id, limit, token) => {
         "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
       },
     }
-  ).then((res) => res.json());
+  )
+    .then((res) => res.json())
+    .catch((error) => {
+      throw new Error("Error: " + error.message);
+    });
+
+  return response;
+};
+
+export const createConversation = async (data, token) => {
+  const response = await fetch(`${process.env.API_URL}/conversation`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
 
   return response;
 };
