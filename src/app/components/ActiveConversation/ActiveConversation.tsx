@@ -14,6 +14,7 @@ import { IconX } from "../Icons/IconX";
 import { ConversationBottomSection } from "./ConversationBottomSection/ConversationBottomSection";
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { Template } from "../../interfaces/template";
+import { formatPhoneNumber } from "@/app/utils/formatPhone";
 
 export const ActiveConversation = ({ messages, conversationId, activeContact }: { messages: IMessage[], conversationId: number, activeContact: Contact }) => {
     const [reactions, setReactions] = useState<Reaction[]>([])
@@ -131,12 +132,12 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
-                        {GenerateInitialsImage(activeContact.name)}
+                        {GenerateInitialsImage(activeContact.name ?? "")}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">
                             <div className="font-medium text-base">
-                                {activeContact.name}
+                                {activeContact.name && activeContact.name !== "" ? activeContact.name : formatPhoneNumber(activeContact.phone)}
                             </div>
                         </div>
                     </div>
@@ -184,10 +185,10 @@ export const ActiveConversation = ({ messages, conversationId, activeContact }: 
             </div>
 
             {showPreview &&
-                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} />
+                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} newConversationPhone={conversationId === -1 ? activeContact.phone : undefined} />
             }
 
-            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
+            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} newConversationPhone={conversationId === -1 ? activeContact.phone : undefined} />
 
             <Modal
                 size="md"

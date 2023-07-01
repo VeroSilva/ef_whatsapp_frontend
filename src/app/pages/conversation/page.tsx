@@ -46,7 +46,7 @@ const Conversation = (): JSX.Element => {
     }, [userState])
 
     useEffect(() => {
-        if (activeConversationState.id !== 0) {
+        if (activeConversationState.id !== -1 && activeConversationState.id !== 0) {
             handleOpenConversation(activeConversationState.id)
         }
 
@@ -62,7 +62,7 @@ const Conversation = (): JSX.Element => {
         return () => {
             document.removeEventListener('keydown', handleEscKeyPress);
         }
-    }, [])
+    }, [activeConversationState])
 
     useEffect(() => {
         if (!!messages.length) {

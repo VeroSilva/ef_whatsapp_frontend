@@ -4,6 +4,7 @@ export interface Contact {
     name: string,
     phone: string,
     tag_id: string,
+    id: number
 }
 
 export interface Conversation {
