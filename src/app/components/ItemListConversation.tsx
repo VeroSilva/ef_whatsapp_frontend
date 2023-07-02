@@ -18,7 +18,7 @@ import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
 import useActiveConversation from "../hooks/useActiveConversation";
 
-export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation }: { conversation: any, handleOpenConversation: Function, activeConversation: number }) => {
+export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
     const [unreadCount, setUnreadCount] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
@@ -39,6 +39,18 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
         setUnreadCount(false)
     }
 
+    const highlightText = (text: string, search: string) => {
+        const regex = new RegExp(`(${search})`, 'gi');
+        const parts = text ? text.split(regex) : [];
+
+        return parts.map((part, index) => {
+            if (part.toLowerCase() === search.toLowerCase()) {
+                return <span key={index} className="font-bold text-teal-500">{part}</span>;
+            }
+            return part;
+        });
+    };
+
     return (
         <div
             className={
@@ -53,7 +65,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">
                     <a href="#" className="font-medium">
-                        {conversation.contact.name}
+                        {highlightText(conversation.contact.name, filter)}
                     </a>
                     <div className="text-xs text-slate-500 ml-auto ">
                         <span className={(unreadCount ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</span>
@@ -61,7 +73,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                 </div>
                 {conversation.phone !== null &&
                     <div className="w-full truncate text-xs text-slate-500 mt-0.5">
-                        {formatPhoneNumber(conversation.contact.phone)}
+                        {highlightText(formatPhoneNumber(conversation.contact.phone), filter)}
                     </div>
                 }
                 <div className="flex mt-2">

@@ -1,59 +1,74 @@
 "use client"
-
-import { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { io, Socket } from 'socket.io-client'
-import { Button } from 'flowbite-react'
-import Image from "next/image"
-import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
-import { IconSearch } from "@/app/components/Icons/IconSearch"
-import useUser from "../../hooks/useUser"
-import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api'
-import { IconLogout } from '@/app/components/Icons/IconLogout'
-import { ItemListConversation } from '@/app/components/ItemListConversation'
-import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation'
-import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
-import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
-import { IconMessage } from '@/app/components/Icons/IconMessage'
-import { Modal } from '@/app/components/Modal/Modal'
+import { useEffect, useState, useRef, SetStateAction } from 'react';
+import { useRouter } from 'next/navigation';
+import { io, Socket } from 'socket.io-client';
+import { Button } from 'flowbite-react';
+import Image from "next/image";
+import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations';
+import { IconSearch } from "@/app/components/Icons/IconSearch";
+import useUser from "../../hooks/useUser";
+import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api';
+import { IconLogout } from '@/app/components/Icons/IconLogout';
+import { ItemListConversation } from '@/app/components/ItemListConversation';
+import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation';
+import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation';
+import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation';
+import { IconMessage } from '@/app/components/Icons/IconMessage';
+import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
 
 const Conversation = (): JSX.Element => {
-    const router = useRouter()
-    // @ts-ignore
-    const { userState, logoutUser } = useUser()
-    // @ts-ignore
-    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation()
-    const [conversations, setConversations] = useState<IConversation[]>([])
-    const [loadingConversations, setLoadingConversations] = useState<boolean>(false)
-    const [messages, setMessages] = useState<IMessage[]>([])
-    const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
+    const router = useRouter();
+    //@ts-ignore
+    const { userState, logoutUser } = useUser();
+    //@ts-ignore
+    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
+    const [conversations, setConversations] = useState<IConversation[]>([]);
+    const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
+    const [messages, setMessages] = useState<IMessage[]>([]);
+    const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
     const socketRef = useRef<Socket | null>(null);
-    const [showModal, setShowModal] = useState<boolean>(false)
-    const [newPhone, setNewPhone] = useState<string>("")
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [newPhone, setNewPhone] = useState<string>("");
+    const [filter, setFilter] = useState<string>("");
 
     useEffect(() => {
         if (!userState || userState.token === "") {
-            router.push('./pages/login')
+            router.push('./pages/login');
         } else {
-            setLoadingConversations(true)
+            setLoadingConversations(true);
 
-            getConversations(0, 100, userState.token).then((res) => {
-                setConversations(res)
-                setLoadingConversations(false)
-            })
+            getConversations(0, 100, filter, userState.token)
+                .then((res) => {
+                    setConversations(res);
+                    setLoadingConversations(false);
+                });
         }
-    }, [userState])
+    }, [userState]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            getConversations(0, 100, filter, userState.token)
+                .then((res) => {
+                    setConversations(res);
+                    setLoadingConversations(false);
+                });
+        }
+    };
+
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFilter(event.target.value);
+    };
 
     useEffect(() => {
         if (activeConversationState.id !== -1 && activeConversationState.id !== 0) {
-            handleOpenConversation(activeConversationState.id)
+            handleOpenConversation(activeConversationState.id);
         }
 
-        const handleEscKeyPress = (event: any) => {
+        const handleEscKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                resetActiveConversation()
-                setMessages([])
+                resetActiveConversation();
+                setMessages([]);
             }
         };
 
@@ -61,29 +76,28 @@ const Conversation = (): JSX.Element => {
 
         return () => {
             document.removeEventListener('keydown', handleEscKeyPress);
-        }
-    }, [activeConversationState])
+        };
+    }, [activeConversationState]);
 
     useEffect(() => {
-        if (!!messages.length) {
-            const unreadMessages = [...messages].filter((message) => !message.read).map((message) => message.id);
+        if (messages.length) {
+            const unreadMessages = messages.filter((message) => !message.read).map((message) => message.id);
 
-            if (!!unreadMessages.length) {
-                markAsRead(userState.token, unreadMessages).then((res) => res);
+            if (unreadMessages.length) {
+                markAsRead(userState.token, unreadMessages)
+                    .then((res) => res);
             }
         }
-    }, [messages])
+    }, [messages]);
 
     useEffect(() => {
         if (!socketRef.current) {
-            const apiUrl: string = process.env.API_URL ?? ""
+            const apiUrl: string = process.env.API_URL ?? "";
             socketRef.current = io(apiUrl);
 
-            // Escuchar la notificación de cambio de tabla
             socketRef.current.on('table_change_notification', (payload) => {
-                console.log(payload)
                 if (payload.table === "messages" && payload.action === "insert") {
-                    const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
+                    const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
                     if (chatIndex !== -1) {
                         const updatedArray = [...conversations];
@@ -92,33 +106,29 @@ const Conversation = (): JSX.Element => {
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
 
-                    if (activeConversationState.id == payload.data.conversation.id) {
+                    if (activeConversationState.id === payload.data.conversation.id) {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
                     const messageIndex = messages.findIndex((message) => message.id === payload.data.message.id);
 
                     if (messageIndex !== -1) {
-                        const message = messages[messageIndex];
-                        console.log(message.status, payload.data.message.status)
+                        const updatedMessages = [...messages];
+                        const message = updatedMessages[messageIndex];
+
                         if (
                             (message.status === "read") ||
-                            (message.status === "delivered" &&
-                                (payload.data.message.status === "failed" ||
-                                    payload.data.message.status === "trying" ||
-                                    payload.data.message.status === "sent")) ||
-                            (message.status === "sent" &&
-                                (payload.data.message.status === "failed" ||
-                                    payload.data.message.status === "trying"))
+                            (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
+                            (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
                         ) {
                             return;
                         }
 
                         message.status = payload.data.message.status;
-                        setMessages([...messages]);
+                        setMessages(updatedMessages);
                     }
 
-                    const chatIndex = [...conversations].findIndex((chat) => chat.id == payload.data.conversation.id);
+                    const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
                     if (chatIndex !== -1) {
                         const updatedArray = [...conversations];
@@ -127,34 +137,33 @@ const Conversation = (): JSX.Element => {
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
                 } else if (payload.table === "conversations" && payload.action === "insert") {
-                    setConversations([...conversations, payload.data])
+                    setConversations([...conversations, payload.data]);
                 }
-            })
+            });
         }
 
-        // Limpia la conexión cuando el componente se desmonte
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
-        }
-    }, [conversations, messages])
+        };
+    }, [conversations, messages]);
 
     const handleOpenConversation = (id: number) => {
-        setMessages([])
-        setLoadingMessages(true)
+        setMessages([]);
+        setLoadingMessages(true);
 
         getMessagesByConversation(id, 50, userState.token)
             .then((res) => {
-                setMessages(res.reverse())
-                setLoadingMessages(false)
-            })
-    }
+                setMessages(res.reverse());
+                setLoadingMessages(false);
+            });
+    };
 
     const handleOpenModal = (show: boolean) => {
-        setShowModal(show)
-    }
+        setShowModal(show);
+    };
 
     const handleCreateConversation = () => {
         setActiveConversation({
@@ -167,30 +176,28 @@ const Conversation = (): JSX.Element => {
                 id: 0
             },
             id: -1
-        })
+        });
 
-        setMessages([])
-        setShowModal(false)
-    }
+        setMessages([]);
+        setShowModal(false);
+    };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewPhone(e.target.value);
     };
 
-    const CreateConversationButton = () => {
-        return (
-            <button
-                onClick={handleCreateConversation}
-                className={
-                    "border border-teal-600 p-2 rounded-md transition ease-in-out delay-50 " +
-                    (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
-                }
-                disabled={newPhone === ""}
-            >
-                Crear conversación
-            </button>
-        )
-    }
+    const CreateConversationButton = () => (
+        <button
+            onClick={handleCreateConversation}
+            className={
+                "border border-teal-600 p-2 rounded-md transition ease-in-out delay-50 " +
+                (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
+            }
+            disabled={newPhone === ""}
+        >
+            Crear conversación
+        </button>
+    );
 
     return (
         <div className="w-full min-h-screen p-5 md:p-20 flex items-center justify-center bg-slate-200">
@@ -215,13 +222,28 @@ const Conversation = (): JSX.Element => {
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
                                 </div>
-                                <input type="search" id="default-search" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Mockups, Logos..." required />
+                                <input
+                                    type="search"
+                                    id="default-search"
+                                    className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="Contacto o celular"
+                                    required
+                                    value={filter}
+                                    onChange={handleFilterChange}
+                                    onKeyDown={handleKeyDown}
+                                />
                             </div>
                         </div>
                         <div>
                             {!loadingConversations ?
                                 conversations.map((conversation, index) => (
-                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} activeConversation={activeConversationState.id} />
+                                    <ItemListConversation
+                                        conversation={conversation}
+                                        key={index}
+                                        handleOpenConversation={handleOpenConversation}
+                                        activeConversation={activeConversationState.id}
+                                        filter={filter}
+                                    />
                                 )) :
                                 [...Array(8)].map((n, index) => (
                                     <ConversationSkeleton key={index} />
@@ -238,7 +260,11 @@ const Conversation = (): JSX.Element => {
                         {loadingMessages ?
                             <ActiveConversationSkeleton /> :
                             activeConversationState.id !== 0 ?
-                                <ActiveConversation messages={messages} conversationId={activeConversationState.id} activeContact={activeConversationState.contact} /> :
+                                <ActiveConversation
+                                    messages={messages}
+                                    conversationId={activeConversationState.id}
+                                    activeContact={activeConversationState.contact}
+                                /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image
                                         src="/images/home-messages.jpg"
@@ -254,27 +280,42 @@ const Conversation = (): JSX.Element => {
                 {/* END: Chat Content */}
             </div>
 
-            <Modal
-                show={showModal}
-                onClose={() => {
-                    setShowModal(false);
-                }}
-                title="Crear nueva conversación"
-                width="500px"
-                footer={CreateConversationButton()}
-            >
-                <input
-                    id="phone"
-                    placeholder="58982828966"
-                    className='border-slate-300 rounded-md w-full focus:outline focus:outline-offset-2 focus:outline-teal-600 focus:ring-0 focus:border-none'
-                    required
-                    type="text"
-                    defaultValue={newPhone}
-                    onChange={handlePhoneChange}
-                />
-            </Modal>
-        </div>
-    )
-}
+            {/* BEGIN: Modal */}
+            {showModal && (
+                <Modal
+                    title="Crear nueva conversación"
+                    onClose={() => handleOpenModal(false)}
+                    show={showModal}
+                >
+                    <div className="flex flex-col space-y-4">
+                        <label htmlFor="phone" className="text-sm text-gray-800 font-semibold">
+                            Número de teléfono:
+                        </label>
+                        <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            placeholder="Ingresa el número de teléfono"
+                            className="border border-gray-300 rounded-lg p-2"
+                            value={newPhone}
+                            onChange={handlePhoneChange}
+                        />
+                    </div>
 
-export default Conversation
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            className="border border-gray-300 rounded-lg p-2"
+                            onClick={() => handleOpenModal(false)}
+                        >
+                            Cancelar
+                        </button>
+                        <CreateConversationButton />
+                    </div>
+                </Modal>
+            )}
+            {/* END: Modal */}
+        </div>
+    );
+};
+
+export default Conversation;
