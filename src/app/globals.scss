@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+.page {
+  position: relative;
+
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/images/perfume-pattern.jpeg");
+    background-repeat: repeat;
+    background-position: 50% 0;
+    background-size: 250px 150px;
+    opacity: 0.2;
+    backdrop-filter: grayscale(100%);
+    filter: grayscale(100%);
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.09);
+  }
+}
+
+/* Custom classes */
+.message-sticker-container { 
+  @apply border border-slate-200/60 mt-1 rounded-md p-1 
+}
+
+.messages-container { 
+  @apply border border-slate-200/60 px-2 py-1 my-1 text-slate-500 rounded-md relative
+}

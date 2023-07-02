@@ -1,4 +1,4 @@
-import './globals.css'
+import './globals.scss'
 import { Montserrat } from 'next/font/google'
 import ContextProvider from './pages/context-provider';
 
@@ -21,7 +21,11 @@ export default function RootLayout({
     <html lang="en">
       <ContextProvider>
         <body className={montserrat.className}>
-          {children}
+          <div className="w-full min-h-screen flex items-center justify-center p-8 page">
+            <div className='flex items-center justify-center bg-neutral-200 w-full max-h-[90vh] h-[90vh] rounded-md drop-shadow-lg max-w-[2000px] z-10'>
+              {children}
+            </div>
+          </div>
         </body>
       </ContextProvider>
     </html>
