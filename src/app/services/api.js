@@ -12,9 +12,9 @@ export const login = async (data) => {
   return response;
 };
 
-export const getConversations = async (offset, limit, search, token) => {
+export const getConversations = async (offset, limit, filter, token) => {
   const response = await fetch(
-    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${search}`,
+    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}`,
     {
       method: "GET",
       headers: {
