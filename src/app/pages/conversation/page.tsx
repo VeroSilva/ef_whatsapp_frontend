@@ -31,28 +31,67 @@ const Conversation = (): JSX.Element => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [newPhone, setNewPhone] = useState<string>("");
     const [filter, setFilter] = useState<string>("");
+    const [page, setPage] = useState(0);
+    const [totalPage, setTotalPages] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const loadingRef = useRef(false);
+
+    const loadConversations = () => {
+        if (loadingRef.current) {
+            return;
+        }
+        setLoadingConversations(true);
+        loadingRef.current = true;
+        getConversations(page * 10, 10, filter, userState.token)
+            .then((res) => {
+                setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
+                setLoadingConversations(false);
+                setPage(res.currentPage);
+                setTotalPages(res.totalPages);
+            })
+            .catch((error: Error) => {
+                setLoadingConversations(false);
+                console.error(error);
+            })
+            .finally(() => {
+                loadingRef.current = false;
+
+            });
+    };
+    useEffect(() => {
+        if (!loadingConversations && containerRef.current) {
+            containerRef.current.addEventListener('scroll', handleScroll);
+        }
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [loadingConversations]);
+
+    const handleScroll = () => {
+        const container = containerRef.current;
+        if (container) {
+            const { scrollTop, scrollHeight, clientHeight } = container;
+
+            if (scrollTop + clientHeight >= scrollHeight - 2 && page < totalPage) {
+                loadConversations();
+            }
+        }
+    };
 
     useEffect(() => {
         if (!userState || userState.token === "") {
             router.push('./pages/login');
         } else {
-            setLoadingConversations(true);
-
-            getConversations(0, 100, filter, userState.token)
-                .then((res) => {
-                    setConversations(res);
-                    setLoadingConversations(false);
-                });
+            loadConversations();
         }
     }, [userState]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            getConversations(0, 100, filter, userState.token)
-                .then((res) => {
-                    setConversations(res);
-                    setLoadingConversations(false);
-                });
+            loadConversations();
         }
     };
 
@@ -215,7 +254,7 @@ const Conversation = (): JSX.Element => {
 
             <div className="grid grid-cols-12 gap-5 w-[1800px] h-[70vh] mt-5 drop-shadow-md">
                 {/* BEGIN: Chat Side Menu */}
-                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto">
+                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto" ref={containerRef}>
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
                         <div className="flex items-center justify-end px-5 pt-5">
                             <button onClick={() => handleOpenModal(true)}>
@@ -248,6 +287,7 @@ const Conversation = (): JSX.Element => {
                                         handleOpenConversation={handleOpenConversation}
                                         activeConversation={activeConversationState.id}
                                         filter={filter}
+
                                     />
                                 )) :
                                 [...Array(8)].map((n, index) => (
