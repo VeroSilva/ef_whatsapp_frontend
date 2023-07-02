@@ -1,14 +1,12 @@
 "use client"
-import { useEffect, useState, useRef, SetStateAction } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
-import { Button } from 'flowbite-react';
 import Image from "next/image";
 import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations';
 import { IconSearch } from "@/app/components/Icons/IconSearch";
 import useUser from "../../hooks/useUser";
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api';
-import { IconLogout } from '@/app/components/Icons/IconLogout';
 import { ItemListConversation } from '@/app/components/ItemListConversation';
 import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation';
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation';
@@ -16,11 +14,12 @@ import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConv
 import { IconMessage } from '@/app/components/Icons/IconMessage';
 import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
+import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
     //@ts-ignore
-    const { userState, logoutUser } = useUser();
+    const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
     const [conversations, setConversations] = useState<IConversation[]>([]);
@@ -111,7 +110,6 @@ const Conversation = (): JSX.Element => {
     useEffect(() => {
         if (activeConversationState.id === -1) resetActiveConversation()
     }, [])
-
 
     useEffect(() => {
         if (activeConversationState.id !== -1 && activeConversationState.id !== 0) {
@@ -253,88 +251,85 @@ const Conversation = (): JSX.Element => {
     );
 
     return (
-        <div className="w-full min-h-screen p-5 md:p-20 flex items-center justify-center bg-slate-200">
-            <div className='absolute top-0 right-0 m-5'>
-                <Button onClick={() => logoutUser()}>
-                    <IconLogout classes='w-5 h-5 text-white me-2' />
-                    Cerrar sesión
-                </Button>
-            </div>
+        <div className="w-full min-h-screen flex items-center p-8">
+            <div className='flex items-center justify-center bg-slate-200 p-8 w-full rounded-md'>
+                <Sidebar />
 
-            <div className="grid grid-cols-12 gap-5 w-[1800px] h-[70vh] mt-5 drop-shadow-md">
-                {/* BEGIN: Chat Side Menu */}
-                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto" ref={containerRef}>
-                    <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
-                        <div className="bg-white sticky top-0">
-                            <div className="flex items-center justify-end px-5 pt-5">
-                                <button onClick={() => handleOpenModal(true)}>
-                                    <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
-                                </button>
-                            </div>
-                            <div className="pb-5 px-5 mt-5">
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                <div className="grid grid-cols-12 gap-1 w-[1800px] p-5 drop-shadow-md">
+                    {/* BEGIN: Chat Side Menu */}
+                    <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[85vh] overflow-auto" ref={containerRef}>
+                        <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
+                            <div className="bg-white sticky top-0">
+                                <div className="flex items-center justify-end px-5 pt-5">
+                                    <button onClick={() => handleOpenModal(true)}>
+                                        <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
+                                    </button>
+                                </div>
+                                <div className="pb-5 px-5 mt-5">
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                                        </div>
+                                        <input
+                                            type="search"
+                                            id="default-search"
+                                            className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            placeholder="Buscar contacto o celular"
+                                            required
+                                            value={filter}
+                                            onChange={handleFilterChange}
+                                            onKeyDown={handleKeyDown}
+                                        />
                                     </div>
-                                    <input
-                                        type="search"
-                                        id="default-search"
-                                        className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Buscar contacto o celular"
-                                        required
-                                        value={filter}
-                                        onChange={handleFilterChange}
-                                        onKeyDown={handleKeyDown}
-                                    />
                                 </div>
                             </div>
-                        </div>
-                        <div>
-                            {
-                                loadingInitialConversations ? [...Array(8)].map((n, index) => (
+                            <div>
+                                {
+                                    loadingInitialConversations ? [...Array(8)].map((n, index) => (
+                                        <ConversationSkeleton key={index} />
+                                    )) : (conversations.map((conversation, index) => (
+                                        <ItemListConversation
+                                            conversation={conversation}
+                                            key={index}
+                                            handleOpenConversation={handleOpenConversation}
+                                            activeConversation={activeConversationState.id}
+                                            filter={filter}
+                                        />
+                                    )))
+                                }
+                                {loadingConversations && [...Array(1)].map((n, index) => (
                                     <ConversationSkeleton key={index} />
-                                )) : (conversations.map((conversation, index) => (
-                                    <ItemListConversation
-                                        conversation={conversation}
-                                        key={index}
-                                        handleOpenConversation={handleOpenConversation}
-                                        activeConversation={activeConversationState.id}
-                                        filter={filter}
-                                    />
-                                )))
-                            }
-                            {loadingConversations && [...Array(1)].map((n, index) => (
-                                <ConversationSkeleton key={index} />
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-                {/* END: Chat Side Menu */}
-                {/* BEGIN: Chat Content */}
-                <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto h-[70vh] overflow-auto">
-                    <div className="box h-full intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
-                        {/* BEGIN: Chat Active */}
-                        {loadingMessages ?
-                            <ActiveConversationSkeleton /> :
-                            activeConversationState.id !== 0 ?
-                                <ActiveConversation
-                                    messages={messages}
-                                    conversationId={activeConversationState.id}
-                                    activeContact={activeConversationState.contact}
-                                /> :
-                                <div className='h-full w-full flex justify-center items-center'>
-                                    <Image
-                                        src="/images/home-messages.jpg"
-                                        width={350}
-                                        height={350}
-                                        alt="Imagen de mensaje"
-                                    />
-                                </div>
-                        }
-                        {/* END: Chat Active */}
+                    {/* END: Chat Side Menu */}
+                    {/* BEGIN: Chat Content */}
+                    <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto h-[85vh] overflow-auto">
+                        <div className="box h-full intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
+                            {/* BEGIN: Chat Active */}
+                            {loadingMessages ?
+                                <ActiveConversationSkeleton /> :
+                                activeConversationState.id !== 0 ?
+                                    <ActiveConversation
+                                        messages={messages}
+                                        conversationId={activeConversationState.id}
+                                        activeContact={activeConversationState.contact}
+                                    /> :
+                                    <div className='h-full w-full flex justify-center items-center'>
+                                        <Image
+                                            src="/images/home-messages.jpg"
+                                            width={350}
+                                            height={350}
+                                            alt="Imagen de mensaje"
+                                        />
+                                    </div>
+                            }
+                            {/* END: Chat Active */}
+                        </div>
                     </div>
+                    {/* END: Chat Content */}
                 </div>
-                {/* END: Chat Content */}
             </div>
 
             {/* BEGIN: Modal */}
