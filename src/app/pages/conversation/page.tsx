@@ -14,6 +14,7 @@ import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveCo
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation';
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation';
 import { IconMessage } from '@/app/components/Icons/IconMessage';
+import { IconUnread } from '@/app/components/Icons/IconUnread';
 import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
 
@@ -31,7 +32,7 @@ const Conversation = (): JSX.Element => {
     const socketRef = useRef<Socket | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [newPhone, setNewPhone] = useState<string>("");
-    const [filter, setFilter] = useState<string>("");
+    const [filter, setFilter] = useState<any>({ search: "", unread: false });
     const [page, setPage] = useState(0);
     const [totalPage, setTotalPages] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -105,8 +106,19 @@ const Conversation = (): JSX.Element => {
 
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFilter(event.target.value);
+        setFilter((prevFilter: any) => ({ ...prevFilter, search: event.target.value }));
     };
+
+    const handleFilterUnread = () => {
+        setFilter((prevFilter: any) => ({ ...prevFilter, unread: !filter.unread }));
+    };
+
+    useEffect(() => {
+        setPage(0);
+        setConversations([]);
+        setLoadingInitialConversations(true)
+        loadConversations(true);
+    }, [filter.unread]);
 
     useEffect(() => {
         if (activeConversationState.id === -1) resetActiveConversation()
@@ -265,8 +277,11 @@ const Conversation = (): JSX.Element => {
                 {/* BEGIN: Chat Side Menu */}
                 <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto" ref={containerRef}>
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
-                        <div className="bg-white sticky top-0">
-                            <div className="flex items-center justify-end px-5 pt-5">
+                        <div className="bg-white sticky top-0 z-50">
+                            <div className="flex items-center justify-between px-5 pt-5">
+                                <button onClick={() => handleFilterUnread()}>
+                                    <IconUnread classes={`w-6 h-6 ${filter.unread ? 'text-red-600 ' : 'text-slate-500 '} ml-auto`} />
+                                </button>
                                 <button onClick={() => handleOpenModal(true)}>
                                     <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
                                 </button>
@@ -282,7 +297,7 @@ const Conversation = (): JSX.Element => {
                                         className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="Buscar contacto o celular"
                                         required
-                                        value={filter}
+                                        value={filter.search}
                                         onChange={handleFilterChange}
                                         onKeyDown={handleKeyDown}
                                     />
@@ -299,7 +314,7 @@ const Conversation = (): JSX.Element => {
                                         key={index}
                                         handleOpenConversation={handleOpenConversation}
                                         activeConversation={activeConversationState.id}
-                                        filter={filter}
+                                        filter={filter.search}
                                     />
                                 )))
                             }

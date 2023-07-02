@@ -39,12 +39,12 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
         setUnreadCount(false)
     }
 
-    const highlightText = (text: string, search: string) => {
-        const regex = new RegExp(`(${search})`, 'gi');
+    const highlightText = (text: string, filter: string) => {
+        const regex = new RegExp(`(${filter})`, 'gi');
         const parts = text ? text.split(regex) : [];
 
         return parts.map((part, index) => {
-            if (part.toLowerCase() === search.toLowerCase()) {
+            if (part.toLowerCase() === filter.toLowerCase()) {
                 return <span key={index} className="font-bold text-teal-500">{part}</span>;
             }
             return part;

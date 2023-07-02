@@ -22,5 +22,5 @@
 }
 
 .messages-container { 
-  @apply border border-slate-200/60 px-4 py-2 my-2 text-slate-500 rounded-md relative
+  @apply border border-slate-200/60 px-2 py-1 my-1 text-slate-500 rounded-md relative
 }

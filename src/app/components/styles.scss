@@ -1,0 +1,13 @@
+
+@keyframes fade-out {
+    from {
+      background-color: #ccfbf1;
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+  
+  .fade-out {
+    animation: fade-out 5s ease-out;
+  }

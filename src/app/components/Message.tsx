@@ -15,13 +15,15 @@ import { ActiveConversationSkeleton } from "./Skeleton/ActiveConversation";
 import { validateBase64 } from "../utils/validateBase64";
 import { IconDocument } from "./Icons/IconDocument";
 import { IconLink } from "./Icons/IconLink";
+import "./styles.scss"
 
 export const Message = ({ message, reaction, handleOpenModal, setModalImage }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function }) => {
     // @ts-ignore
     const { userState } = useUser()
     const [content, setContent] = useState<string | undefined>("")
     const [loadingContent, setLoadingContent] = useState<boolean>(false)
-    const isFromClient = message.status === "client"
+    const [isFromClient, setIsFromClient] = useState(message.status === "client");
+    const [isRead, setIsRead] = useState(message.read);
 
     useEffect(() => {
         if (message.message_type === "text") {
@@ -122,7 +124,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
 
     return (
         <>
-            <div className={"flex items-end " + (isFromClient ? "float-left justify-start" : "float-right justify-end")}>
+            <div className={`flex text-sm items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
                 <div className={
                     "max-w-xl " +
                     (message.message_type !== "sticker" ?
@@ -216,7 +218,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                         }
                     </div>
                 </div>
-            </div>
+            </div >
 
             <div className="clear-both"></div>
         </>
