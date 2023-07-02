@@ -132,7 +132,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
 
-            const isAtBottom = scrollHeight - scrollTop === clientHeight;
+            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 2;
             setIsScrolledToBottom(isAtBottom);
         }
     };
