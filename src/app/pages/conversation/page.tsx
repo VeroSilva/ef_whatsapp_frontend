@@ -34,15 +34,17 @@ const Conversation = (): JSX.Element => {
     const [page, setPage] = useState(0);
     const [totalPage, setTotalPages] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
+    const [limit, setLimit] = useState(10);
     const loadingRef = useRef(false);
 
-    const loadConversations = () => {
+    const loadConversations = (clear: boolean) => {
         if (loadingRef.current) {
             return;
         }
-        setLoadingConversations(true);
         loadingRef.current = true;
-        getConversations(page * 10, 10, filter, userState.token)
+        const offset = clear ? 0 * limit : page * limit;
+        setLoadingConversations(true);
+        getConversations(offset, limit, filter, userState.token)
             .then((res) => {
                 setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
                 setLoadingConversations(false);
@@ -50,12 +52,11 @@ const Conversation = (): JSX.Element => {
                 setTotalPages(res.totalPages);
             })
             .catch((error: Error) => {
-                setLoadingConversations(false);
                 console.error(error);
             })
             .finally(() => {
                 loadingRef.current = false;
-
+                setLoadingConversations(false);
             });
     };
     useEffect(() => {
@@ -76,7 +77,7 @@ const Conversation = (): JSX.Element => {
             const { scrollTop, scrollHeight, clientHeight } = container;
 
             if (scrollTop + clientHeight >= scrollHeight - 2 && page < totalPage) {
-                loadConversations();
+                loadConversations(false);
             }
         }
     };
@@ -85,15 +86,21 @@ const Conversation = (): JSX.Element => {
         if (!userState || userState.token === "") {
             router.push('./pages/login');
         } else {
-            loadConversations();
+            loadConversations(true);
         }
     }, [userState]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            loadConversations();
+            handleClearPaginate();
         }
     };
+    const handleClearPaginate = () => {
+        setPage(0);
+        setConversations([]);
+        loadConversations(true);
+    };
+
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFilter(event.target.value);
