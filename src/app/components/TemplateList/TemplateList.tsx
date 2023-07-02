@@ -27,7 +27,7 @@ export const TemplateList = ({ templates, handleSendMessage, isLoading, setShowP
 
     return (
         <>
-            <div className="bg-slate-100 rounded border border-slate-300 w-2/3 p-8 overflow-auto">
+            <div className="bg-slate-100 rounded border border-slate-300 w-full p-8 overflow-auto">
                 {!selectedTemplate && templates.map((template, index) => (
                     <div key={`template-${index}`}>
                         <h1 className="text-sky-800 font-bold mb-4">{template.category}</h1>
