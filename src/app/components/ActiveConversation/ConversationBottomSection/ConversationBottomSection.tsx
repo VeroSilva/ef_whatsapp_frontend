@@ -5,7 +5,7 @@ import { IconTrash } from "../../Icons/IconTrash"
 import { AudioRecorder } from "./AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
 import { ConversationDropdown } from "../ConversationDropdown/ConversationDropdown"
-import { ConversationEmojis } from "../ConversationEmojis/ConversationEmojis"
+import { EmojiDropdown } from "../EmojiDropdown/EmojiDropdown"
 import { createConversation } from "@/app/services/api"
 import useUser from "@/app/hooks/useUser"
 import { dataMessageToSend } from "@/app/utils/messages"
@@ -39,7 +39,7 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
 
     return (
         <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400 transition-opacity duration-300">
-            {/* <ConversationEmojis /> */}
+            <EmojiDropdown setMessageToSend={setMessageToSend} messageToSend={messageToSend} />
 
             <ConversationDropdown setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
 
