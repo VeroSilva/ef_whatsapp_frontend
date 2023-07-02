@@ -37,7 +37,7 @@ export const ConversationPreview = ({
     }
 
     return (
-        <div className="w-full p-8 absolute top-0 h-full flex flex-col items-center z-10 bg-gradient-to-b from-slate-800 to-gray-900">
+        <div className="w-full p-8 absolute top-0 h-full flex flex-col items-center justify-center z-10 bg-gradient-to-b from-slate-800 to-gray-900">
             {selectedFile ?
                 <Preview
                     file={selectedFile}

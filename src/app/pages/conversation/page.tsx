@@ -61,6 +61,11 @@ const Conversation = (): JSX.Element => {
     };
 
     useEffect(() => {
+        if (activeConversationState.id === -1) resetActiveConversation()
+    }, [])
+
+
+    useEffect(() => {
         if (activeConversationState.id !== -1 && activeConversationState.id !== 0) {
             handleOpenConversation(activeConversationState.id);
         }

@@ -127,7 +127,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                     "max-w-xl " +
                     (message.message_type !== "sticker" ?
                         "messages-container " +
-                        (isFromClient ? "bg-slate-100 " : "bg-emerald-100 ") +
+                        (isFromClient ? "bg-slate-200 " : "bg-emerald-100 ") +
                         (message.message_type === "image" && loadingContent ? "h-[270px]" : "")
                         : "h-[200px]")
                 }>
@@ -138,7 +138,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                     {(message.message.response_to) &&
                         <div className={
                             "reply my-4 p-2 border-2 border-teal-200 rounded-md " +
-                            (isFromClient ? "border-l-teal-500 bg-slate-200" : "border-r-teal-500 bg-green-300")
+                            (isFromClient ? "border-l-teal-500 bg-slate-100" : "border-r-teal-500 bg-green-300")
                         }>
                             {message.replied_message?.message_type === "template" ?
                                 <TemplateReply template={message.replied_message?.message.template} />

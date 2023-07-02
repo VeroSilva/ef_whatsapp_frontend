@@ -26,6 +26,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
 
     const handleInputBodyChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
         const { value } = e.target;
+
         setInputsBodyVariables(prevState => {
             const newState: any = [...prevState];
             newState[index] = value;
@@ -179,7 +180,6 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
             <h3 className="mb-4 font-bold text-center text-slate-700">{template.name}</h3>
 
             <div className={templateIsEditable ? "grid grid-cols-2 grid-flow-row gap-8" : "flex justify-center"}>
-
                 {templateIsEditable &&
                     <div className="mb-4">
                         {headerData && headerData.example &&
@@ -308,7 +308,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                         {substrings.map((substring, index) => (
                                             <React.Fragment key={index}>
                                                 {substring}
-                                                {component.example && <strong>{!!inputsBodyVariables.length ? inputsBodyVariables[index] : matchesBody[index]}</strong>}
+                                                {component.example && <strong>{inputsBodyVariables[index] ?? matchesBody[index]}</strong>}
                                             </React.Fragment>
                                         ))}
                                     </p>
