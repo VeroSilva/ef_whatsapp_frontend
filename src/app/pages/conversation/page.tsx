@@ -338,6 +338,7 @@ const Conversation = (): JSX.Element => {
                     title="Crear nueva conversación"
                     onClose={() => handleOpenModal(false)}
                     show={showModal}
+                    width="500px"
                 >
                     <div className="flex flex-col space-y-4">
                         <label htmlFor="phone" className="text-sm text-gray-800 font-semibold">
