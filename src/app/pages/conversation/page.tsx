@@ -24,6 +24,7 @@ const Conversation = (): JSX.Element => {
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
     const [conversations, setConversations] = useState<IConversation[]>([]);
+    const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
@@ -34,7 +35,7 @@ const Conversation = (): JSX.Element => {
     const [page, setPage] = useState(0);
     const [totalPage, setTotalPages] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(100);
     const loadingRef = useRef(false);
 
     const loadConversations = (clear: boolean) => {
@@ -47,7 +48,6 @@ const Conversation = (): JSX.Element => {
         getConversations(offset, limit, filter, userState.token)
             .then((res) => {
                 setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
-                setLoadingConversations(false);
                 setPage(res.currentPage);
                 setTotalPages(res.totalPages);
             })
@@ -57,6 +57,7 @@ const Conversation = (): JSX.Element => {
             .finally(() => {
                 loadingRef.current = false;
                 setLoadingConversations(false);
+                setLoadingInitialConversations(false)
             });
     };
     useEffect(() => {
@@ -86,6 +87,7 @@ const Conversation = (): JSX.Element => {
         if (!userState || userState.token === "") {
             router.push('./pages/login');
         } else {
+            setLoadingInitialConversations(true)
             loadConversations(true);
         }
     }, [userState]);
@@ -263,44 +265,47 @@ const Conversation = (): JSX.Element => {
                 {/* BEGIN: Chat Side Menu */}
                 <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto" ref={containerRef}>
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
-                        <div className="flex items-center justify-end px-5 pt-5">
-                            <button onClick={() => handleOpenModal(true)}>
-                                <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
-                            </button>
-                        </div>
-                        <div className="pb-5 px-5 mt-5">
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                        <div className="bg-white sticky top-0">
+                            <div className="flex items-center justify-end px-5 pt-5">
+                                <button onClick={() => handleOpenModal(true)}>
+                                    <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
+                                </button>
+                            </div>
+                            <div className="pb-5 px-5 mt-5">
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                                    </div>
+                                    <input
+                                        type="search"
+                                        id="default-search"
+                                        className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="Buscar contacto o celular"
+                                        required
+                                        value={filter}
+                                        onChange={handleFilterChange}
+                                        onKeyDown={handleKeyDown}
+                                    />
                                 </div>
-                                <input
-                                    type="search"
-                                    id="default-search"
-                                    className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="Contacto o celular"
-                                    required
-                                    value={filter}
-                                    onChange={handleFilterChange}
-                                    onKeyDown={handleKeyDown}
-                                />
                             </div>
                         </div>
                         <div>
-                            {!loadingConversations ?
-                                conversations.map((conversation, index) => (
+                            {
+                                loadingInitialConversations ? [...Array(8)].map((n, index) => (
+                                    <ConversationSkeleton key={index} />
+                                )) : (conversations.map((conversation, index) => (
                                     <ItemListConversation
                                         conversation={conversation}
                                         key={index}
                                         handleOpenConversation={handleOpenConversation}
                                         activeConversation={activeConversationState.id}
                                         filter={filter}
-
                                     />
-                                )) :
-                                [...Array(8)].map((n, index) => (
-                                    <ConversationSkeleton key={index} />
-                                ))
+                                )))
                             }
+                            {loadingConversations && [...Array(1)].map((n, index) => (
+                                <ConversationSkeleton key={index} />
+                            ))}
                         </div>
                     </div>
                 </div>
