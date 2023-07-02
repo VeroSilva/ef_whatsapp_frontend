@@ -5,38 +5,32 @@ import { useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
 import { Button } from 'flowbite-react'
 import Image from "next/image"
-import { Contact, Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
-import { IconEdit } from "@/app/components/Icons/IconEdit"
+import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations'
 import { IconSearch } from "@/app/components/Icons/IconSearch"
 import useUser from "../../hooks/useUser"
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api'
 import { IconLogout } from '@/app/components/Icons/IconLogout'
 import { ItemListConversation } from '@/app/components/ItemListConversation'
 import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation'
-import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation'
 import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation'
+import { IconMessage } from '@/app/components/Icons/IconMessage'
+import { Modal } from '@/app/components/Modal/Modal'
+import useActiveConversation from "../../hooks/useActiveConversation";
 
 const Conversation = (): JSX.Element => {
     const router = useRouter()
     // @ts-ignore
     const { userState, logoutUser } = useUser()
+    // @ts-ignore
+    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation()
     const [conversations, setConversations] = useState<IConversation[]>([])
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false)
-    const [activeConversation, setActiveConversation] = useState<number>(0)
-    const [activeContact, setActiveContact] = useState<Contact>({
-        country: "",
-        email: "",
-        name: "",
-        phone: "",
-        tag_id: "",
-    })
     const [messages, setMessages] = useState<IMessage[]>([])
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
     const socketRef = useRef<Socket | null>(null);
-
-    // @ts-ignore
-    const cookies: any = parseCookies()
+    const [showModal, setShowModal] = useState<boolean>(false)
+    const [newPhone, setNewPhone] = useState<string>("")
 
     useEffect(() => {
         if (!userState || userState.token === "") {
@@ -52,33 +46,23 @@ const Conversation = (): JSX.Element => {
     }, [userState])
 
     useEffect(() => {
-        if (cookies.conversationId) {
-            handleOpenConversation(cookies.conversationId);
-
-            if (localStorage.getItem("activeContact")) {
-                const contactData = JSON.parse(localStorage.getItem("activeContact") ?? "")
-
-                setActiveContact(contactData)
-            }
+        if (activeConversationState.id !== -1 && activeConversationState.id !== 0) {
+            handleOpenConversation(activeConversationState.id)
         }
 
         const handleEscKeyPress = (event: any) => {
             if (event.key === 'Escape') {
-                setActiveConversation(0)
-
+                resetActiveConversation()
                 setMessages([])
-
-                destroyCookie(null, 'conversationId')
             }
         };
 
         document.addEventListener('keydown', handleEscKeyPress);
 
         return () => {
-            destroyCookie(null, 'conversationId')
             document.removeEventListener('keydown', handleEscKeyPress);
         }
-    }, [])
+    }, [activeConversationState])
 
     useEffect(() => {
         if (!!messages.length) {
@@ -108,7 +92,7 @@ const Conversation = (): JSX.Element => {
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
 
-                    if (activeConversation == payload.data.conversation.id) {
+                    if (activeConversationState.id == payload.data.conversation.id) {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
@@ -158,7 +142,6 @@ const Conversation = (): JSX.Element => {
     }, [conversations, messages])
 
     const handleOpenConversation = (id: number) => {
-        setActiveConversation(id)
         setMessages([])
         setLoadingMessages(true)
 
@@ -166,10 +149,47 @@ const Conversation = (): JSX.Element => {
             .then((res) => {
                 setMessages(res.reverse())
                 setLoadingMessages(false)
-                setCookie(null, 'conversationId', `${id}`, {
-                    maxAge: 30 * 24 * 60 * 60
-                })
             })
+    }
+
+    const handleOpenModal = (show: boolean) => {
+        setShowModal(show)
+    }
+
+    const handleCreateConversation = () => {
+        setActiveConversation({
+            contact: {
+                country: "",
+                email: "",
+                name: "",
+                phone: newPhone,
+                tag_id: "",
+                id: 0
+            },
+            id: -1
+        })
+
+        setMessages([])
+        setShowModal(false)
+    }
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPhone(e.target.value);
+    };
+
+    const CreateConversationButton = () => {
+        return (
+            <button
+                onClick={handleCreateConversation}
+                className={
+                    "border border-teal-600 p-2 rounded-md transition ease-in-out delay-50 " +
+                    (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
+                }
+                disabled={newPhone === ""}
+            >
+                Crear conversación
+            </button>
+        )
     }
 
     return (
@@ -181,12 +201,14 @@ const Conversation = (): JSX.Element => {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-12 gap-5 w-[1800px] h-[780px] mt-5 drop-shadow-md">
+            <div className="grid grid-cols-12 gap-5 w-[1800px] h-[70vh] mt-5 drop-shadow-md">
                 {/* BEGIN: Chat Side Menu */}
-                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3">
+                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 h-[70vh] overflow-auto">
                     <div className="box intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
-                        <div className="flex items-center px-5 pt-5">
-                            <IconEdit classes="w-6 h-6 text-slate-500 ml-auto" />
+                        <div className="flex items-center justify-end px-5 pt-5">
+                            <button onClick={() => handleOpenModal(true)}>
+                                <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
+                            </button>
                         </div>
                         <div className="pb-5 px-5 mt-5">
                             <div className="relative">
@@ -196,10 +218,10 @@ const Conversation = (): JSX.Element => {
                                 <input type="search" id="default-search" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Mockups, Logos..." required />
                             </div>
                         </div>
-                        <div className="h-[642px] overflow-y-auto scrollbar-hidden">
+                        <div>
                             {!loadingConversations ?
                                 conversations.map((conversation, index) => (
-                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} setActiveContact={setActiveContact} />
+                                    <ItemListConversation conversation={conversation} key={index} handleOpenConversation={handleOpenConversation} activeConversation={activeConversationState.id} />
                                 )) :
                                 [...Array(8)].map((n, index) => (
                                     <ConversationSkeleton key={index} />
@@ -210,13 +232,13 @@ const Conversation = (): JSX.Element => {
                 </div>
                 {/* END: Chat Side Menu */}
                 {/* BEGIN: Chat Content */}
-                <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
+                <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto h-[70vh] overflow-auto">
                     <div className="box h-full intro-y bg-slate-50 rounded-md border border-gray-200 drop-shadow-md">
                         {/* BEGIN: Chat Active */}
                         {loadingMessages ?
                             <ActiveConversationSkeleton /> :
-                            activeConversation !== 0 ?
-                                <ActiveConversation messages={messages} conversationId={activeConversation} activeContact={activeContact} /> :
+                            activeConversationState.id !== 0 ?
+                                <ActiveConversation messages={messages} conversationId={activeConversationState.id} activeContact={activeConversationState.contact} /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image
                                         src="/images/home-messages.jpg"
@@ -231,6 +253,26 @@ const Conversation = (): JSX.Element => {
                 </div>
                 {/* END: Chat Content */}
             </div>
+
+            <Modal
+                show={showModal}
+                onClose={() => {
+                    setShowModal(false);
+                }}
+                title="Crear nueva conversación"
+                width="500px"
+                footer={CreateConversationButton()}
+            >
+                <input
+                    id="phone"
+                    placeholder="58982828966"
+                    className='border-slate-300 rounded-md w-full focus:outline focus:outline-offset-2 focus:outline-teal-600 focus:ring-0 focus:border-none'
+                    required
+                    type="text"
+                    defaultValue={newPhone}
+                    onChange={handlePhoneChange}
+                />
+            </Modal>
         </div>
     )
 }

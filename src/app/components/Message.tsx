@@ -128,7 +128,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                     (message.message_type !== "sticker" ?
                         "messages-container " +
                         (isFromClient ? "bg-slate-100 " : "bg-emerald-100 ") +
-                        (message.message_type === "image" ? "h-[270px]" : "")
+                        (message.message_type === "image" && loadingContent ? "h-[270px]" : "")
                         : "h-[200px]")
                 }>
                     {!!reaction.length &&
@@ -152,24 +152,30 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                         : (message.message_type === "image" || message.message_type === "sticker") ?
                             loadingContent ?
                                 <ActiveConversationSkeleton /> :
-                                <Image
-                                    src={content ? (validateBase64(content) ? content : '') : ""}
-                                    width={message.message_type === "image" ? 250 : 150}
-                                    height={message.message_type === "image" ? 250 : 150}
-                                    alt="Imagen de mensaje"
-                                    className={"object-cover rounded-md cursor-pointer " + (message.message_type === "image" ? "h-[230px]" : "h-[160px]")}
-                                    onClick={() => {
-                                        setModalImage(content)
-                                        handleOpenModal(true)
-                                    }}
-                                    key={message.id}
-                                />
+                                <>
+                                    <Image
+                                        src={content ? (validateBase64(content) ? content : '') : ""}
+                                        width={message.message_type === "image" ? 250 : 150}
+                                        height={message.message_type === "image" ? 250 : 150}
+                                        alt="Imagen de mensaje"
+                                        className={"object-cover rounded-md cursor-pointer " + (message.message_type === "image" ? "h-[230px]" : "h-[160px]")}
+                                        onClick={() => {
+                                            setModalImage(content)
+                                            handleOpenModal(true)
+                                        }}
+                                        key={message.id}
+                                    />
+                                    {message.message.caption && <p className="my-2">{message.message.caption}</p>}
+                                </>
                             : message.message_type === "video" ?
-                                <ReactPlayer
-                                    url={content}
-                                    controls
-                                    width="250px"
-                                />
+                                <>
+                                    <ReactPlayer
+                                        url={content}
+                                        controls
+                                        width="250px"
+                                    />
+                                    {message.message.caption && <p className="my-2">{message.message.caption}</p>}
+                                </>
                                 : message.message_type === "audio" ?
                                     <ReactAudioPlayer
                                         src={content}

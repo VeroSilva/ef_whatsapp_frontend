@@ -1,6 +1,6 @@
 import './globals.css'
 import { Montserrat } from 'next/font/google'
-import UserProvider from './pages/user-context-provider';
+import ContextProvider from './pages/context-provider';
 
 const montserrat = Montserrat({
   weight: ['400', '700'],
@@ -19,11 +19,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <UserProvider>
+      <ContextProvider>
         <body className={montserrat.className}>
           {children}
         </body>
-      </UserProvider>
+      </ContextProvider>
     </html>
   )
 }

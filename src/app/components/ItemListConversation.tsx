@@ -16,13 +16,28 @@ import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
 import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
+import useActiveConversation from "../hooks/useActiveConversation";
 
-export const ItemListConversation = ({ conversation, handleOpenConversation, setActiveContact }: { conversation: any, handleOpenConversation: Function, setActiveContact: Function }) => {
+export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation }: { conversation: any, handleOpenConversation: Function, activeConversation: number }) => {
     const [unreadCount, setUnreadCount] = useState(false)
+    // @ts-ignore
+    const { setActiveConversation } = useActiveConversation()
 
     useEffect(() => {
         setUnreadCount(parseInt(conversation.unread_count) > 0)
     }, [conversation])
+
+    const handleClick = () => {
+        if (activeConversation !== conversation.id) {
+            setActiveConversation({
+                contact: conversation.contact,
+                id: conversation.id
+            })
+            handleOpenConversation(conversation.id)
+        }
+
+        setUnreadCount(false)
+    }
 
     return (
         <div
@@ -30,15 +45,10 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, set
                 "cursor-pointer flex items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
                 (unreadCount ? "bg-teal-100" : "hover:bg-slate-100")
             }
-            onClick={() => {
-                handleOpenConversation(conversation.id)
-                setActiveContact(conversation.contact)
-                setUnreadCount(false)
-                localStorage.setItem("activeContact", JSON.stringify(conversation.contact));
-            }}
+            onClick={handleClick}
         >
             <div className="w-14 h-14 flex-none image-fit mr-1">
-                {GenerateInitialsImage(conversation.contact.name)}
+                {GenerateInitialsImage(conversation.contact.name ?? "")}
             </div>
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">

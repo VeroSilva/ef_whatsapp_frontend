@@ -1,20 +1,32 @@
-import { useState, ChangeEvent, useRef, useEffect } from "react"
-import { Dropdown, Spinner } from "flowbite-react"
+import { useState } from "react"
+import { Spinner } from "flowbite-react"
 import { IconSend } from "../../Icons/IconSend"
 import { IconTrash } from "../../Icons/IconTrash"
 import { AudioRecorder } from "./AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
 import { ConversationDropdown } from "../ConversationDropdown/ConversationDropdown"
 import { ConversationEmojis } from "../ConversationEmojis/ConversationEmojis"
+import { createConversation } from "@/app/services/api"
+import useUser from "@/app/hooks/useUser"
+import { dataMessageToSend } from "@/app/utils/messages"
 
-export const ConversationBottomSection = ({ conversationId, setSelectedFile, setTemplates }: { conversationId: number, setSelectedFile: Function, setTemplates: Function }) => {
+export const ConversationBottomSection = ({ conversationId, setSelectedFile, setTemplates, newConversationPhone }: { conversationId: number, setSelectedFile: Function, setTemplates: Function, newConversationPhone?: string }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
     const [audio, setAudio] = useState<Blob | null>(null)
     // @ts-ignore
     const { sendMessage, isLoading } = useMessage()
+    // @ts-ignore
+    const { userState } = useUser()
 
-    const handleSendMessage = (type: string, data: any, resetData: Function) => {
-        sendMessage({ type, data, conversationId }).finally(() => resetData())
+    const handleSendMessage = async (type: string, data: any, resetData: Function) => {
+        if (conversationId === -1) { //temporary conversation
+            const dataToSend = await dataMessageToSend({ data, type })
+
+            createConversation({ to: newConversationPhone, messageData: dataToSend }, userState.token)
+                .then((res) => console.log(res))
+        } else {
+            sendMessage({ type, data, conversationId }).finally(() => resetData())
+        }
     }
 
     return (

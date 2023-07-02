@@ -4,6 +4,7 @@ export interface Contact {
     name: string,
     phone: string,
     tag_id: string,
+    id: number
 }
 
 export interface Conversation {
@@ -35,7 +36,8 @@ interface MessageDetail {
     reacted_message_id?: string,
     template?: any,
     response_to?: string,
-    text?: string
+    text?: string,
+    caption?: string
 }
 
 export interface Message {
