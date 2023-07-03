@@ -125,7 +125,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
 
     return (
         <>
-            <div className={`flex text-md items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
+            <div data-id={message.id} className={`flex text-md items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
                 <div className={
                     "max-w-xl " +
                     (message.message_type !== "sticker" ?
@@ -135,7 +135,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                         : "h-[200px]")
                 }>
                     {!!reaction.length &&
-                        <span role="img" className={"reaction absolute -bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
+                        <span role="img" className={"reaction absolute bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
                     }
 
                     {(message.message.response_to) &&

@@ -13,19 +13,22 @@ import { ConversationBottomSection } from "./ConversationBottomSection/Conversat
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { Template } from "../../interfaces/template";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
+import { Spinner } from "flowbite-react";
 
 interface ActiveConversationProps {
     messages: IMessage[];
     conversationId: number;
     activeContact: Contact;
-    loadMessages: (clear: boolean, id: number) => void
+    loadMessages: (clear: boolean, id: number) => void,
+    loadingMessages: Boolean;
 }
 
 export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     messages,
     conversationId,
     activeContact,
-    loadMessages
+    loadMessages,
+    loadingMessages
 }) => {
     const [reactions, setReactions] = useState<Reaction[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -38,24 +41,24 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     const [templates, setTemplates] = useState<Template[]>([]);
     const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
+    const [currentTopMessage, setCurrentTopMessage] = useState(0);
 
     useEffect(() => {
-        if (isScrolledToBottom) {
-            scrollToBottom();
+        if (!isScrolledToBottom && updatedMessages.length) {
+            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
+        } else if (isScrolledToTop && updatedMessages.length) {
+            scrollToElement(currentTopMessage);
+        } else if (isScrolledToBottom && updatedMessages.length) {
+            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
         }
-    }, [isScrolledToBottom, updatedMessages]);
+    }, [updatedMessages]);
 
     useEffect(() => {
-        if (isScrolledToTop) {
+        if (isScrolledToTop == true) {
+            setCurrentTopMessage(updatedMessages[0].id)
             loadMessages(false, conversationId)
         }
     }, [isScrolledToTop]);
-
-    useEffect(() => {
-        if (messagesContainerRef.current?.lastElementChild !== null) {
-            scrollToBottom();
-        }
-    }, [messagesContainerRef.current?.lastElementChild]);
 
     useEffect(() => {
         setReactions([]);
@@ -139,15 +142,19 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
         const container = messagesContainerRef.current;
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
-            const isAtTop = scrollTop <= 50;
-            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 2;
+            const isAtTop = scrollTop <= 5;
+            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 1.5;
             setIsScrolledToTop(isAtTop);
             setIsScrolledToBottom(isAtBottom);
         }
     };
 
-    const scrollToBottom = () => {
-        messagesContainerRef.current?.lastElementChild?.scrollIntoView();
+    const scrollToElement = (id: Number) => {
+        const element = document.querySelector(`[data-id="${id}"]`);
+        if (element) {
+            element.scrollIntoView();
+        }
+        // messagesCoelementntainerRef.current?.lastElementChild?.scrollIntoView();
     };
 
     const handleOpenModal = (show: boolean) => {
@@ -178,6 +185,18 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                 </div>
             </div>
             <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
+                {
+
+                    (isScrolledToTop && loadingMessages) && (
+                        <div className="flex justify-center items-center h-screen">
+                            <Spinner
+                                aria-label="Extra large spinner example"
+                                size="xl"
+                            />
+                        </div>
+                    )
+                }
+
                 {updatedMessages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp);
