@@ -37,22 +37,26 @@ const Users = (): JSX.Element => {
         type: "",
         message: "",
         show: false
-    })
+    });
 
     useEffect(() => {
+        handleLoadUsers()
+    }, []);
+
+    const handleLoadUsers = () => {
         setLoading(true);
         getUsers(userState.token).then((res => {
             setUsers(res);
             setLoading(false);
         }))
-    }, []);
+    }
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show);
     };
 
     const dataIsValid = () => {
-        if (credentials.username === "" || credentials.password === "" || credentials.rol === "") return false;
+        if (credentials.username === "" || credentials.password === "" || credentials.role === "") return false;
         else return true;
     };
 
@@ -71,6 +75,7 @@ const Users = (): JSX.Element => {
                         show: true
                     })
                 } else {
+                    handleLoadUsers()
                     setAlert({
                         type: "success",
                         message: "Usuario creado con éxito!",
@@ -220,9 +225,9 @@ const Users = (): JSX.Element => {
                                 onChange={(e) => setCredentials({ ...credentials, role: e.target.value })}
                             >
                                 <option selected className="text-gray-600">Seleccione rol</option>
-                                <option value="admin">Administrador</option>
-                                <option value="call">Call center</option>
-                                <option value="support">Soporte</option>
+                                <option value="1">Administrador</option>
+                                <option value="2">Call center</option>
+                                <option value="3">Soporte</option>
                             </select>
                         </div>
                     </div>
