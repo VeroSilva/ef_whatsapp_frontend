@@ -61,6 +61,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                 className="object-cover rounded-md w-full h-full"
                                 loading="lazy"
                                 decoding="async"
+                                unoptimized
                             />
                         </div>
                         : null

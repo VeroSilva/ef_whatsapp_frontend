@@ -134,6 +134,7 @@ const Conversation = (): JSX.Element => {
         setPageConversation(0);
         setConversations([]);
         loadConversations(true);
+        setLoadingInitialConversations(true)
     };
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,7 +298,7 @@ const Conversation = (): JSX.Element => {
                 {/* BEGIN: Chat Side Menu */}
                 <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto min-h-full bg-slate-50 border border-gray-200" ref={containerRef}>
                     <div className="box intro-y bg-slate-50 ">
-                        <div className="bg-slate-50 sticky top-0">
+                        <div className="bg-slate-50 sticky top-0 z-40">
                             <div className="flex items-center justify-between px-5 pt-5">
                                 <button onClick={() => handleFilterUnread()}>
                                     <IconUnread classes={`w-6 h-6 ${filter.unread ? 'text-red-600 ' : 'text-slate-500 '} ml-auto`} />

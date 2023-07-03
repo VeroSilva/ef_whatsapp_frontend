@@ -155,7 +155,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     };
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col relative">
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
