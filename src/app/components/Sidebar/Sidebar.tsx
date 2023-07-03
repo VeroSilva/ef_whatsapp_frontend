@@ -33,7 +33,7 @@ export const Sidebar = () => {
     const [active, setActive] = useState("Chat")
 
     return (
-        <div className={`bg-slate-100 shadow-sm p-5 pt-8 relative duration-200 h-full rounded-tl-md rounded-bl-md ${open ? "w-72" : "w-20"}`}>
+        <div className={`bg-slate-100 z-50 shadow-sm p-5 pt-8 relative duration-200 h-full rounded-tl-md rounded-bl-md ${open ? "w-72" : "w-20"}`}>
             <button className="p-1 bg-sky-800 text-slate-100 rounded-full absolute -right-3 top-9" onClick={() => setOpen(!open)}>
                 <IconChevron classes={`w-6 h-6 duration-200 ${open && "rotate-180"}`} />
             </button>

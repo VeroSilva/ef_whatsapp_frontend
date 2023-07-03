@@ -265,11 +265,10 @@ const Conversation = (): JSX.Element => {
     return (
         <>
             <Sidebar />
-
-            <div className="grid grid-cols-12 gap-1 p-5 h-full flex-1">
+            <div className="grid grid-cols-12 h-full flex-1">
                 {/* BEGIN: Chat Side Menu */}
-                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto" ref={containerRef}>
-                    <div className="box intro-y bg-slate-50 rounded-md border border-gray-200">
+                <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto min-h-full bg-slate-50 border border-gray-200" ref={containerRef}>
+                    <div className="box intro-y bg-slate-50 ">
                         <div className="bg-slate-50 sticky top-0">
                             <div className="flex items-center justify-between px-5 pt-5">
                                 <button onClick={() => handleFilterUnread()}>
@@ -320,7 +319,7 @@ const Conversation = (): JSX.Element => {
                 {/* END: Chat Side Menu */}
                 {/* BEGIN: Chat Content */}
                 <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
-                    <div className="box h-full intro-y bg-slate-50 rounded-md border border-gray-200">
+                    <div className="box h-full intro-y bg-slate-50 rounded-tr-md rounded-br-md border border-gray-200">
                         {/* BEGIN: Chat Active */}
                         {loadingMessages ?
                             <ActiveConversationSkeleton /> :

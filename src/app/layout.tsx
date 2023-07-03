@@ -22,7 +22,7 @@ export default function RootLayout({
       <ContextProvider>
         <body className={montserrat.className}>
           <div className="w-full min-h-screen flex items-center justify-center p-8 page">
-            <div className='flex items-center justify-center bg-neutral-200 w-full max-h-[90vh] h-[90vh] rounded-md drop-shadow-lg max-w-[2000px] z-10'>
+            <div className='flex items-center justify-center w-full max-h-[90vh] h-[90vh] rounded-md drop-shadow-lg max-w-[2000px] z-10'>
               {children}
             </div>
           </div>
