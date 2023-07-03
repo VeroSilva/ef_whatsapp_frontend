@@ -16,6 +16,8 @@ import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
 import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
+import { IconWarning } from './Icons/IconWarning';
+
 import useActiveConversation from "../hooks/useActiveConversation";
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
@@ -67,8 +69,13 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                     <a href="#" className="font-medium">
                         {highlightText(conversation.contact.name, filter)}
                     </a>
-                    <div className="text-xs text-slate-500 ml-auto ">
-                        <span className={(unreadCount ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</span>
+                    <div className="text-xs text-right text-slate-500 ml-auto whitespace-nowrap">
+                        <p className={(unreadCount ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</p>
+                        {
+                            Math.floor((Date.now() - conversation.message_created_at * 1000) / (1000 * 60 * 60)) >= 24 && (
+                                <IconWarning classes="w-5 h-5 text-yellow-400 inline-block me-1" />
+                            )
+                        }
                     </div>
                 </div>
                 {conversation.phone !== null &&

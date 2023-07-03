@@ -124,7 +124,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
 
     return (
         <>
-            <div className={`flex text-sm items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
+            <div className={`flex text-md items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
                 <div className={
                     "max-w-xl " +
                     (message.message_type !== "sticker" ?
