@@ -206,7 +206,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                                 type="text"
                                                 value={inputHeaderVariable ?? ""}
                                                 onChange={e => handleInputHeaderChange(e)}
-                                                className="border border-slate-300 rounded-md my-2 w-full"
+                                                className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                             />
                                         </div>
                                     </div>
@@ -232,7 +232,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                                     type="text"
                                                     value={inputsBodyVariables[index] ?? ""}
                                                     onChange={e => handleInputBodyChange(e, index)}
-                                                    className="border border-slate-300 rounded-md my-2 w-full"
+                                                    className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                                 />
                                             </div>
                                         </div>
@@ -251,7 +251,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                         placeholder={`Link para: ${buttonsUrl[0].text}`}
                                         value={inputButtonVariable}
                                         onChange={e => handleInputButtonsChange(e)}
-                                        className="border border-slate-300 rounded-md my-2 w-full"
+                                        className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                     />
                                 </div>
                             </>

@@ -165,3 +165,18 @@ export const getUsers = async (token) => {
 
   return response;
 };
+
+export const createUser = async (data, token) => {
+  const response = await fetch(`${process.env.API_URL}/user`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
