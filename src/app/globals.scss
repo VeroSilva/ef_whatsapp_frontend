@@ -56,3 +56,15 @@
 .messages-container { 
   @apply border border-slate-200/60 px-2 py-1 my-1 text-slate-500 rounded-md relative
 }
+
+.input-sky {
+  @apply focus:ring-sky-800 focus:border-sky-800
+}
+
+.main-button {
+  @apply bg-sky-800 text-white rounded-md text-sm px-4 py-2 mb-8
+}
+
+.second-button {
+  @apply border border-sky-800 text-sky-800 rounded-md text-sm px-4 py-2 mb-8
+}
