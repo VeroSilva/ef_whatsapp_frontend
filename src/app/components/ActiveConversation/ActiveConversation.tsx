@@ -166,56 +166,12 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                     <a href="#" className="w-5 h-5 text-slate-500">
                         <IconSearch classes="w-5 h-5" />
                     </a>
-                    <a href="#" className="w-5 h-5 text-slate-500 ml-5">
-                        <IconUserPlus classes="w-5 h-5" />
-                    </a>
-
-                    <button
-                        id="dropdownMenuIconButton"
-                        data-dropdown-toggle="dropdownDots"
-                        className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900"
-                        type="button"
-                    >
-                        <IconEllipsisVertical classes="w-6 h-6" />
-                    </button>
-
-                    <div
-                        id="dropdownDots"
-                        className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
-                    >
-                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-                            <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    Settings
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    Earnings
-                                </a>
-                            </li>
-                        </ul>
-                        <div className="py-2">
-                            <a
-                                href="#"
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                            >
-                                Separated link
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
                 {updatedMessages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp);
-
                         return <Message message={message} key={index} reaction={reacted} handleOpenModal={handleOpenModal} setModalImage={setModalImage} />;
                     } else return null;
                 })}

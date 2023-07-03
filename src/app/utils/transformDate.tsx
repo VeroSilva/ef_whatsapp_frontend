@@ -5,7 +5,7 @@ export const transformDate = (timestamp: number): string => {
   // Verifica si la fecha está dentro de las últimas 24 horas
   const isWithin24Hours = (currentDate.getTime() - providedDate.getTime()) < 24 * 60 * 60 * 1000;
 
-  if (isWithin24Hours) {
+  if (isWithin24Hours && currentDate.getDate() === providedDate.getDate()) {
     // Formatea la fecha en "hh:mm"
     const formattedTime = `${providedDate.getHours()}:${providedDate.getMinutes().toString().padStart(2, '0')}`;
     return formattedTime;
