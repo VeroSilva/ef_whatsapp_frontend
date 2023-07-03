@@ -24,42 +24,74 @@ const Conversation = (): JSX.Element => {
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
     const [conversations, setConversations] = useState<IConversation[]>([]);
-    const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
-    const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
     const [messages, setMessages] = useState<IMessage[]>([]);
-    const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
     const socketRef = useRef<Socket | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [newPhone, setNewPhone] = useState<string>("");
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
-    const [page, setPage] = useState(0);
-    const [totalPage, setTotalPages] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [limit, setLimit] = useState(100);
-    const loadingRef = useRef(false);
+
+    const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
+    const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
+    const [pageConversation, setPageConversation] = useState(0);
+    const [totalPagesConversation, setTotalPagesConversation] = useState(0);
+    const [limitConversation, setLimitConversation] = useState(100);
+    const loadingRefConversation = useRef(false);
+
+    const [loadingInitialMessages, setLoadingInitialMessages] = useState<boolean>(false);
+    const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
+    const [pageMessage, setPageMessage] = useState(0);
+    const [totalPagesMessage, setTotalPagesMessage] = useState(1);
+    const [limitMessage, setLimitMessage] = useState(50);
+    const loadingRefMessage = useRef(false);
 
     const loadConversations = (clear: boolean) => {
-        if (loadingRef.current) {
+        if (loadingRefConversation.current) {
             return;
         }
-        loadingRef.current = true;
-        const offset = clear ? 0 * limit : page * limit;
+        loadingRefConversation.current = true;
+        const offset = clear ? 0 * limitConversation : pageConversation * limitConversation;
         setLoadingConversations(true);
-        getConversations(offset, limit, filter, userState.token)
+        getConversations(offset, limitConversation, filter, userState.token)
             .then((res) => {
                 setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
-                setPage(res.currentPage);
-                setTotalPages(res.totalPages);
+                setPageConversation(res.currentPage);
+                setTotalPagesConversation(res.totalPages);
             })
             .catch((error: Error) => {
                 console.error(error);
             })
             .finally(() => {
-                loadingRef.current = false;
+                loadingRefConversation.current = false;
                 setLoadingConversations(false);
                 setLoadingInitialConversations(false)
             });
     };
+
+    const loadMessages = (clear: boolean, id: number) => {
+        if (loadingRefMessage.current || pageMessage == totalPagesMessage) {
+            return;
+        }
+        loadingRefMessage.current = true;
+        const offset = clear ? 0 * limitMessage : pageMessage * limitMessage;
+        setLoadingMessages(true);
+        getMessagesByConversation(id, offset, limitMessage, userState.token)
+            .then((res) => {
+                setMessages((prevMessages) => [...res.messages.reverse(), ...prevMessages]);
+                setPageMessage(res.currentPage);
+                setTotalPagesMessage(res.totalPages);
+                setLoadingMessages(false);
+            })
+            .catch((error: Error) => {
+                console.error(error);
+            })
+            .finally(() => {
+                loadingRefMessage.current = false;
+                setLoadingMessages(false);
+                setLoadingInitialMessages(false)
+            });
+    };
+
     useEffect(() => {
         if (!loadingConversations && containerRef.current) {
             containerRef.current.addEventListener('scroll', handleScroll);
@@ -77,7 +109,7 @@ const Conversation = (): JSX.Element => {
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
 
-            if (scrollTop + clientHeight >= scrollHeight - 2 && page < totalPage) {
+            if (scrollTop + clientHeight >= scrollHeight - 2 && pageConversation < totalPagesConversation) {
                 loadConversations(false);
             }
         }
@@ -94,15 +126,15 @@ const Conversation = (): JSX.Element => {
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            handleClearPaginate();
+            handleClearPaginateConversation();
         }
     };
-    const handleClearPaginate = () => {
-        setPage(0);
+
+    const handleClearPaginateConversation = () => {
+        setPageConversation(0);
         setConversations([]);
         loadConversations(true);
     };
-
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFilter((prevFilter: any) => ({ ...prevFilter, search: event.target.value }));
@@ -113,7 +145,7 @@ const Conversation = (): JSX.Element => {
     };
 
     useEffect(() => {
-        setPage(0);
+        setPageConversation(0);
         setConversations([]);
         setLoadingInitialConversations(true)
         loadConversations(true);
@@ -215,13 +247,9 @@ const Conversation = (): JSX.Element => {
 
     const handleOpenConversation = (id: number) => {
         setMessages([]);
-        setLoadingMessages(true);
-
-        getMessagesByConversation(id, 50, userState.token)
-            .then((res) => {
-                setMessages(res.reverse());
-                setLoadingMessages(false);
-            });
+        setLoadingInitialMessages(true);
+        setPageMessage(0);
+        loadMessages(true, id);
     };
 
     const handleOpenModal = (show: boolean) => {
@@ -321,13 +349,14 @@ const Conversation = (): JSX.Element => {
                 <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
                     <div className="box h-full intro-y bg-slate-50 rounded-tr-md rounded-br-md border border-gray-200">
                         {/* BEGIN: Chat Active */}
-                        {loadingMessages ?
+                        {loadingInitialMessages ?
                             <ActiveConversationSkeleton /> :
                             activeConversationState.id !== 0 ?
                                 <ActiveConversation
                                     messages={messages}
                                     conversationId={activeConversationState.id}
                                     activeContact={activeConversationState.contact}
+                                    loadMessages={loadMessages}
                                 /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image

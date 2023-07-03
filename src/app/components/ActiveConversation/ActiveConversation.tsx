@@ -18,18 +18,21 @@ interface ActiveConversationProps {
     messages: IMessage[];
     conversationId: number;
     activeContact: Contact;
+    loadMessages: (clear: boolean, id: number) => void
 }
 
 export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     messages,
     conversationId,
     activeContact,
+    loadMessages
 }) => {
     const [reactions, setReactions] = useState<Reaction[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalImage, setModalImage] = useState<string>("");
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+    const [isScrolledToTop, setIsScrolledToTop] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [templates, setTemplates] = useState<Template[]>([]);
@@ -41,6 +44,12 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
             scrollToBottom();
         }
     }, [isScrolledToBottom, updatedMessages]);
+
+    useEffect(() => {
+        if (isScrolledToTop) {
+            loadMessages(false, conversationId)
+        }
+    }, [isScrolledToTop]);
 
     useEffect(() => {
         if (messagesContainerRef.current?.lastElementChild !== null) {
@@ -128,11 +137,11 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
 
     const handleScroll = () => {
         const container = messagesContainerRef.current;
-
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
-
+            const isAtTop = scrollTop <= 50;
             const isAtBottom = scrollHeight - scrollTop >= clientHeight - 2;
+            setIsScrolledToTop(isAtTop);
             setIsScrolledToBottom(isAtBottom);
         }
     };

@@ -27,7 +27,7 @@ const menuItems = [
 ]
 
 export const Sidebar = () => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     //@ts-ignore
     const { logoutUser } = useUser();
     const [active, setActive] = useState("Chat")

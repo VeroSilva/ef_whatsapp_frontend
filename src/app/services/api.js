@@ -29,9 +29,9 @@ export const getConversations = async (offset, limit, filter, token) => {
   return response;
 };
 
-export const getMessagesByConversation = async (id, limit, token) => {
+export const getMessagesByConversation = async (id, offset, limit, token) => {
   const response = await fetch(
-    `${process.env.API_URL}/conversation/${id}/messages?offset=0&limit=${limit}`,
+    `${process.env.API_URL}/conversation/${id}/messages?offset=${offset}&limit=${limit}`,
     {
       method: "GET",
       headers: {
