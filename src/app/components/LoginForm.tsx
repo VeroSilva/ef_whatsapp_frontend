@@ -67,7 +67,7 @@ export const LoginForm = () => {
                 <input
                     type="text"
                     id="input-group-1"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
                     placeholder="username"
                     onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                 />
@@ -87,7 +87,7 @@ export const LoginForm = () => {
                 <input
                     type={showPassword ? "text" : "password"}
                     id="input-group-1"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
                     placeholder="password"
                     onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 />
@@ -96,7 +96,7 @@ export const LoginForm = () => {
             <div className="mt-5 xl:mt-8 text-center xl:text-left flex justify-center">
                 <button
                     type="button"
-                    className={"flex text-white focus:ring-4 focus:ring-teal-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2  mb-2 focus:outline-none transition ease-in-out delay-150 " + (disabled ? "bg-gray-400 cursor-not-allowed" : "bg-teal-600 hover:bg-teal-800")}
+                    className={"flex text-white focus:ring-4 focus:ring-sky-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2  mb-2 focus:outline-none transition ease-in-out delay-150 " + (disabled ? "bg-gray-400 cursor-not-allowed" : "bg-sky-800 hover:bg-sky-600")}
                     disabled={disabled}
                     onClick={handleLogin}
                 >
