@@ -70,6 +70,7 @@ const Conversation = (): JSX.Element => {
 
     const loadMessages = (clear: boolean, id: number) => {
         if (loadingRefMessage.current || pageMessage == totalPagesMessage) {
+            setLoadingInitialMessages(false);
             return;
         }
         loadingRefMessage.current = true;
@@ -77,10 +78,17 @@ const Conversation = (): JSX.Element => {
         setLoadingMessages(true);
         getMessagesByConversation(id, offset, limitMessage, userState.token)
             .then((res) => {
-                setMessages((prevMessages) => [...res.messages.reverse(), ...prevMessages]);
-                setPageMessage(res.currentPage);
-                setTotalPagesMessage(res.totalPages);
-                setLoadingMessages(false);
+
+                if (!res.message) {
+                    setMessages((prevMessages) => [...res.messages.reverse(), ...prevMessages]);
+                    setPageMessage(res.currentPage);
+                    setTotalPagesMessage(res.totalPages);
+                    setLoadingMessages(false);
+                } else {
+                    resetActiveConversation();
+                    setMessages([]);
+                }
+
             })
             .catch((error: Error) => {
                 console.error(error);

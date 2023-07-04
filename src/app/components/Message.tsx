@@ -39,10 +39,11 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
         getMedia(userState.token, message.message.url)
             .then((media) => {
                 setContent(media);
-                setLoadingContent(false);
             })
             .catch((error) => {
                 console.error("Error fetching media:", error);
+            })
+            .finally(() => {
                 setLoadingContent(false);
             });
 

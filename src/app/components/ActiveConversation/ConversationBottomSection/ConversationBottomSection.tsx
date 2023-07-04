@@ -19,7 +19,7 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
     const { userState } = useUser()
 
     const handleSendMessage = async (type: string, data: any, resetData: Function) => {
-        if (conversationId === -1) { //temporary conversation
+        if (conversationId === -1) {
             const dataToSend = await dataMessageToSend({ data, type })
 
             createConversation({ to: newConversationPhone, messageData: dataToSend }, userState.token)
