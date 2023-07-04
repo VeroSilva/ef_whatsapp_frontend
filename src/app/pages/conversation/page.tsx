@@ -286,7 +286,7 @@ const Conversation = (): JSX.Element => {
         <button
             onClick={handleCreateConversation}
             className={
-                "border border-teal-600 p-2 rounded-md transition ease-in-out delay-50 " +
+                "main-button transition ease-in-out delay-50 " +
                 (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
             }
             disabled={newPhone === ""}
@@ -414,7 +414,7 @@ const Conversation = (): JSX.Element => {
 
                     <div className="flex justify-end space-x-4 mt-4">
                         <button
-                            className="border border-gray-300 rounded-lg p-2"
+                            className="second-button"
                             onClick={() => handleOpenModal(false)}
                         >
                             Cancelar

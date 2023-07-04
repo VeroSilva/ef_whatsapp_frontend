@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/app/components/Sidebar/Sidebar";
 import { SkeletonTable } from "@/app/components/Skeleton/Table";
 import { usePaginateTable } from "../../hooks/usePaginateTable"
-import { deleteUser, getUsers } from "@/app/services/api";
+import { deleteTag, getTags } from "@/app/services/api";
 import useUser from "../../hooks/useUser"
 import { IconEdit } from "@/app/components/Icons/IconEdit";
 import { IconTrash } from "@/app/components/Icons/IconTrash";
@@ -13,16 +13,16 @@ import { IconLoading } from "@/app/components/Icons/IconLoading";
 import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
 import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
-import { FormUser } from "@/app/components/FormUser/FormUser";
+import { FormTag } from "@/app/components/FormTag/FormTag";
 
-const Users = (): JSX.Element => {
+const Tags = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
-    const [loadingDeleteUser, setLoadingDeleteUser] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [userData, setUserData] = useState<any>({});
+    const [loadingDeleteTag, setLoadingDeleteTag] = useState(false);
+    const [tags, setTags] = useState([]);
+    const [tagData, setTagData] = useState<any>({});
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
-    const { slice, range } = usePaginateTable({ data: users, page, rowsPerPage });
+    const { slice, range } = usePaginateTable({ data: tags, page, rowsPerPage });
     // @ts-ignore
     const { userState } = useUser();
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -33,14 +33,9 @@ const Users = (): JSX.Element => {
         message: "",
         show: false
     });
-    const roles = [
-        { id: "1", name: "Administrador", classes: "bg-blue-500" },
-        { id: "2", name: "Call Center", classes: "bg-indigo-500" },
-        { id: "3", name: "Soporte", classes: "bg-violet-500" },
-    ]
 
     useEffect(() => {
-        handleLoadUsers()
+        handleLoadTags()
     }, []);
 
     useEffect(() => {
@@ -55,19 +50,19 @@ const Users = (): JSX.Element => {
         }
     }, [alert])
 
-    const handleLoadUsers = () => {
+    const handleLoadTags = () => {
         setLoading(true);
-        getUsers(userState.token).then((res => {
-            setUsers(res);
+        getTags(userState.token).then((res => {
+            setTags(res);
             setLoading(false);
         }))
     }
 
-    const handleDeleteUser = () => {
-        setLoadingDeleteUser(true);
+    const handleDeleteTag = () => {
+        setLoadingDeleteTag(true);
 
-        deleteUser(userData.id, userState.token).then((res => {
-            setLoadingDeleteUser(false);
+        deleteTag(tagData.id, userState.token).then((res => {
+            setLoadingDeleteTag(false);
             handleOpenDeleteModal(false);
 
             if (!res) {
@@ -77,10 +72,10 @@ const Users = (): JSX.Element => {
                     show: true
                 })
             } else {
-                handleLoadUsers()
+                handleLoadTags()
                 setAlert({
                     type: "success",
-                    message: "Usuario eliminado con éxito!",
+                    message: "Etiqueta eliminada con éxito!",
                     show: true
                 })
             }
@@ -107,7 +102,7 @@ const Users = (): JSX.Element => {
                 <button
                     className="main-button"
                     onClick={() => handleOpenModal(true)}
-                >Nuevo usuario</button>
+                >Nueva etiqueta</button>
 
                 <div className="relative overflow-x-auto w-full rounded-md">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -117,10 +112,13 @@ const Users = (): JSX.Element => {
                                     ID
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
-                                    Username
+                                    Name
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
-                                    Rol
+                                    Descripción
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-center">
+                                    Color
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
                                     Acciones
@@ -129,51 +127,45 @@ const Users = (): JSX.Element => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <SkeletonTable col={3} />
+                                <SkeletonTable col={4} />
                             ) : (
-                                slice.map((user, index) => {
-                                    const role = user.role && roles.find(role => role.id === user.role);
-
-                                    return (
-                                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{user.id}</th>
-                                            <td className="px-6 py-4 text-center">{user.username}</td>
-                                            <td className="px-6 py-4 text-center">
-                                                {
-                                                    role ?
-                                                        <span className={`rounded-lg text-xs text-white px-2 py-1 ${role.classes}`}>{role.name}</span> :
-                                                        <span className="bg-gray-500 text-xs text-white rounded-lg px-2 py-1">No registrado</span>
-                                                }
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex justify-center items-center">
-                                                    <a
-                                                        className="flex items-center mr-3 text-xs"
-                                                        href="#"
-                                                        onClick={() => {
-                                                            handleOpenEditModal(true);
-                                                            setUserData(user);
-                                                        }}
-                                                    >
-                                                        <IconEdit classes="w-5 h-5" />
-                                                        Editar
-                                                    </a>
-                                                    <a
-                                                        className="flex items-center text-danger text-xs"
-                                                        href="#"
-                                                        onClick={() => {
-                                                            setShowDeleteModal(true);
-                                                            setUserData(user);
-                                                        }}
-                                                    >
-                                                        <IconTrash classes="w-5 h-5 text-rose-600" />
-                                                        Eliminar
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })
+                                slice.map((tag, index) => (
+                                    <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{tag.id}</th>
+                                        <td className="px-6 py-4 text-center">{tag.name}</td>
+                                        <td className="px-6 py-4 text-center">{tag.description}</td>
+                                        <td className="px-6 py-4 flex justify-center">
+                                            <div className="w-6 h-6 rounded-full" style={{ backgroundColor: tag.color }}></div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex justify-center items-center">
+                                                <a
+                                                    className="flex items-center mr-3 text-xs"
+                                                    href="#"
+                                                    onClick={() => {
+                                                        handleOpenEditModal(true);
+                                                        setTagData(tag);
+                                                    }}
+                                                >
+                                                    <IconEdit classes="w-5 h-5" />
+                                                    Editar
+                                                </a>
+                                                <a
+                                                    className="flex items-center text-danger text-xs"
+                                                    href="#"
+                                                    onClick={() => {
+                                                        setShowDeleteModal(true);
+                                                        setTagData(tag);
+                                                    }}
+                                                >
+                                                    <IconTrash classes="w-5 h-5 text-rose-600" />
+                                                    Eliminar
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                                )
                             )}
                         </tbody>
                     </table>
@@ -200,50 +192,47 @@ const Users = (): JSX.Element => {
                 {/* END: Pagination */}
             </div>
 
-            {/* BEGIN: Create User Modal */}
+            {/* BEGIN: Create Tag Modal */}
             <Modal
-                title="Crear nuevo usuario"
+                title="Crear nueva etiqueta"
                 onClose={() => handleOpenModal(false)}
                 show={showModal}
                 width="500px"
             >
-                <FormUser
+                <FormTag
                     type="create"
-                    roles={roles}
                     setAlert={setAlert}
-                    handleLoadUsers={handleLoadUsers}
+                    handleLoadTags={handleLoadTags}
                     handleOpenModal={handleOpenModal}
                 />
             </Modal>
-            {/* END: Create User Modal */}
+            {/* END: Create Tag Modal */}
 
-            {/* BEGIN: Edit User Modal */}
+            {/* BEGIN: Edit Tag Modal */}
             <Modal
-                title="Editar usuario"
+                title="Editar etiqueta"
                 onClose={() => handleOpenEditModal(false)}
                 show={showEditModal}
                 width="500px"
             >
-                <FormUser
+                <FormTag
                     type="edit"
-                    roles={roles}
                     setAlert={setAlert}
-                    handleLoadUsers={handleLoadUsers}
+                    handleLoadTags={handleLoadTags}
                     handleOpenModal={handleOpenEditModal}
-                    data={userData}
+                    data={tagData}
                 />
             </Modal>
 
-            {/* END: Delete User Modal */}
+            {/* END: Delete Tag Modal */}
             <Modal
-                // title="Eliminar usuario usuario"
                 onClose={() => handleOpenDeleteModal(false)}
                 show={showDeleteModal}
                 width="500px"
             >
                 <div className="text-xl mt-5">Estás seguro?</div>
                 <div className="text-slate-500 mt-2">
-                    Quieres eliminar el usuario de: <strong>{userData.username}</strong>?{" "}
+                    Quieres eliminar la etiqueta de: <strong>{tagData.name}</strong>?{" "}
                     <br />
                     Esta acción es irreversible.
                 </div>
@@ -257,14 +246,14 @@ const Users = (): JSX.Element => {
                     </button>
                     <button
                         className="bg-red-800 text-white rounded-md text-sm px-4 py-2 mb-8 transition ease-in-out delay-50 flex"
-                        onClick={handleDeleteUser}
+                        onClick={handleDeleteTag}
                     >
-                        {loadingDeleteUser && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
+                        {loadingDeleteTag && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
                         Sí, eliminar
                     </button>
                 </div>
             </Modal>
-            {/* END: Delete User Modal */}
+            {/* END: Delete Tag Modal */}
 
             {/* {alert.show && */}
             <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
@@ -279,4 +268,4 @@ const Users = (): JSX.Element => {
     )
 }
 
-export default Users;
+export default Tags;

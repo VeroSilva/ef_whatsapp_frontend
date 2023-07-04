@@ -209,3 +209,61 @@ export const deleteUser = async (id, token) => {
 
   return response;
 };
+
+export const getTags = async (token) => {
+  const response = await fetch(`${process.env.API_URL}/tag`, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const createTag = async (data, token) => {
+  const response = await fetch(`${process.env.API_URL}/tag`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const editTag = async (data, id, token) => {
+  const response = await fetch(`${process.env.API_URL}/tag/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const deleteTag = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/tag/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
