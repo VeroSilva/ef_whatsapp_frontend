@@ -78,7 +78,6 @@ const Conversation = (): JSX.Element => {
         setLoadingMessages(true);
         getMessagesByConversation(id, offset, limitMessage, userState.token)
             .then((res) => {
-
                 if (!res.message) {
                     setMessages((prevMessages) => [...res.messages.reverse(), ...prevMessages]);
                     setPageMessage(res.currentPage);

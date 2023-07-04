@@ -13,7 +13,7 @@ export const ConversationPreview = ({
     setShowPreview,
     newConversationPhone
 }: { selectedFile: File | null, classifiedTemplates: any[], conversationId: number, setShowPreview: Function, newConversationPhone?: string }) => {
-    const { sendMessage, isLoading } = useMessage()
+    const { sendMessage, isLoading, setIsLoading } = useMessage()
     // @ts-ignore
     const { userState } = useUser()
     // @ts-ignore
@@ -23,9 +23,13 @@ export const ConversationPreview = ({
         try {
             if (conversationId === -1) { //temporary conversation
                 const dataToSend = await dataMessageToSend({ data, type })
+                setIsLoading(true)
 
                 await createConversation({ to: newConversationPhone, messageData: dataToSend }, userState.token)
-                    .then((res) => setActiveConversation(res))
+                    .then((res) => {
+                        setIsLoading(false)
+                        setActiveConversation(res)
+                    })
             } else {
                 await sendMessage({ type, data, conversationId });
             }

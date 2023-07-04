@@ -28,6 +28,7 @@ export const useMessage = () => {
 
     return {
         sendMessage,
-        isLoading
+        isLoading,
+        setIsLoading
     };
 };
