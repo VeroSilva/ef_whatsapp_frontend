@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconChevron } from "../Icons/IconChevron"
 import { IconLogout } from "../Icons/IconLogout";
 import useUser from "../../hooks/useUser";
@@ -30,7 +30,22 @@ export const Sidebar = () => {
     const [open, setOpen] = useState(false);
     //@ts-ignore
     const { logoutUser } = useUser();
-    const [active, setActive] = useState("Chat")
+    const [active, setActive] = useState("");
+
+    useEffect(() => {
+        const activeMenu = localStorage.getItem('activeMenu')
+
+        if (activeMenu) {
+            setActive(activeMenu)
+        } else {
+            setActive("Chat")
+        }
+    }, []);
+
+    const handleActiveMenu = (menuTitle: string) => {
+        setActive(menuTitle)
+        localStorage.setItem('activeMenu', menuTitle);
+    }
 
     return (
         <div className={`bg-slate-100 z-50 shadow-sm p-5 pt-8 relative duration-200 h-full rounded-tl-md rounded-bl-md ${open ? "w-72" : "w-20"}`}>
@@ -42,7 +57,7 @@ export const Sidebar = () => {
                 src={open ? "/images/logo/LogoEF_PERFUMES_Horizontal.png" : "/images/logo/LogoEF_PERFUMES_Vertical.png"}
                 width={200}
                 height={100}
-                className="h-[50px] duration-200"
+                className="h-[50px] w-auto"
                 alt="Logo EF Perfumes"
             />
 
@@ -55,7 +70,7 @@ export const Sidebar = () => {
                                 className={
                                     `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${active === menu.title && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
                                 }
-                                onClick={() => setActive(menu.title)}
+                                onClick={() => handleActiveMenu(menu.title)}
                             >
                                 <span>{menu.icon}</span>
                                 <span className={`text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>{menu.title}</span>
@@ -66,7 +81,7 @@ export const Sidebar = () => {
             </ul>
 
             <button onClick={() => logoutUser()} className="text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-2 w-full">
-                <IconLogout classes='w-5 h-5 rotate-180' />
+                <span><IconLogout classes='w-5 h-5 rotate-180' /></span>
                 <span className={`text-base text-sm flex-1 origin-left duration-200 text-start ${!open && "scale-0"}`}>Cerrar sesión</span>
             </button>
         </div>
