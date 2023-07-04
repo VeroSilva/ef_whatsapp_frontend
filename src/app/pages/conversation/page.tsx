@@ -376,10 +376,11 @@ const Conversation = (): JSX.Element => {
                                 /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image
-                                        src="/images/home-messages.jpg"
-                                        width={350}
-                                        height={350}
+                                        src="/images/home.png"
+                                        width={250}
+                                        height={250}
                                         alt="Imagen de mensaje"
+                                        className='grayscale'
                                     />
                                 </div>
                         }
