@@ -180,3 +180,32 @@ export const createUser = async (data, token) => {
 
   return response;
 };
+
+export const editUser = async (data, id, token) => {
+  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const deleteUser = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
