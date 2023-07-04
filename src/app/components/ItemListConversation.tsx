@@ -75,7 +75,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                             Math.floor((Date.now() - conversation.message_created_at * 1000) / (1000 * 60 * 60)) >= 24 && (
                                 <div className="group relative">
                                     <IconWarning classes="w-5 h-5 text-yellow-400 inline-block me-1" />
-                                    <span className="z-50 whitespace-nowrap absolute top- right-0 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leidos</span>
+                                    <span className="z-50 whitespace-nowrap absolute top- right-0 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Recontactar cliente</span>
                                 </div>
                             )
                         }

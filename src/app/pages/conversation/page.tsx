@@ -406,7 +406,7 @@ const Conversation = (): JSX.Element => {
                             id="phone"
                             name="phone"
                             placeholder="Ingresa el número de teléfono"
-                            className="border border-gray-300 rounded-lg p-2"
+                            className="border border-gray-300 rounded-lg p-2 input-sky"
                             value={newPhone}
                             onChange={handlePhoneChange}
                         />

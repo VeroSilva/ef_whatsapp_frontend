@@ -176,7 +176,6 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        console.log('asd')
         if (event.key === "Enter") {
             handleSearchTextChange();
         }
@@ -193,7 +192,10 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                         <div className="flex items-center">
                             <div className="font-medium text-base">
                                 {activeContact.name && activeContact.name !== ""
-                                    ? activeContact.name
+                                    ? <>
+                                        <span className="block">{activeContact.name}</span>
+                                        <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeContact.phone)}</span>
+                                    </>
                                     : formatPhoneNumber(activeContact.phone)}
                             </div>
                         </div>
