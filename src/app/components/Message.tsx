@@ -29,22 +29,25 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
         if (message.message_type === "text") {
             setContent(message.message.body);
         } else if (['image', 'audio', 'document', 'video', 'sticker'].includes(message.message_type)) {
-            setLoadingContent(true);
-
-            getMedia(userState.token, message.message.url)
-                .then((media) => {
-                    setContent(media);
-                    setLoadingContent(false);
-                })
-                .catch((error) => {
-                    console.error("Error fetching media:", error);
-                    setLoadingContent(false);
-                });
+            handleGetMedia()
         }
-    }, []);
+    }, [message]);
 
+    const handleGetMedia = () => {
+        setLoadingContent(true);
+
+        getMedia(userState.token, message.message.url)
+            .then((media) => {
+                setContent(media);
+                setLoadingContent(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching media:", error);
+                setLoadingContent(false);
+            });
+
+    }
     //Validar cuando es una imagen con texto!
-
     const TemplateMessage = ({ message }: { message: any }) => {
         return (
             <div className="w-[300px]">
