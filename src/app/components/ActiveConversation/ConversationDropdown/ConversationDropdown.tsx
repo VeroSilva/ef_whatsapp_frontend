@@ -69,13 +69,18 @@ export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSel
     };
 
     return (
-        <div className="relative">
+        <div
+            className="relative"
+        >
             <button onClick={handleOpenDropdown}>
                 <IconPaperClip classes="w-8 h-8 text-teal-600" />
             </button>
 
             {showDropdown &&
-                <ul className="absolute bottom-0 mb-14">
+                <ul
+                    className="absolute bottom-0 mb-14"
+                    onBlur={() => setShowDropdown(false)}
+                >
                     <li className="my-2">
                         <label htmlFor="file-input" id="file-label-2" className="flex">
                             <button

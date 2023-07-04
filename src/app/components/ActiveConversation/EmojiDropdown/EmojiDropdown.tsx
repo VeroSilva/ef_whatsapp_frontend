@@ -1,4 +1,4 @@
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useEffect, useRef } from 'react';
 import { IconBall } from '../../Icons/IconBall';
 import { IconCar } from '../../Icons/IconCar';
 import { IconCup } from '../../Icons/IconCup';
@@ -17,13 +17,35 @@ type EmojiTabProps = {
 export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageToSend: Function, messageToSend: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState('smileys');
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscapeKey);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, []);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
 
     const handleTabClick = (tab: string) => {
-        console.log(tab)
         setSelectedTab(tab);
     };
 
@@ -43,7 +65,7 @@ export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageT
     );
 
     return (
-        <div className="relative inline-block">
+        <div className="relative inline-block" ref={dropdownRef}>
             <button
                 className="focus:outline-none me-2"
                 onClick={toggleDropdown}
@@ -51,7 +73,9 @@ export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageT
                 <IconSmile classes='w-9 h-9 text-teal-600' />
             </button>
             {isOpen && (
-                <div className="absolute bottom-0 left-0 mb-16 bg-white border border-gray-300 rounded shadow-lg z-10">
+                <div
+                    className="absolute bottom-0 left-0 mb-16 bg-white border border-gray-300 rounded shadow-lg z-10"
+                >
                     <div className="flex">
                         <EmojiTab tab="smileys" label={<IconSmile classes='w-7 h-7' />} /> {/*Smileys and People*/}
                         <EmojiTab tab="animals" label={<IconBear classes='w-7 h-7' />} /> {/*Animals and Nature*/}
