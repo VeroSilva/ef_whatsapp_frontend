@@ -13,7 +13,6 @@ export const LoginForm = () => {
     // @ts-ignore
     const { userState, loginUser } = useUser();
     const [showPassword, setShowPassword] = useState(false)
-    const [rememberMe, setRememberMe] = useState(false)
     const [disabled, setDisabled] = useState(false)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -40,14 +39,6 @@ export const LoginForm = () => {
                             username: credentials.username,
                             token: d.token
                         })
-
-                        if (rememberMe) {
-                            setCookie(null, 'remember_token', d.token, {
-                                maxAge: 604800,
-                                path: '/',
-                                secure: true,
-                            })
-                        }
 
                         setLoading(false)
                     })
@@ -100,25 +91,6 @@ export const LoginForm = () => {
                     placeholder="password"
                     onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 />
-            </div>
-
-            <div className="text-slate-500 flex text-xs sm:text-sm mt-4">
-                <div className="flex items-center mr-auto">
-                    <input
-                        id="remember-me"
-                        type="checkbox"
-                        value=""
-                        className="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                    ></input>
-                    <label
-                        className="cursor-pointer select-none ml-2"
-                        htmlFor="remember-me"
-                    >
-                        Remember me
-                    </label>
-                </div>
             </div>
 
             <div className="mt-5 xl:mt-8 text-center xl:text-left flex justify-center">

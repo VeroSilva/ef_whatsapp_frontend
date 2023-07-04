@@ -14,7 +14,6 @@ const Login = () => {
 
     useEffect(() => {
         if (userState && userState.token) {
-            // || cookies.remember_token
             router.push('./pages/conversation')
         }
     }, [userState])
