@@ -200,8 +200,9 @@ const Conversation = (): JSX.Element => {
                         updatedArray[chatIndex] = payload.data.conversation;
 
                         setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
+                    } else if (!!filter.unread) {
+                        setConversations([...conversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
                     }
-
                     if (activeConversationState.id === payload.data.conversation.id) {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
@@ -250,6 +251,9 @@ const Conversation = (): JSX.Element => {
         setMessages([]);
         setLoadingInitialMessages(true);
         setPageMessage(0);
+        if (filter.unread) {
+            setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
+        }
         loadMessages(true, id);
     };
 
@@ -300,12 +304,18 @@ const Conversation = (): JSX.Element => {
                     <div className="box intro-y bg-slate-50 ">
                         <div className="bg-slate-50 sticky top-0 z-40">
                             <div className="flex items-center justify-between px-5 pt-5">
-                                <button onClick={() => handleFilterUnread()}>
-                                    <IconUnread classes={`w-6 h-6 ${filter.unread ? 'text-red-600 ' : 'text-slate-500 '} ml-auto`} />
-                                </button>
-                                <button onClick={() => handleOpenModal(true)}>
-                                    <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
-                                </button>
+                                <div className="group relative">
+                                    <button onClick={() => handleFilterUnread()} >
+                                        <IconUnread classes={`w-6 h-6 ${filter.unread ? 'text-red-600 ' : 'text-slate-500 '} ml-auto`} />
+                                    </button>
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leidos</span>
+                                </div>
+                                <div className="group relative">
+                                    <button onClick={() => handleOpenModal(true)}>
+                                        <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
+                                    </button>
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Crear nueva conversación</span>
+                                </div>
                             </div>
                             <div className="pb-5 px-5 mt-5">
                                 <div className="relative">
@@ -337,8 +347,12 @@ const Conversation = (): JSX.Element => {
                                         activeConversation={activeConversationState.id}
                                         filter={filter.search}
                                     />
+
                                 )))
                             }
+                            {!loadingConversations && !loadingInitialConversations && !conversations.length && (<p className='text-md text-center'>
+                                ¡Enhorabuena! <br /> No tienes mensajes pendientes por leer.
+                            </p>)}
                             {loadingConversations && [...Array(1)].map((n, index) => (
                                 <ConversationSkeleton key={index} />
                             ))}
@@ -358,6 +372,7 @@ const Conversation = (): JSX.Element => {
                                     conversationId={activeConversationState.id}
                                     activeContact={activeConversationState.contact}
                                     loadMessages={loadMessages}
+                                    loadingMessages={loadingMessages}
                                 /> :
                                 <div className='h-full w-full flex justify-center items-center'>
                                     <Image

@@ -2,7 +2,6 @@ export const IconUnread = ({ classes }: { classes: string }) => (
     <svg className={classes} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style={{
         fill: "currentColor",
     }}>
-        <title>ionicons-v5-o</title>
         <path d="M320,96H88a40,40,0,0,0-40,40V376a40,40,0,0,0,40,40H422.73a40,40,0,0,0,40-40V239" style={{
             fill: "none",
             stroke: "currentColor",

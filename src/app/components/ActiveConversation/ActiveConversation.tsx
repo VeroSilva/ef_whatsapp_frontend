@@ -13,19 +13,22 @@ import { ConversationBottomSection } from "./ConversationBottomSection/Conversat
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { Template } from "../../interfaces/template";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
+import { Spinner } from "flowbite-react";
 
 interface ActiveConversationProps {
     messages: IMessage[];
     conversationId: number;
     activeContact: Contact;
-    loadMessages: (clear: boolean, id: number) => void
+    loadMessages: (clear: boolean, id: number) => void,
+    loadingMessages: Boolean;
 }
 
 export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     messages,
     conversationId,
     activeContact,
-    loadMessages
+    loadMessages,
+    loadingMessages
 }) => {
     const [reactions, setReactions] = useState<Reaction[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -38,28 +41,27 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     const [templates, setTemplates] = useState<Template[]>([]);
     const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
+    const [currentTopMessage, setCurrentTopMessage] = useState(0);
 
     useEffect(() => {
-        if (isScrolledToBottom) {
-            scrollToBottom();
+        if (!isScrolledToBottom && updatedMessages.length) {
+            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
+        } else if (isScrolledToTop && updatedMessages.length) {
+            scrollToElement(currentTopMessage);
+        } else if (isScrolledToBottom && updatedMessages.length) {
+            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
         }
-    }, [isScrolledToBottom, updatedMessages]);
+    }, [updatedMessages]);
 
     useEffect(() => {
-        if (isScrolledToTop) {
+        if (isScrolledToTop == true && updatedMessages.length) {
+            setCurrentTopMessage(updatedMessages[0].id)
             loadMessages(false, conversationId)
         }
     }, [isScrolledToTop]);
 
     useEffect(() => {
-        if (messagesContainerRef.current?.lastElementChild !== null) {
-            scrollToBottom();
-        }
-    }, [messagesContainerRef.current?.lastElementChild]);
-
-    useEffect(() => {
         setReactions([]);
-
         messages
             .filter((message) => message.message_type === "reaction")
             .forEach((message) => {
@@ -72,7 +74,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                 ]);
             });
 
-        const newArray = [...messages].map((itemA) => {
+        const newMessages = [...messages].map((itemA) => {
             if (itemA.message.response_to !== null) {
                 const repliedMessage = messages.find(
                     (itemB) => itemA.message.response_to === itemB.message.id_whatsapp
@@ -90,7 +92,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
             };
         });
 
-        setUpdatedMessages(newArray);
+        setUpdatedMessages(newMessages);
     }, [messages]);
 
     useEffect(() => {
@@ -139,19 +141,45 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
         const container = messagesContainerRef.current;
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
-            const isAtTop = scrollTop <= 50;
-            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 2;
+            const isAtTop = scrollTop <= 5;
+            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 1.5;
             setIsScrolledToTop(isAtTop);
             setIsScrolledToBottom(isAtBottom);
         }
     };
 
-    const scrollToBottom = () => {
-        messagesContainerRef.current?.lastElementChild?.scrollIntoView();
+    const scrollToElement = (id: Number) => {
+        const element = document.querySelector(`[data-id="${id}"]`);
+        if (element) {
+            element.scrollIntoView();
+        }
     };
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show);
+    };
+
+    const [searchText, setSearchText] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    function handleSearchTextChange() {
+        if (searchText !== '') {
+            const regex = new RegExp(`(${searchText})`, 'gi');
+            const parentDiv = messagesContainerRef.current;
+            if (parentDiv) {
+                const messageEls = parentDiv.querySelectorAll('p, span, a');
+                messageEls.forEach((el) => {
+                    el.innerHTML = el.textContent ? el.textContent.replace(regex, '<mark>$1</mark>') : '';
+                });
+            }
+        }
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        console.log('asd')
+        if (event.key === "Enter") {
+            handleSearchTextChange();
+        }
     };
 
     return (
@@ -172,12 +200,38 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                     </div>
                 </div>
                 <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
-                    <a href="#" className="w-5 h-5 text-slate-500">
-                        <IconSearch classes="w-5 h-5" />
-                    </a>
+
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                        </div>
+                        <input
+                            ref={inputRef}
+                            type="search"
+                            id="default-search"
+                            className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 input-sky"
+                            placeholder="Buscar coincidencia"
+                            required
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                        />
+                    </div>
                 </div>
             </div>
             <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
+                {
+
+                    (isScrolledToTop && loadingMessages) && (
+                        <div className="flex justify-center items-center h-screen">
+                            <Spinner
+                                aria-label="Extra large spinner example"
+                                size="xl"
+                            />
+                        </div>
+                    )
+                }
+
                 {updatedMessages.map((message, index) => {
                     if (message.message_type !== "reaction") {
                         const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp);

@@ -29,22 +29,25 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
         if (message.message_type === "text") {
             setContent(message.message.body);
         } else if (['image', 'audio', 'document', 'video', 'sticker'].includes(message.message_type)) {
-            setLoadingContent(true);
-
-            getMedia(userState.token, message.message.url)
-                .then((media) => {
-                    setContent(media);
-                    setLoadingContent(false);
-                })
-                .catch((error) => {
-                    console.error("Error fetching media:", error);
-                    setLoadingContent(false);
-                });
+            handleGetMedia()
         }
-    }, []);
+    }, [message]);
 
+    const handleGetMedia = () => {
+        setLoadingContent(true);
+
+        getMedia(userState.token, message.message.url)
+            .then((media) => {
+                setContent(media);
+                setLoadingContent(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching media:", error);
+                setLoadingContent(false);
+            });
+
+    }
     //Validar cuando es una imagen con texto!
-
     const TemplateMessage = ({ message }: { message: any }) => {
         return (
             <div className="w-[300px]">
@@ -125,7 +128,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
 
     return (
         <>
-            <div className={`flex text-md items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
+            <div data-id={message.id} className={`flex text-md items-end rounded-md ${isFromClient ? 'float-left justify-start' : 'float-right justify-end'} ${isFromClient && !isRead ? ' fade-out' : ''}`}>
                 <div className={
                     "max-w-xl " +
                     (message.message_type !== "sticker" ?
@@ -135,7 +138,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                         : "h-[200px]")
                 }>
                     {!!reaction.length &&
-                        <span role="img" className={"reaction absolute -bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
+                        <span role="img" className={"reaction absolute bottom-4 " + (isFromClient ? "right-4" : "left-4")}>{reaction[0].emoji}</span>
                     }
 
                     {(message.message.response_to) &&
