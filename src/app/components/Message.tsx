@@ -16,8 +16,9 @@ import { validateBase64 } from "../utils/validateBase64";
 import { IconDocument } from "./Icons/IconDocument";
 import { IconLink } from "./Icons/IconLink";
 import "./styles.scss"
+import React from "react";
 
-export const Message = ({ message, reaction, handleOpenModal, setModalImage }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function }) => {
+export const Message = React.memo(({ message, reaction, handleOpenModal, setModalImage, highlightedText }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function, highlightedText: string }) => {
     // @ts-ignore
     const { userState } = useUser()
     const [content, setContent] = useState<string | undefined>("")
@@ -28,10 +29,15 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
     useEffect(() => {
         if (message.message_type === "text") {
             setContent(message.message.body);
-        } else if (['image', 'audio', 'document', 'video', 'sticker'].includes(message.message_type)) {
-            handleGetMedia()
+        } else if (
+            ['image', 'audio', 'document', 'video', 'sticker'].includes(
+                message.message_type
+            ) &&
+            !content
+        ) {
+            handleGetMedia();
         }
-    }, [message]);
+    }, [message, content]);
 
     const handleGetMedia = () => {
         setLoadingContent(true);
@@ -50,6 +56,8 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
     }
     //Validar cuando es una imagen con texto!
     const TemplateMessage = ({ message }: { message: any }) => {
+        const highlightedBody = highlightedText == '' ? message.body : message.body.replace(highlightedText, '<mark>$1</mark>');
+        const highlightedFooter = highlightedText == '' ? message.footer : message.footer.replace(highlightedText, '<mark>$1</mark>');
         return (
             <div className="w-[300px]">
                 {message.header !== "" &&
@@ -58,21 +66,27 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                     message.header.type === "image" ?
                         <div className="relative h-[180px]">
                             <Image
-                                src={message.header.data} //aquí va useState variable para que sea editable
+                                src={message.header.data}
                                 width={300}
                                 height={300}
                                 alt="Imagen de template"
                                 className="object-cover rounded-md w-full h-full"
                                 loading="lazy"
                                 decoding="async"
-                                unoptimized
+                                key={message.id}
                             />
                         </div>
                         : null
                 }
 
-                {message.body !== "" && <p className="my-2 text-slate-800">{message.body}</p>}
-                {message.footer !== "" && <p className="my-2 text-slate-500">{message.footer}</p>}
+                {message.body !== "" && <p
+                    className="my-2 text-slate-800"
+                    dangerouslySetInnerHTML={{ __html: highlightedBody }}
+                />}
+                {message.footer !== "" && <p
+                    className="my-2 text-slate-500"
+                    dangerouslySetInnerHTML={{ __html: highlightedFooter }}
+                />}
 
                 {!!message.buttons.length &&
                     <div className="flex flex-wrap justify-around gap-2 border-t-2 border-slate-400 pt-2">
@@ -94,7 +108,15 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
         const renderHeader = () => {
             if (header && header.type !== "") {
                 if (header.type === "image") {
-                    return <img src={header.data} alt="Header Image" />;
+                    return <Image
+                        src={header.data}
+                        width={300}
+                        height={300}
+                        alt="Header Image"
+                        className="object-cover rounded-md w-full h-full"
+                        loading="lazy"
+                        decoding="async"
+                    />;
                 } else if (header.type === "text") {
                     return <h2 className="font-semibold text-sm">{header.data}</h2>;
                 }
@@ -170,6 +192,7 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
                                             setModalImage(content)
                                             handleOpenModal(true)
                                         }}
+                                        priority={true}
                                         key={message.id}
                                     />
                                     {message.message.caption && <p className="my-2">{message.message.caption}</p>}
@@ -228,4 +251,4 @@ export const Message = ({ message, reaction, handleOpenModal, setModalImage }: {
             <div className="clear-both"></div>
         </>
     )
-}
+})

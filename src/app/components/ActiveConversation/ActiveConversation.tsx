@@ -1,8 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Modal } from 'flowbite-react';
 import Image from "next/image";
-import { IconUserPlus } from "@/app/components/Icons/IconUserPlus";
-import { IconEllipsisVertical } from "@/app/components/Icons/IconEllipsisVertical";
 import { IconSearch } from "@/app/components/Icons/IconSearch";
 import { Message as IMessage, Contact } from "../../interfaces/conversations";
 import { Reaction } from "../../interfaces/reactions";
@@ -14,6 +12,7 @@ import { ConversationPreview } from "../ConversationPreview/ConversationPreview"
 import { Template } from "../../interfaces/template";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
 import { Spinner } from "flowbite-react";
+import React from "react";
 
 interface ActiveConversationProps {
     messages: IMessage[];
@@ -42,6 +41,8 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
     const [currentTopMessage, setCurrentTopMessage] = useState(0);
+    const [highlightedText, setHighlightedText] = useState('');
+    const MemoizedMessage = React.memo(Message);
 
     useEffect(() => {
         if (!isScrolledToBottom && updatedMessages.length) {
@@ -62,7 +63,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
 
     useEffect(() => {
         setReactions([]);
-        messages
+        [...messages]
             .filter((message) => message.message_type === "reaction")
             .forEach((message) => {
                 setReactions((reactions) => [
@@ -76,7 +77,7 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
 
         const newMessages = [...messages].map((itemA) => {
             if (itemA.message.response_to !== null) {
-                const repliedMessage = messages.find(
+                const repliedMessage = [...messages].find(
                     (itemB) => itemA.message.response_to === itemB.message.id_whatsapp
                 );
                 if (repliedMessage) {
@@ -137,16 +138,16 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
         }
     }, [showPreview]);
 
-    const handleScroll = () => {
+    const handleScroll = useCallback(() => {
         const container = messagesContainerRef.current;
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
-            const isAtTop = scrollTop <= 5;
+            const isAtTop = scrollTop <= 3;
             const isAtBottom = scrollHeight - scrollTop >= clientHeight - 1.5;
             setIsScrolledToTop(isAtTop);
             setIsScrolledToBottom(isAtBottom);
         }
-    };
+    }, []);
 
     const scrollToElement = (id: Number) => {
         const element = document.querySelector(`[data-id="${id}"]`);
@@ -165,13 +166,10 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     function handleSearchTextChange() {
         if (searchText !== '') {
             const regex = new RegExp(`(${searchText})`, 'gi');
-            const parentDiv = messagesContainerRef.current;
-            if (parentDiv) {
-                const messageEls = parentDiv.querySelectorAll('p, span, a');
-                messageEls.forEach((el) => {
-                    el.innerHTML = el.textContent ? el.textContent.replace(regex, '<mark>$1</mark>') : '';
-                });
-            }
+            //@ts-ignore
+            setHighlightedText(regex);
+        } else {
+            setHighlightedText('');
         }
     }
 
@@ -234,12 +232,20 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
                     )
                 }
 
-                {updatedMessages.map((message, index) => {
-                    if (message.message_type !== "reaction") {
-                        const reacted = reactions.filter((reaction: Reaction) => reaction.waId === message.message?.id_whatsapp);
-                        return <Message message={message} key={index} reaction={reacted} handleOpenModal={handleOpenModal} setModalImage={setModalImage} />;
-                    } else return null;
-                })}
+                {updatedMessages.map((message, index) =>
+                    message.message_type !== "reaction" ? (
+                        <MemoizedMessage
+                            key={message.id}
+                            message={message}
+                            reaction={reactions.filter(
+                                (reaction: Reaction) => reaction.waId === message.message?.id_whatsapp
+                            )}
+                            handleOpenModal={handleOpenModal}
+                            setModalImage={setModalImage}
+                            highlightedText={highlightedText}
+                        />
+                    ) : null
+                )}
             </div>
 
             {showPreview && (

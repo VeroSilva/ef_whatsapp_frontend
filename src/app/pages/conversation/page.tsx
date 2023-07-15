@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
 import Image from "next/image";
@@ -42,7 +42,7 @@ const Conversation = (): JSX.Element => {
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
     const [pageMessage, setPageMessage] = useState(0);
     const [totalPagesMessage, setTotalPagesMessage] = useState(1);
-    const [limitMessage, setLimitMessage] = useState(50);
+    const [limitMessage, setLimitMessage] = useState(5);
     const loadingRefMessage = useRef(false);
 
     const loadConversations = (clear: boolean) => {
@@ -66,7 +66,7 @@ const Conversation = (): JSX.Element => {
                 setLoadingConversations(false);
                 setLoadingInitialConversations(false)
             });
-    };
+    }
 
     const loadMessages = (clear: boolean, id: number) => {
         if (loadingRefMessage.current || pageMessage == totalPagesMessage) {
@@ -98,7 +98,8 @@ const Conversation = (): JSX.Element => {
                 setLoadingMessages(false);
                 setLoadingInitialMessages(false)
             });
-    };
+    }
+
 
     useEffect(() => {
         if (!loadingConversations && containerRef.current) {
@@ -185,7 +186,7 @@ const Conversation = (): JSX.Element => {
 
     useEffect(() => {
         if (messages.length) {
-            const unreadMessages = messages.filter((message) => !message.read).map((message) => message.id);
+            const unreadMessages = [...messages].filter((message) => !message.read).map((message) => message.id);
 
             if (unreadMessages.length) {
                 markAsRead(userState.token, unreadMessages)
@@ -215,7 +216,7 @@ const Conversation = (): JSX.Element => {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
-                    const messageIndex = messages.findIndex((message) => message.id === payload.data.message.id);
+                    const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
 
                     if (messageIndex !== -1) {
                         const updatedMessages = [...messages];
@@ -389,6 +390,8 @@ const Conversation = (): JSX.Element => {
                                         height={250}
                                         alt="Imagen de mensaje"
                                         className='grayscale'
+                                        loading="lazy"
+                                        decoding="async"
                                     />
                                 </div>
                         }
