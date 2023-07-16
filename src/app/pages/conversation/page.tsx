@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
 import Image from "next/image";
@@ -16,6 +16,7 @@ import { IconUnread } from '@/app/components/Icons/IconUnread';
 import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
+import { ModalCreateConversartion } from '@/app/components/ModalCreateConversastion/ModalCreateConversastion';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
@@ -27,7 +28,6 @@ const Conversation = (): JSX.Element => {
     const [messages, setMessages] = useState<IMessage[]>([]);
     const socketRef = useRef<Socket | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [newPhone, setNewPhone] = useState<string>("");
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -269,39 +269,8 @@ const Conversation = (): JSX.Element => {
         setShowModal(show);
     };
 
-    const handleCreateConversation = () => {
-        setActiveConversation({
-            contact: {
-                country: "",
-                email: "",
-                name: "",
-                phone: newPhone,
-                tag_id: "",
-                id: 0
-            },
-            id: -1
-        });
-
-        setMessages([]);
-        setShowModal(false);
-    };
-
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewPhone(e.target.value);
-    };
-
-    const CreateConversationButton = () => (
-        <button
-            onClick={handleCreateConversation}
-            className={
-                "main-button transition ease-in-out delay-50 " +
-                (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
-            }
-            disabled={newPhone === ""}
-        >
-            Crear conversación
-        </button>
-    );
+    const MemoziedModalCreateConversartion = memo(ModalCreateConversartion);
+    const MemoizedActiveConversation = memo(ActiveConversation);
 
     return (
         <>
@@ -375,10 +344,9 @@ const Conversation = (): JSX.Element => {
                         {loadingInitialMessages ?
                             <ActiveConversationSkeleton /> :
                             activeConversationState.id !== 0 ?
-                                <ActiveConversation
+                                <MemoizedActiveConversation
                                     messages={messages}
                                     conversationId={activeConversationState.id}
-                                    activeContact={activeConversationState.contact}
                                     loadMessages={loadMessages}
                                     loadingMessages={loadingMessages}
                                 /> :
@@ -401,39 +369,7 @@ const Conversation = (): JSX.Element => {
             </div>
 
             {/* BEGIN: Modal */}
-            {showModal && (
-                <Modal
-                    title="Crear nueva conversación"
-                    onClose={() => handleOpenModal(false)}
-                    show={showModal}
-                    width="500px"
-                >
-                    <div className="flex flex-col space-y-4">
-                        <label htmlFor="phone" className="text-sm text-gray-800 font-semibold">
-                            Número de teléfono:
-                        </label>
-                        <input
-                            type="text"
-                            id="phone"
-                            name="phone"
-                            placeholder="Ingresa el número de teléfono"
-                            className="border border-gray-300 rounded-lg p-2 input-sky"
-                            value={newPhone}
-                            onChange={handlePhoneChange}
-                        />
-                    </div>
-
-                    <div className="flex justify-end space-x-4 mt-4">
-                        <button
-                            className="second-button"
-                            onClick={() => handleOpenModal(false)}
-                        >
-                            Cancelar
-                        </button>
-                        <CreateConversationButton />
-                    </div>
-                </Modal>
-            )}
+            <MemoziedModalCreateConversartion show={showModal} handleOpenModal={handleOpenModal} setMessages={setMessages} />
             {/* END: Modal */}
         </>
     );

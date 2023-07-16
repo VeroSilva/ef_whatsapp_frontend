@@ -13,11 +13,11 @@ import { Template } from "../../interfaces/template";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
 import { Spinner } from "flowbite-react";
 import React from "react";
+import useActiveConversation from "@/app/hooks/useActiveConversation";
 
 interface ActiveConversationProps {
     messages: IMessage[];
     conversationId: number;
-    activeContact: Contact;
     loadMessages: (clear: boolean, id: number) => void,
     loadingMessages: Boolean;
 }
@@ -25,7 +25,6 @@ interface ActiveConversationProps {
 export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     messages,
     conversationId,
-    activeContact,
     loadMessages,
     loadingMessages
 }) => {
@@ -43,6 +42,8 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
     const [currentTopMessage, setCurrentTopMessage] = useState(0);
     const [highlightedText, setHighlightedText] = useState('');
     const MemoizedMessage = React.memo(Message);
+    //@ts-ignore
+    const { activeConversationState } = useActiveConversation();
 
     useEffect(() => {
         if (!isScrolledToBottom && updatedMessages.length) {
@@ -184,17 +185,17 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
             <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 flex-none relative">
-                        {GenerateInitialsImage(activeContact.name ?? "")}
+                        {GenerateInitialsImage(activeConversationState.contact.name ?? "")}
                     </div>
                     <div className="ml-3 mr-auto">
                         <div className="flex items-center">
                             <div className="font-medium text-base">
-                                {activeContact.name && activeContact.name !== ""
+                                {activeConversationState.contact.name && activeConversationState.contact.name !== ""
                                     ? <>
-                                        <span className="block">{activeContact.name}</span>
-                                        <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeContact.phone)}</span>
+                                        <span className="block">{activeConversationState.contact.name}</span>
+                                        <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
                                     </>
-                                    : formatPhoneNumber(activeContact.phone)}
+                                    : formatPhoneNumber(activeConversationState.contact.phone)}
                             </div>
                         </div>
                     </div>
@@ -249,10 +250,10 @@ export const ActiveConversation: React.FC<ActiveConversationProps> = ({
             </div>
 
             {showPreview && (
-                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} newConversationPhone={conversationId === -1 ? activeContact.phone : undefined} />
+                <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={conversationId} setShowPreview={setShowPreview} newConversationPhone={conversationId === -1 ? activeConversationState.contact.phone : undefined} />
             )}
 
-            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} newConversationPhone={conversationId === -1 ? activeContact.phone : undefined} />
+            <ConversationBottomSection conversationId={conversationId} setSelectedFile={setSelectedFile} setTemplates={setTemplates} newConversationPhone={conversationId === -1 ? activeConversationState.contact.phone : undefined} />
 
             <Modal
                 size="md"
