@@ -252,3 +252,5 @@ export const Message = React.memo(({ message, reaction, handleOpenModal, setModa
         </>
     )
 })
+
+Message.displayName = 'Message';
