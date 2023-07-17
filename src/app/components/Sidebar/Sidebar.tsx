@@ -7,6 +7,7 @@ import { IconTemplates } from "../Icons/IconTemplates";
 import { IconUsers } from "../Icons/IconUsers";
 import { IconTag } from "../Icons/IconTag";
 import Image from "next/image";
+import { IconFlow } from "../Icons/IconFlow";
 
 const menuItems = [
     {
@@ -23,7 +24,12 @@ const menuItems = [
         title: "Etiquetas",
         link: "/pages/tags",
         icon: <IconTag classes="w-6 h-6" />
-    }
+    },
+    {
+        title: "Flujo de templates",
+        link: "/pages/templates-flows",
+        icon: <IconFlow classes="w-5 h-5" />
+    },
 ]
 
 export const Sidebar = () => {

@@ -8,6 +8,6 @@ export type UserContextProps = {
   logoutUser: (user: User) => void;
 };
 
-const UserContext = createContext({});
+const UserContext = createContext<UserContextProps>({} as UserContextProps);
 
 export default UserContext;
