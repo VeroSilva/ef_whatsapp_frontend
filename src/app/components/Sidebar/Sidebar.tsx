@@ -10,6 +10,7 @@ import Image from "next/image";
 import { CompanyPhones } from "@/app/interfaces/user";
 import { IconHome } from "../Icons/IconHome";
 import { IconPhone } from "../Icons/IconPhone";
+import { IconFlow } from "../Icons/IconFlow";
 
 const menuItems = [
     {
@@ -31,6 +32,11 @@ const menuItems = [
         title: "Teléfonos",
         link: "/pages/phones",
         icon: <IconPhone classes="w-6 h-6" />
+    },
+    {
+        title: "Flujo de templates",
+        link: "/pages/templates-flows",
+        icon: <IconFlow classes="w-5 h-5" />
     }
 ]
 
