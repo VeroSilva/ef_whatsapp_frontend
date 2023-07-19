@@ -42,7 +42,7 @@ const Conversation = (): JSX.Element => {
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
     const [pageMessage, setPageMessage] = useState(0);
     const [totalPagesMessage, setTotalPagesMessage] = useState(1);
-    const [limitMessage, setLimitMessage] = useState(5);
+    const [limitMessage, setLimitMessage] = useState(50);
     const loadingRefMessage = useRef(false);
 
     const loadConversations = (clear: boolean) => {
