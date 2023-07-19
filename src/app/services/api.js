@@ -14,7 +14,7 @@ export const login = async (data) => {
 
 export const getConversations = async (offset, limit, filter, token) => {
   const response = await fetch(
-    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}`,
+    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=1`,
     {
       method: "GET",
       headers: {
@@ -97,7 +97,7 @@ export const sendMessage = async (id, data, token) => {
 export const getMedia = async (token, url) => {
   const response = await fetch(`${process.env.API_URL}/message/downloadMedia`, {
     method: "POST",
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ url, conversation_id: 1 }),
     headers: {
       Accept: "*/*",
       Authorization: token,
