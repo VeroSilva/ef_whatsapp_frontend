@@ -15,9 +15,22 @@ const nextConfig = {
   },
   // Configuración de dominios de imágenes
   images: {
-    domains: ["scontent.whatsapp.net", "efperfumes.com", "kinsta.com"],
+    domains: [
+      "scontent.whatsapp.net",
+      "efperfumes.com",
+      "kinsta.com",
+      "api.efperfumes.com",
+      "wa.efperfumes.com",
+    ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "efperfumes.com",
+        port: "",
+        pathname: "/wp-content/uploads/**",
+      },
+    ],
   },
-
   // Configuración de TypeScript
   typescript: {
     ignoreBuildErrors: true,
