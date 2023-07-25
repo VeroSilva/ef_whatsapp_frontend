@@ -3,7 +3,7 @@
 
 "use client"
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
@@ -18,7 +18,7 @@ import TextUpdaterNode from './TextUpdaterNode.tsx';
 import './index.scss';
 
 const initialNodes = [
-    { id: 'client-message', type: 'textUpdater', position: { x: 0, y: 0 }, data: { value: "Mensaje cliente", buttons: [] } }
+    { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
 ];
 
 const nodeTypes = { textUpdater: TextUpdaterNode };
@@ -28,6 +28,10 @@ const TemplatesDragAndDrop = () => {
     const [nodes, setNodes] = useState(initialNodes);
     const [edges, setEdges] = useState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
+    const [templateToSend, setTemplateToSend] = useState({});
+    const [jsonToSend, setJsonToSend] = useState([]);
+    const [data, setData] = useState([]);
+    const [readyToSend, setIsReadyToSend] = useState(false);
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
@@ -40,8 +44,7 @@ const TemplatesDragAndDrop = () => {
 
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
             const type = event.dataTransfer.getData('application/reactflow');
-            const nodeText = event.dataTransfer.getData('nodeText');
-            const nodeButtons = event.dataTransfer.getData('nodeButtons');
+            const templateData = JSON.parse(event.dataTransfer.getData('template'));
 
             // check if the dropped element is valid
             if (typeof type === 'undefined' || !type) {
@@ -53,15 +56,24 @@ const TemplatesDragAndDrop = () => {
                 y: event.clientY - reactFlowBounds.top,
             });
             const newNode = {
-                id: nodeText,
+                id: templateData.name,
                 type: 'textUpdater',
                 position,
-                data: { value: nodeText, buttons: JSON.parse(nodeButtons) },
+                data: { template: templateData, setTemplateToSend, setIsReadyToSend },
             };
 
             setNodes((nds) => nds.concat(newNode));
+            setData((data) => [...data,
+            {
+                readyToSend,
+                template: {
+                    id: templateData.id,
+                    templateToSend: {}
+                }
+            }
+            ])
         },
-        [reactFlowInstance]
+        [reactFlowInstance, readyToSend]
     );
 
     const onNodesChange = useCallback(
@@ -97,6 +109,9 @@ const TemplatesDragAndDrop = () => {
                         <Background variant="dots" gap={12} size={1} />
                     </ReactFlow>
                 </div>
+
+                <button className='main-button absolute'>Guardar cambios</button>
+
                 <Sidebar />
             </ReactFlowProvider>
         </div>

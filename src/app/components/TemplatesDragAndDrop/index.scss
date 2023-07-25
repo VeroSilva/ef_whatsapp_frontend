@@ -47,17 +47,33 @@ $border-color_2: #ff0072;
         margin-top: 10px;
     }
 
+    .selected {
+        .text-updater-node {
+            box-shadow: 0 0 0 1.5px #075985;
+        }
+    }
+
     .text-updater-node {
-        height: 50px;
         border: 1px solid #eee;
         padding: 5px;
         border-radius: 5px;
         background: white;
+        padding: 8px;
+        font-size: 8px;
+        scale: 0.8;
 
         label {
             display: block;
             color: #777;
             font-size: 12px;
+        }
+
+        .template-detail {
+            max-width: 500px;
+
+            input {
+                font-size: 10px;
+            }
         }
     }
 }
