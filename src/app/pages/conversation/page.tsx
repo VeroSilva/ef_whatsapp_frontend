@@ -17,6 +17,8 @@ import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 import { ModalCreateConversartion } from '@/app/components/ModalCreateConversastion/ModalCreateConversastion';
+//@ts-ignore
+import newMessageAudio from '../../../../sounds/receive.mp3';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
@@ -99,19 +101,6 @@ const Conversation = (): JSX.Element => {
             });
     }
 
-
-    useEffect(() => {
-        if (!loadingConversations && containerRef.current) {
-            containerRef.current.addEventListener('scroll', handleScroll);
-        }
-
-        return () => {
-            if (containerRef.current) {
-                containerRef.current.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, [loadingConversations]);
-
     const handleScroll = () => {
         const container = containerRef.current;
         if (container) {
@@ -122,15 +111,6 @@ const Conversation = (): JSX.Element => {
             }
         }
     };
-
-    useEffect(() => {
-        if (!userState || userState.token === "") {
-            router.push('./pages/login');
-        } else {
-            setLoadingInitialConversations(true)
-            loadConversations(true);
-        }
-    }, [userState]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
@@ -152,6 +132,50 @@ const Conversation = (): JSX.Element => {
     const handleFilterUnread = () => {
         setFilter((prevFilter: any) => ({ ...prevFilter, unread: !filter.unread }));
     };
+
+    const handleOpenConversation = (id: number) => {
+        setMessages([]);
+        setLoadingInitialMessages(true);
+        setPageMessage(0);
+        if (filter.unread) {
+            setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
+        }
+        loadMessages(true, id);
+    };
+
+    const handleOpenModal = (show: boolean) => {
+        setShowModal(show);
+    };
+
+    const playSound = () => {
+        //@ts-ignore
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioElement = new Audio(newMessageAudio);
+        const track = audioContext.createMediaElementSource(audioElement);
+        track.connect(audioContext.destination);
+        audioElement.play();
+    };
+
+    useEffect(() => {
+        if (!loadingConversations && containerRef.current) {
+            containerRef.current.addEventListener('scroll', handleScroll);
+        }
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [loadingConversations]);
+
+    useEffect(() => {
+        if (!userState || userState.token === "") {
+            router.push('./pages/login');
+        } else {
+            setLoadingInitialConversations(true)
+            loadConversations(true);
+        }
+    }, [userState]);
 
     useEffect(() => {
         setPageConversation(0);
@@ -214,6 +238,8 @@ const Conversation = (): JSX.Element => {
                     if (activeConversationState.id === payload.data.conversation.id) {
                         setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                     }
+
+                    if (payload.data.message.status === "client") playSound();
                 } else if (payload.table === "messages" && payload.action === "update") {
                     const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
 
@@ -254,20 +280,6 @@ const Conversation = (): JSX.Element => {
             }
         };
     }, [conversations, messages]);
-
-    const handleOpenConversation = (id: number) => {
-        setMessages([]);
-        setLoadingInitialMessages(true);
-        setPageMessage(0);
-        if (filter.unread) {
-            setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
-        }
-        loadMessages(true, id);
-    };
-
-    const handleOpenModal = (show: boolean) => {
-        setShowModal(show);
-    };
 
     const MemoziedModalCreateConversartion = memo(ModalCreateConversartion);
     const MemoizedActiveConversation = memo(ActiveConversation);
