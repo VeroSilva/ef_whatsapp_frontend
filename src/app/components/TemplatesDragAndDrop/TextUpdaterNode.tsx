@@ -1,15 +1,19 @@
-import { FC, useState, useMemo } from 'react';
-import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
-import useTemplates from "../../hooks/useTemplates";
+import { FC, useState, useEffect } from 'react';
+import { Handle, Position } from 'reactflow';
+import { TemplateDetail } from '../TemplateList/TemplateDetail/TemplateDetail';
 
 interface TextUpdaterNodeProps {
     data: any;
     isConnectable: boolean;
+    setTemplateToSend: () => void;
 }
 
 const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
-    const updateNodeInternals = useUpdateNodeInternals();
     const [dimensions, setDimensions] = useState({ width: 150, height: 50 });
+    const { template, setTemplateToSend, setIsReadyToSend } = data;
+
+    const buttons = template.components.find((item: any) => item.type === "BUTTONS");
+    const buttonsData = buttons ? buttons.buttons.filter((btn: any) => btn.type === "QUICK_REPLY") : []
 
     const positionHandle = (index: number) => {
         if (index === 1 || index === 2) {
@@ -23,27 +27,21 @@ const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
     return (
         <div className="text-updater-node">
-            <Handle type="target" position={Position.Top} id="a" isConnectable={isConnectable} />
-            <span>
-                {data.value}
-            </span>
+            <Handle type="target" position={Position.Top} id={template.name} isConnectable={isConnectable} />
 
-            {!data.buttons.length && (
-                <Handle type="source" position={Position.Bottom} id={`handle-${data.value}`} isConnectable={isConnectable} />
-            )}
+            <TemplateDetail template={template} setIsReadyToSend={setIsReadyToSend} setTemplateToSend={setTemplateToSend} />
 
             {
-                data.buttons.map((button: any, index: number) => (
-                    <div className="group" key={`item-${index}`}>
+                buttonsData.map((button: any, index: number) => (
+                    <div className="group" key={`item-button-${index}`}>
                         <Handle
                             type="source"
                             position={Position.Bottom}
                             id={`${button.text.replace(/\s+/g, '')}`}
                             isConnectable={isConnectable}
-                            key={`item-${index}`}
                             style={{ left: positionHandle(index + 1) }}
                         />
-                        <span className="z-50 whitespace-nowrap fixed top-[25px] scale-0 transition-all rounded bg-gray-800 p-1 text-xs text-white group-hover:scale-100">{button.text}</span>
+                        <span className="z-50 whitespace-nowrap fixed bottom-2 scale-0 transition-all rounded bg-gray-800 p-1 text-xs text-white group-hover:scale-100">{button.text}</span>
                     </div>
                 ))
             }
