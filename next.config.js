@@ -22,7 +22,6 @@ const nextConfig = {
       "kinsta.com",
       "api.efperfumes.com",
       "wa.efperfumes.com",
-      "www.simplilearn.com",
     ],
     remotePatterns: [
       {
