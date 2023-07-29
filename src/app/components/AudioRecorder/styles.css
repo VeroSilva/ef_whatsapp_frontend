@@ -1,0 +1,18 @@
+@keyframes gradient {
+    0% {
+        background-color: #f43f5e;
+    }
+
+    50% {
+        background-color: #f59e0b;
+    }
+
+    100% {
+        background-color: #f43f5e;
+    }
+}
+
+.animate-gradient {
+    animation: gradient 2s linear infinite;
+    animation-fill-mode: forwards;
+}

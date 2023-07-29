@@ -2,23 +2,20 @@
 import { useEffect, useState, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
-import Image from "next/image";
 import { Conversation as IConversation, Message as IMessage } from '@/app/interfaces/conversations';
 import { IconSearch } from "@/app/components/Icons/IconSearch";
 import useUser from "../../hooks/useUser";
 import { getConversations, getMessagesByConversation, markAsRead } from '@/app/services/api';
 import { ItemListConversation } from '@/app/components/ItemListConversation';
-import { ActiveConversation } from '@/app/components/ActiveConversation/ActiveConversation';
 import { ConversationSkeleton } from '@/app/components/Skeleton/Conversation';
-import { ActiveConversationSkeleton } from '@/app/components/Skeleton/ActiveConversation';
 import { IconMessage } from '@/app/components/Icons/IconMessage';
 import { IconUnread } from '@/app/components/Icons/IconUnread';
-import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 import { ModalCreateConversartion } from '@/app/components/ModalCreateConversastion/ModalCreateConversastion';
 //@ts-ignore
 import newMessageAudio from '../../../../sounds/receive.mp3';
+import { Chat } from '@/app/components/Chat/Chat';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
@@ -282,7 +279,6 @@ const Conversation = (): JSX.Element => {
     }, [conversations, messages]);
 
     const MemoziedModalCreateConversartion = memo(ModalCreateConversartion);
-    const MemoizedActiveConversation = memo(ActiveConversation);
 
     return (
         <>
@@ -350,33 +346,7 @@ const Conversation = (): JSX.Element => {
                 </div>
                 {/* END: Chat Side Menu */}
                 {/* BEGIN: Chat Content */}
-                <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
-                    <div className="box h-full intro-y bg-slate-50 rounded-tr-md rounded-br-md border border-gray-200">
-                        {/* BEGIN: Chat Active */}
-                        {loadingInitialMessages ?
-                            <ActiveConversationSkeleton /> :
-                            activeConversationState.id !== 0 ?
-                                <MemoizedActiveConversation
-                                    messages={messages}
-                                    conversationId={activeConversationState.id}
-                                    loadMessages={loadMessages}
-                                    loadingMessages={loadingMessages}
-                                /> :
-                                <div className='h-full w-full flex justify-center items-center'>
-                                    <Image
-                                        src="/images/home.png"
-                                        width={250}
-                                        height={250}
-                                        alt="Imagen de mensaje"
-                                        className='grayscale'
-                                        loading="lazy"
-                                        decoding="async"
-                                    />
-                                </div>
-                        }
-                        {/* END: Chat Active */}
-                    </div>
-                </div>
+                <Chat />
                 {/* END: Chat Content */}
             </div>
 

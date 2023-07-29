@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { IconDocument } from "../../Icons/IconDocument";
 import { IconImage } from "../../Icons/IconImage";
 import { IconPaperClip } from "../../Icons/IconPaperClip";
@@ -6,9 +6,10 @@ import { IconTemplates } from "../../Icons/IconTemplates";
 import { getTemplates } from "@/app/services/api";
 import useUser from "../../../hooks/useUser";
 
-export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFile: Function, setTemplates: Function }) => {
+export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFile: Function, setTemplates: Function }) => {
     const imageInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showImageSpan, setShowImageSpan] = useState<boolean>(false)
     const [showDocumentSpan, setShowDocumentSpan] = useState<boolean>(false)
@@ -33,6 +34,7 @@ export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSel
 
         if (file) {
             setSelectedFile(file)
+            setShowDropdown(false)
         }
     };
 
@@ -68,9 +70,32 @@ export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSel
         setShowTemplatesSpan(false);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscapeKey);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, []);
+
     return (
         <div
             className="relative"
+            ref={dropdownRef}
         >
             <button onClick={handleOpenDropdown}>
                 <IconPaperClip classes="w-8 h-8 text-teal-600" />
@@ -79,7 +104,6 @@ export const ConversationDropdown = ({ setSelectedFile, setTemplates }: { setSel
             {showDropdown &&
                 <ul
                     className="absolute bottom-0 mb-14"
-                    onBlur={() => setShowDropdown(false)}
                 >
                     <li className="my-2">
                         <label htmlFor="file-input" id="file-label-2" className="flex">

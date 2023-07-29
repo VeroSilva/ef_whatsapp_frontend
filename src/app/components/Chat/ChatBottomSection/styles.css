@@ -1,0 +1,13 @@
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops))
+}
+
+.media-dropdown {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.media-dropdown li:hover {
+    background: none;
+}

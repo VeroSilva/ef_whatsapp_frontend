@@ -4,9 +4,9 @@ export const dataMessageToSend = async ({ type, data }: { type: string, data: an
     let dataTransformed;
 
     if (type !== "text" && type !== "template") {
-        dataTransformed = await blobToBase64(data);
+        dataTransformed = await blobToBase64(data.content);
     } else {
-        dataTransformed = data;
+        dataTransformed = data.content;
     }
 
     const dataToSend = {
@@ -29,7 +29,11 @@ export const dataMessageToSend = async ({ type, data }: { type: string, data: an
     } else if (type === "template") {
         dataToSend[type] = dataTransformed;
     } else if (type === "document") {
-        dataToSend[type].filename = data.name;
+        dataToSend[type].filename = data.content.name;
+    }
+
+    if (type === "image" || type === "video") {
+        dataToSend[type].caption = data.caption;
     }
 
     return dataToSend

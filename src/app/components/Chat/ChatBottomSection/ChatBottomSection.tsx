@@ -2,15 +2,16 @@ import { useState } from "react"
 import { Spinner } from "flowbite-react"
 import { IconSend } from "../../Icons/IconSend"
 import { IconTrash } from "../../Icons/IconTrash"
-import { AudioRecorder } from "./AudioRecorder"
+import { AudioRecorder } from "../../AudioRecorder/AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
-import { ConversationDropdown } from "../ConversationDropdown/ConversationDropdown"
-import { EmojiDropdown } from "../EmojiDropdown/EmojiDropdown"
+import { MediaDropdown } from "../ChatMediaDropdown/ChatMediaDropdown"
+import { EmojiDropdown } from "../../EmojiDropdown/EmojiDropdown"
 import { createConversation } from "@/app/services/api"
 import useUser from "@/app/hooks/useUser"
 import { dataMessageToSend } from "@/app/utils/messages"
+import { InputSendMessage } from "../../InputSendMessage/InputSendMessage"
 
-export const ConversationBottomSection = ({ conversationId, setSelectedFile, setTemplates, newConversationPhone }: { conversationId: number, setSelectedFile: Function, setTemplates: Function, newConversationPhone?: string }) => {
+export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplates, newConversationPhone }: { conversationId: number, setSelectedFile: Function, setTemplates: Function, newConversationPhone?: string }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
     const [audio, setAudio] = useState<Blob | null>(null)
     // @ts-ignore
@@ -29,19 +30,9 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
         }
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === 'Enter') {
-            event.preventDefault()
-            handleSendMessage("text", messageToSend, () => { })
-            setMessageToSend("")
-        }
-    };
-
     return (
         <div className="p-5 flex items-center border-t border-slate-200/60 dark:border-darkmode-400 transition-opacity duration-300">
-            <EmojiDropdown setMessageToSend={setMessageToSend} messageToSend={messageToSend} />
-
-            <ConversationDropdown setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
+            <MediaDropdown setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
 
             {audio ? (
                 <div className="audio-container w-full flex items-center border border-gray-200 px-2 bg-gray-100 rounded-lg">
@@ -62,14 +53,7 @@ export const ConversationBottomSection = ({ conversationId, setSelectedFile, set
                     </div>
                 </div>
             ) : (
-                <textarea
-                    className="h-[56px] mx-3 py-3 w-full form-control h-16 resize-none border border-gray-200 rounded px-5 shadow-none focus:border-gray-200 focus:ring-0"
-                    rows={1}
-                    placeholder="Type your message..."
-                    value={messageToSend}
-                    onChange={(e) => setMessageToSend(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e)}
-                ></textarea>
+                <InputSendMessage handleSendMessage={handleSendMessage} setMessageToSend={setMessageToSend} messageToSend={messageToSend} />
             )}
 
             {!audio ?

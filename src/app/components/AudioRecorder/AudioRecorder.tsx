@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { IconMicrophone } from "../../Icons/IconMicrophone";
+import { IconMicrophone } from "../Icons/IconMicrophone";
 import "./styles.css"
 
 export const AudioRecorder = ({ audio, setAudio }: { audio: Blob | null, setAudio: Function }): JSX.Element => {

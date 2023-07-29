@@ -4,11 +4,16 @@ import ReactAudioPlayer from 'react-audio-player';
 import { IconDocument } from "../Icons/IconDocument";
 import { PreviewActions } from "./PreviewActions";
 import { getFileType } from "../../utils/fileType";
+import { useState } from "react";
+import { InputSendMessage } from "../InputSendMessage/InputSendMessage";
 
 export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: { file: File, handleSendMessage: Function, isLoading: boolean, setShowPreview: Function }) => {
+    const [caption, setCaption] = useState("");
+
     const handleAccept = () => {
         const type = getFileType(file?.type)
-        handleSendMessage(type, file).finally(() => handleCancel())
+
+        handleSendMessage(type, { content: file, caption }).finally(() => handleCancel())
     }
 
     const handleCancel = () => {
@@ -46,6 +51,8 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
                             </div>
                         </div>
             }
+
+            <InputSendMessage handleSendMessage={handleAccept} setMessageToSend={setCaption} messageToSend={caption} />
 
             <PreviewActions handleAccept={handleAccept} handleCancel={handleCancel} isLoading={isLoading} isReadyToSend={true} />
         </>

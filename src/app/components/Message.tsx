@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import Image from "next/image"
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player'
@@ -17,14 +17,17 @@ import { IconDocument } from "./Icons/IconDocument";
 import { IconLink } from "./Icons/IconLink";
 import "./styles.scss"
 import React from "react";
+import useActiveConversation from "../hooks/useActiveConversation";
 
-export const Message = React.memo(({ message, reaction, handleOpenModal, setModalImage, highlightedText }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function, highlightedText: string }) => {
+const Message = ({ message, reaction, handleOpenModal, setModalImage, highlightedText }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function, highlightedText: string }) => {
     // @ts-ignore
     const { userState } = useUser()
     const [content, setContent] = useState<string | undefined>("")
     const [loadingContent, setLoadingContent] = useState<boolean>(false)
     const [isFromClient, setIsFromClient] = useState(message.status === "client");
     const [isRead, setIsRead] = useState(message.read);
+    //@ts-ignore
+    const { activeConversationState } = useActiveConversation();
 
     useEffect(() => {
         if (message.message_type === "text") {
@@ -39,10 +42,10 @@ export const Message = React.memo(({ message, reaction, handleOpenModal, setModa
         }
     }, [message, content]);
 
-    const handleGetMedia = () => {
+    const handleGetMedia = useCallback(() => {
         setLoadingContent(true);
 
-        getMedia(userState.token, message.message.url)
+        getMedia(userState.token, message.message.url, activeConversationState.id)
             .then((media) => {
                 setContent(media);
             })
@@ -53,8 +56,9 @@ export const Message = React.memo(({ message, reaction, handleOpenModal, setModa
                 setLoadingContent(false);
             });
 
-    }
+    }, [])
     //Validar cuando es una imagen con texto!
+
     const TemplateMessage = ({ message }: { message: any }) => {
         const highlightedBody = highlightedText == '' ? message.body : message.body.replace(highlightedText, '<mark>$1</mark>');
         const highlightedFooter = highlightedText == '' ? message.footer : message.footer.replace(highlightedText, '<mark>$1</mark>');
@@ -192,8 +196,8 @@ export const Message = React.memo(({ message, reaction, handleOpenModal, setModa
                                             setModalImage(content)
                                             handleOpenModal(true)
                                         }}
-                                        priority={true}
-                                        key={message.id}
+                                        key={`image-message-${message.id}`}
+                                        priority
                                     />
                                     {message.message.caption && <p className="my-2">{message.message.caption}</p>}
                                 </>
@@ -251,6 +255,8 @@ export const Message = React.memo(({ message, reaction, handleOpenModal, setModa
             <div className="clear-both"></div>
         </>
     )
-})
+};
+
+export const MemoizedMessage = React.memo(Message);
 
 Message.displayName = 'Message';

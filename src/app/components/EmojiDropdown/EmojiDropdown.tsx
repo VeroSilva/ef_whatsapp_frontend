@@ -1,12 +1,12 @@
 import { useState, ReactNode, useEffect, useRef } from 'react';
-import { IconBall } from '../../Icons/IconBall';
-import { IconCar } from '../../Icons/IconCar';
-import { IconCup } from '../../Icons/IconCup';
-import { IconBear } from '../../Icons/IconBear';
-import { IconFlag } from '../../Icons/IconFlag';
-import { IconHeart } from '../../Icons/IconHeart';
-import { IconLightBulb } from '../../Icons/IconLightBulb';
-import { IconSmile } from '../../Icons/IconSmile';
+import { IconBall } from '../Icons/IconBall';
+import { IconCar } from '../Icons/IconCar';
+import { IconCup } from '../Icons/IconCup';
+import { IconBear } from '../Icons/IconBear';
+import { IconFlag } from '../Icons/IconFlag';
+import { IconHeart } from '../Icons/IconHeart';
+import { IconLightBulb } from '../Icons/IconLightBulb';
+import { IconSmile } from '../Icons/IconSmile';
 import { activityEmojis, animalsAndNatureEmojis, flagsEmojis, foodAndDrinkEmokis, objectsEmojis, smileysAndPeopleEmojis, symbolsEmojis, travelAndPlacesEmojis } from '@/app/utils/emojis';
 
 type EmojiTabProps = {
@@ -65,7 +65,7 @@ export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageT
     );
 
     return (
-        <div className="relative inline-block" ref={dropdownRef}>
+        <div ref={dropdownRef} className="absolute top-0 bottom-0 right-5 w-9 h-9 my-[auto] mx-0">
             <button
                 className="focus:outline-none me-2"
                 onClick={toggleDropdown}
@@ -74,7 +74,7 @@ export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageT
             </button>
             {isOpen && (
                 <div
-                    className="absolute bottom-0 left-0 mb-16 bg-white border border-gray-300 rounded shadow-lg z-10"
+                    className="absolute bottom-0 right-0 mb-16 bg-white border border-gray-300 rounded shadow-lg z-10"
                 >
                     <div className="flex">
                         <EmojiTab tab="smileys" label={<IconSmile classes='w-7 h-7' />} /> {/*Smileys and People*/}

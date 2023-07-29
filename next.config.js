@@ -3,6 +3,7 @@ const { env } = require("./env-config");
 const nextConfig = {
   env: {
     API_URL: process.env.API_URL,
+    API_SOCKET: process.env.API_SOCKET,
     API_CUSTOM_HEADER: process.env.API_CUSTOM_HEADER,
   },
   async rewrites() {
@@ -21,6 +22,7 @@ const nextConfig = {
       "kinsta.com",
       "api.efperfumes.com",
       "wa.efperfumes.com",
+      "www.simplilearn.com",
     ],
     remotePatterns: [
       {
