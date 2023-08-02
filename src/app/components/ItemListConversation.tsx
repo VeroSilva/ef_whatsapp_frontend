@@ -1,7 +1,7 @@
 // "use client";
 
 import { useEffect, useState } from 'react';
-import GenerateInitialsImage from '../utils/generateUserImage';
+import {MemoizedGenerateInitialsImage} from '../utils/generateUserImage';
 import { IconCheck } from './Icons/IconCheck';
 import { IconClock } from './Icons/IconClock';
 import { IconDocument } from './Icons/IconDocument';
@@ -62,7 +62,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             onClick={handleClick}
         >
             <div className="w-14 h-14 flex-none image-fit mr-1">
-                {GenerateInitialsImage(conversation.contact.name ?? "")}
+                <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />
             </div>
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">

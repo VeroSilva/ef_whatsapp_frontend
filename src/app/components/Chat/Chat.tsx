@@ -3,7 +3,7 @@ import { ActiveConversationSkeleton } from "../Skeleton/ActiveConversation"
 import { ListMessages } from "./ListMessages/ListMessages";
 import Image from "next/image";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
-import GenerateInitialsImage from "@/app/utils/generateUserImage";
+import {MemoizedGenerateInitialsImage} from "@/app/utils/generateUserImage";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
 import { IconSearch } from "../Icons/IconSearch";
 import React from "react";
@@ -93,12 +93,12 @@ export const Chat = () => {
                                 <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                                     <div className="flex items-center">
                                         <div className="w-16 h-16 flex-none relative">
-                                            {GenerateInitialsImage(activeConversationState.contact.name ?? "")}
+                                            <MemoizedGenerateInitialsImage name={(activeConversationState ? activeConversationState.contact.name : "")} color="#0d9488" />
                                         </div>
                                         <div className="ml-3 mr-auto">
                                             <div className="flex items-center">
                                                 <div className="font-medium text-base">
-                                                    {activeConversationState.contact.name && activeConversationState.contact.name !== ""
+                                                    {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== ""
                                                         ? <>
                                                             <span className="block">{activeConversationState.contact.name}</span>
                                                             <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
@@ -128,7 +128,7 @@ export const Chat = () => {
                                     </div>
                                 </div>
 
-                                <ListMessages highlightedText={""} />
+                                <ListMessages highlightedText={highlightedText} />
 
                                 {showPreview && (
                                     <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={activeConversationState.id} setShowPreview={setShowPreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />

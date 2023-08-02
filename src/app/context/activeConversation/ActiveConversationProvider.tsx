@@ -44,8 +44,8 @@ export const ActiveConversationProvider: React.FC<ActiveConversationProviderProp
     dispatch({ type: "setActiveConversation", payload: activeConversation });
   };
 
-  const resetActiveConversation = (activeConversation: ContainerActiveConversation): void => {
-    dispatch({ type: "resetActiveConversation", payload: activeConversation });
+  const resetActiveConversation = (): void => {
+    dispatch({ type: "resetActiveConversation" });
   };
 
   return (

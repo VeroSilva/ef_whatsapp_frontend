@@ -2,7 +2,7 @@ import { ACTIVE_CONVERSATION, ContainerActiveConversation, INITIAL_STATE } from 
 
 type ActiveConversationAction =
   | { type: 'setActiveConversation'; payload: ContainerActiveConversation }
-  | { type: 'resetActiveConversation'; payload: ContainerActiveConversation }
+  | { type: 'resetActiveConversation' }
 
 export const ActiveConversationReducer = (state: ContainerActiveConversation, action: ActiveConversationAction) => {
   switch (action.type) {

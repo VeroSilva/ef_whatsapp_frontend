@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Modal, Spinner } from 'flowbite-react';
 import Image from "next/image";
 import { Message as IMessage } from "../../../interfaces/conversations";
@@ -90,15 +90,13 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 socketRef.current = null;
             }
         }
-    }, [messages])
+    }, [userState.token])
 
     useEffect(() => {
         if (activeConversationState.id !== 0) {
             setMessages([]);
             loadMessages(true, activeConversationState.id)
         };
-
-        // console.log("AJA QUE ES LA VERGA", activeConversationState)
     }, [activeConversationState])
 
     useEffect(() => {
@@ -154,7 +152,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     }, [isScrolledToTop]);
 
     const loadMessages = (clear: boolean, id: number) => {
-        if (loadingRefMessage.current || pageMessage == totalPagesMessage) {
+        if (loadingRefMessage.current || (pageMessage == totalPagesMessage && pageMessage != 1)) {
             setLoadingInitialMessages(false);
             return;
         }
@@ -195,7 +193,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         audioElement.play();
     };
 
-    const handleScroll = useCallback(() => {
+    const handleScroll = () => {
         const container = messagesContainerRef.current;
 
         if (container) {
@@ -206,14 +204,14 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
             setIsScrolledToTop(isAtTop);
             setIsScrolledToBottom(isAtBottom);
         }
-    }, []);
+    };
 
-    const scrollToElement = useCallback((id: Number) => {
+    const scrollToElement = (id: Number) => {
         const element = document.querySelector(`[data-id="${id}"]`);
         if (element) {
             element.scrollIntoView();
         }
-    }, []);
+    }
 
     const handleOpenModal = (show: boolean) => {
         setShowModal(show);
