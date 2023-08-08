@@ -7,6 +7,13 @@ export interface Contact {
     id: number
 }
 
+export interface Tag {
+    id: number,
+    name: string,
+    color: string,
+    description: string
+}
+
 export interface Conversation {
     contact: Contact,
     contact_id: number,

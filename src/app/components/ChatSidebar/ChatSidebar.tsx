@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { IconMessage } from "../Icons/IconMessage"
 import { IconSearch } from "../Icons/IconSearch"
 import { IconUnread } from "../Icons/IconUnread"
-import { Conversation as IConversation} from '@/app/interfaces/conversations';
+import { Conversation as IConversation } from '@/app/interfaces/conversations';
 import { getConversations, markAsRead } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
 import useActiveConversation from "../../hooks/useActiveConversation";
@@ -89,7 +89,7 @@ export const ChatSidebar = () => {
             socketRef.current.on('new_conversation', (payload) => {
                 console.log("Evento 'new_conversation' recibido:", payload);
 
-                setConversations([...conversations, payload.data]);
+                setConversations([payload.data, ...conversations]);
             });
         }
 

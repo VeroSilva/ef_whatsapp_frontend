@@ -1,7 +1,7 @@
 // "use client";
 
 import { useEffect, useState } from 'react';
-import {MemoizedGenerateInitialsImage} from '../utils/generateUserImage';
+import { MemoizedGenerateInitialsImage } from '../utils/generateUserImage';
 import { IconCheck } from './Icons/IconCheck';
 import { IconClock } from './Icons/IconClock';
 import { IconDocument } from './Icons/IconDocument';
@@ -19,6 +19,7 @@ import { IconReply } from './Icons/IconReply';
 import { IconWarning } from './Icons/IconWarning';
 
 import useActiveConversation from "../hooks/useActiveConversation";
+import { isColorDark } from '../utils/functions';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
     const [unreadCount, setUnreadCount] = useState(false)
@@ -33,7 +34,8 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
         if (activeConversation !== conversation.id) {
             setActiveConversation({
                 contact: conversation.contact,
-                id: conversation.id
+                id: conversation.id,
+                tags: conversation.tags
             })
             handleOpenConversation(conversation.id)
         }
@@ -56,11 +58,20 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     return (
         <div
             className={
-                "cursor-pointer flex items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
+                "cursor-pointer flex flex-wrap items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
                 (unreadCount ? "bg-teal-100" : "hover:bg-slate-100")
             }
             onClick={handleClick}
         >
+            <div className='w-full mb-2 flex gap-2 flex-wrap'>
+                {conversation.tags.map((tag: any) => (
+                    <span
+                        key={`tag-${tag.id}`}
+                        style={{ backgroundColor: tag.color }}
+                        className={`rounded-full px-2 py-1 text-xs font-bold ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
+                    >{tag.name}</span>
+                ))}
+            </div>
             <div className="w-14 h-14 flex-none image-fit mr-1">
                 <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />
             </div>

@@ -52,7 +52,9 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
                         </div>
             }
 
-            <InputSendMessage handleSendMessage={handleAccept} setMessageToSend={setCaption} messageToSend={caption} />
+            <div className="w-9/12 m-auto">
+                <InputSendMessage handleSendMessage={handleAccept} setMessageToSend={setCaption} messageToSend={caption} />
+            </div>
 
             <PreviewActions handleAccept={handleAccept} handleCancel={handleCancel} isLoading={isLoading} isReadyToSend={true} />
         </>

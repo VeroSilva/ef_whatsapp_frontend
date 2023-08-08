@@ -267,3 +267,33 @@ export const deleteTag = async (id, token) => {
 
   return response;
 };
+
+export const addTagToConversation = async (idConversation, idTag, token) => {
+  const response = await fetch(
+    `${process.env.API_URL}/conversation/${idConversation}/tag/${idTag}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: token,
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};
+
+export const removeTagToConversation = async (idConversation, idTag, token) => {
+  const response = await fetch(
+    `${process.env.API_URL}/conversation/${idConversation}/tag/${idTag}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: token,
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};

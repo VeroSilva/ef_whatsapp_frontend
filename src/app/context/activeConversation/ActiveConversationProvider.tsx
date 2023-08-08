@@ -1,7 +1,7 @@
 import React, { useReducer, useState, useEffect } from "react";
 import ActiveConversationContext from "./ActiveConversationContext";
 import { ActiveConversationReducer } from "./ActiveConversationReducer";
-import { Contact } from "@/app/interfaces/conversations";
+import { Contact, Tag } from "@/app/interfaces/conversations";
 
 interface ActiveConversationProviderProps {
   children: React.ReactNode;
@@ -9,7 +9,8 @@ interface ActiveConversationProviderProps {
 
 export interface ContainerActiveConversation {
   contact: Contact,
-  id: number
+  id: number,
+  tags: Tag[]
 }
 
 export const INITIAL_STATE: ContainerActiveConversation = {
@@ -21,7 +22,8 @@ export const INITIAL_STATE: ContainerActiveConversation = {
     tag_id: "",
     id: 0
   },
-  id: 0
+  id: 0,
+  tags: []
 };
 
 export const ACTIVE_CONVERSATION = "activeConversation";
