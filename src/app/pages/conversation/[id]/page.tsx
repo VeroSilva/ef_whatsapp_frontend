@@ -3,8 +3,8 @@ import { useEffect, useState, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
 import { Message as IMessage } from '@/app/interfaces/conversations';
-import useUser from "../../hooks/useUser";
-import useActiveConversation from "../../hooks/useActiveConversation";
+import useUser from "../../../hooks/useUser";
+import useActiveConversation from "../../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 import { ModalCreateConversartion } from '@/app/components/ModalCreateConversastion/ModalCreateConversastion';
 //@ts-ignore
@@ -16,7 +16,7 @@ const Conversation = (): JSX.Element => {
     //@ts-ignore
     const { userState } = useUser();
     //@ts-ignore
-    const { activeConversationState, resetActiveConversation } = useActiveConversation();
+    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
 
     useEffect(() => {
         if (!userState || userState.token === "") {

@@ -39,6 +39,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const [pageMessage, setPageMessage] = useState(0);
     const [totalPagesMessage, setTotalPagesMessage] = useState(1);
     const [limitMessage, setLimitMessage] = useState(50);
+    const [lastConversation, setLastConversation] = useState(0);
     const [loadingInitialMessages, setLoadingInitialMessages] = useState<boolean>(false);
 
     useEffect(() => {
@@ -135,6 +136,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     }, [messages]);
 
     useEffect(() => {
+        console.log(isScrolledToBottom, isScrolledToTop)
         if (!isScrolledToBottom && updatedMessages.length) {
             scrollToElement(updatedMessages[updatedMessages.length - 1].id);
         } else if (isScrolledToTop && updatedMessages.length) {
@@ -152,15 +154,14 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     }, [isScrolledToTop]);
 
     const loadMessages = (clear: boolean, id: number) => {
-        if (loadingRefMessage.current || (pageMessage == totalPagesMessage && pageMessage != 1)) {
+        if (loadingRefMessage.current || (pageMessage == totalPagesMessage && id == lastConversation)) {
             setLoadingInitialMessages(false);
             return;
         }
-
         loadingRefMessage.current = true;
         const offset = clear ? 0 * limitMessage : pageMessage * limitMessage;
         setLoadingMessages(true);
-
+        setLastConversation(id);
         getMessagesByConversation(id, offset, limitMessage, userState.token)
             .then((res) => {
                 if (!res.message) {
@@ -171,8 +172,8 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 } else {
                     resetActiveConversation();
                     setMessages([]);
+                    setLastConversation(0);
                 }
-
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -198,7 +199,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
 
         if (container) {
             const { scrollTop, scrollHeight, clientHeight } = container;
-
             const isAtTop = scrollTop <= 3;
             const isAtBottom = scrollHeight - scrollTop >= clientHeight - 1.5;
             setIsScrolledToTop(isAtTop);
