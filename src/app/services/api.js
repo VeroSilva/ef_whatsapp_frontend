@@ -115,10 +115,10 @@ export const getMedia = async (token, url, conversation_id) => {
   return response.text();
 };
 
-export const markAsRead = async (token, ids) => {
+export const markAsRead = async (token, idConversation) => {
   const response = await fetch(`${process.env.API_URL}/message/markAsRead`, {
     method: "POST",
-    body: JSON.stringify({ ids: ids }),
+    body: JSON.stringify({ conversation_id: idConversation }),
     headers: {
       Accept: "*/*",
       Authorization: token,

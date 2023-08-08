@@ -97,7 +97,7 @@ export const Chat = () => {
                                 <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
                                     <div className="flex items-center">
                                         <div className="w-16 h-16 flex-none relative">
-                                            <MemoizedGenerateInitialsImage name={(activeConversationState ? activeConversationState.contact.name : "")} color="#0d9488" />
+                                            <MemoizedGenerateInitialsImage name={(activeConversationState.contact.name ?? "")} color="#0d9488" />
                                         </div>
 
                                         <div className="ml-3 mr-auto">

@@ -3,7 +3,7 @@ import { IconMessage } from "../Icons/IconMessage"
 import { IconSearch } from "../Icons/IconSearch"
 import { IconUnread } from "../Icons/IconUnread"
 import { Conversation as IConversation } from '@/app/interfaces/conversations';
-import { getConversations, markAsRead } from '@/app/services/api';
+import { getConversations } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { ConversationSkeleton } from "../Skeleton/Conversation";

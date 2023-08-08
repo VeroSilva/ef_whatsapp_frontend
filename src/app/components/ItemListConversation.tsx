@@ -17,7 +17,9 @@ import { formatPhoneNumber } from '../utils/formatPhone';
 import { IconTemplates } from './Icons/IconTemplates';
 import { IconReply } from './Icons/IconReply';
 import { IconWarning } from './Icons/IconWarning';
+import { markAsRead } from '@/app/services/api';
 
+import useUser from "../hooks/useUser"
 import useActiveConversation from "../hooks/useActiveConversation";
 import { isColorDark } from '../utils/functions';
 
@@ -25,6 +27,8 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     const [unreadCount, setUnreadCount] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
+    // @ts-ignore
+    const { userState } = useUser();
 
     useEffect(() => {
         setUnreadCount(parseInt(conversation.unread_count) > 0)
@@ -37,6 +41,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                 id: conversation.id,
                 tags: conversation.tags
             })
+            markAsRead(userState.token, conversation.id)
             handleOpenConversation(conversation.id)
         }
 

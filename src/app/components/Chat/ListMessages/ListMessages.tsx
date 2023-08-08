@@ -138,7 +138,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     }, [messages]);
 
     useEffect(() => {
-        console.log(isScrolledToBottom, isScrolledToTop)
         if (!isScrolledToBottom && updatedMessages.length) {
             scrollToElement(updatedMessages[updatedMessages.length - 1].id);
         } else if (isScrolledToTop && updatedMessages.length) {

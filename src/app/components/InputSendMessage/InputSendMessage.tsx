@@ -4,7 +4,7 @@ export const InputSendMessage = ({ handleSendMessage, setMessageToSend, messageT
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault()
-            handleSendMessage("text", { content: messageToSend }, () => { })
+            handleSendMessage("text", messageToSend, () => { })
             setMessageToSend("")
         }
     }

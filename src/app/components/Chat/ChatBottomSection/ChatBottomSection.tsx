@@ -5,11 +5,12 @@ import { IconTrash } from "../../Icons/IconTrash"
 import { AudioRecorder } from "../../AudioRecorder/AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
 import { MediaDropdown } from "../ChatMediaDropdown/ChatMediaDropdown"
-import { EmojiDropdown } from "../../EmojiDropdown/EmojiDropdown"
 import { createConversation } from "@/app/services/api"
 import useUser from "@/app/hooks/useUser"
 import { dataMessageToSend } from "@/app/utils/messages"
 import { InputSendMessage } from "../../InputSendMessage/InputSendMessage"
+import { usePathname } from "next/navigation"
+import useActiveConversation from "@/app/hooks/useActiveConversation";
 
 export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplates, newConversationPhone }: { conversationId: number, setSelectedFile: Function, setTemplates: Function, newConversationPhone?: string }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
@@ -18,18 +19,23 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplate
     const { sendMessage, isLoading } = useMessage()
     // @ts-ignore
     const { userState } = useUser()
+    // @ts-ignore
+    const { setActiveConversation } = useActiveConversation()
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     const handleSendMessage = async (type: string, data: any, resetData: Function) => {
         if (conversationId === -1) {
-            const contentData: any = { content: data }
-            const dataToSend = await dataMessageToSend({ data: contentData, type })
+            const dataToSend = await dataMessageToSend({ data, type })
 
-            createConversation({ to: newConversationPhone, messageData: dataToSend }, userState.token)
-                .then((res) => console.log(res))
+            createConversation({ to: newConversationPhone, messageData: dataToSend, company_phone_id: phoneId }, userState.token)
+                .then((res) => {
+                    const { contact, id } = res
+                    setActiveConversation({ contact, id, tags: [] })
+                })
         } else {
-            const contentData: any = { content: data }
-
-            sendMessage({ type, data: contentData, conversationId }).finally(() => resetData())
+            sendMessage({ type, data, conversationId }).finally(() => resetData())
         }
     }
 
