@@ -11,6 +11,11 @@ import { CompanyPhones } from "@/app/interfaces/user";
 
 const menuItems = [
     {
+        title: "Inicio",
+        link: "/pages/home",
+        icon: <IconUsers classes="w-6 h-6" />
+    },
+    {
         title: "Usuarios",
         link: "/pages/users",
         icon: <IconUsers classes="w-6 h-6" />
@@ -43,7 +48,7 @@ export const Sidebar = () => {
                 return idx.title == `+${phone.phone}`
             });
             if (idx == -1) {
-                menuItems.unshift(
+                menuItems.push(
                     {
                         title: `+${phone.phone}`,
                         link: `/pages/conversation/${phone.company_phone_id}`,

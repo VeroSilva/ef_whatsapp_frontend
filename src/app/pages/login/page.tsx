@@ -15,7 +15,7 @@ const Login = () => {
 
     useEffect(() => {
         if (userState && userState.token) {
-            router.push('./pages/conversation')
+            router.push('./pages/home')
         }
     }, [userState])
 
