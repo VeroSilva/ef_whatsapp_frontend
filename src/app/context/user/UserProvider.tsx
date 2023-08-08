@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useEffect } from "react";
-import { User } from "@/app/interfaces/user";
+import { User, CompanyPhones } from "@/app/interfaces/user";
 import UserContext from "./UserContext";
 import { UserReducer } from "./UserReducer";
 
@@ -9,7 +9,7 @@ interface UserProviderProps {
 
 export const INITIAL_STATE: User = {
   username: "",
-  token: ""
+  token: "",
 };
 
 export const LS_USER_ID = "userID";

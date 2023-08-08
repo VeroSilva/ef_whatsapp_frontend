@@ -37,7 +37,8 @@ export const LoginForm = () => {
                     data.then((d: any) => {
                         loginUser({
                             username: credentials.username,
-                            token: d.token
+                            token: d.token,
+                            company_phones: d.company_phones,
                         })
 
                         setLoading(false)

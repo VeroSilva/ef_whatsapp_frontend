@@ -10,6 +10,7 @@ import { ConversationSkeleton } from "../Skeleton/Conversation";
 import { ItemListConversation } from "../ItemListConversation";
 import { io, Socket } from 'socket.io-client';
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
+import { usePathname } from 'next/navigation';
 
 export const ChatSidebar = () => {
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
@@ -27,6 +28,9 @@ export const ChatSidebar = () => {
     const { activeConversationState } = useActiveConversation();
     const containerRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     useEffect(() => {
         setPageConversation(0);
@@ -145,7 +149,7 @@ export const ChatSidebar = () => {
         const offset = clear ? 0 * limitConversation : pageConversation * limitConversation;
         setLoadingConversations(true);
 
-        getConversations(offset, limitConversation, filter, userState.token)
+        getConversations(offset, limitConversation, filter, userState.token, phoneId)
             .then((res) => {
                 setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
                 setPageConversation(res.currentPage);

@@ -12,9 +12,15 @@ export const login = async (data) => {
   return response;
 };
 
-export const getConversations = async (offset, limit, filter, token) => {
+export const getConversations = async (
+  offset,
+  limit,
+  filter,
+  token,
+  company_phone_id
+) => {
   const response = await fetch(
-    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=1`,
+    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=${company_phone_id}`,
     {
       method: "GET",
       headers: {

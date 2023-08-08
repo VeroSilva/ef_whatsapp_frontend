@@ -7,13 +7,9 @@ import { IconTemplates } from "../Icons/IconTemplates";
 import { IconUsers } from "../Icons/IconUsers";
 import { IconTag } from "../Icons/IconTag";
 import Image from "next/image";
+import { CompanyPhones } from "@/app/interfaces/user";
 
 const menuItems = [
-    {
-        title: "Chat",
-        link: "/pages/conversation",
-        icon: <IconTemplates classes="w-6 h-6" />
-    },
     {
         title: "Usuarios",
         link: "/pages/users",
@@ -27,20 +23,36 @@ const menuItems = [
 ]
 
 export const Sidebar = () => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
     //@ts-ignore
-    const { logoutUser } = useUser();
+    const { logoutUser, userState } = useUser();
     const [active, setActive] = useState("");
 
     useEffect(() => {
         const activeMenu = localStorage.getItem('activeMenu')
-
         if (activeMenu) {
             setActive(activeMenu)
         } else {
             setActive("Chat")
         }
     }, []);
+
+    useEffect(() => {
+        userState?.company_phones.map((phone: CompanyPhones) => {
+            const idx = menuItems.findIndex((idx) => {
+                return idx.title == `+${phone.phone}`
+            });
+            if (idx == -1) {
+                menuItems.unshift(
+                    {
+                        title: `+${phone.phone}`,
+                        link: `/pages/conversation/${phone.company_phone_id}`,
+                        icon: <IconTemplates classes="w-6 h-6" />,
+                    }
+                )
+            }
+        })
+    }, [menuItems, userState]);
 
     const handleActiveMenu = (menuTitle: string) => {
         setActive(menuTitle)
