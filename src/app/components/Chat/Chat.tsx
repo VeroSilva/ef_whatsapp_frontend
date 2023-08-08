@@ -99,6 +99,7 @@ export const Chat = () => {
                                         <div className="w-16 h-16 flex-none relative">
                                             <MemoizedGenerateInitialsImage name={(activeConversationState ? activeConversationState.contact.name : "")} color="#0d9488" />
                                         </div>
+
                                         <div className="ml-3 mr-auto">
                                             <div className="flex items-center">
                                                 <div className="font-medium text-base">
@@ -111,21 +112,8 @@ export const Chat = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
-                                        <div className='w-full mb-2 flex gap-2 flex-wrap'>
-                                            {activeConversationState.tags.map((tag: any) => (
-                                                <span
-                                                    key={`tag-${tag.id}`}
-                                                    style={{ backgroundColor: tag.color }}
-                                                    className={`rounded-full px-2 py-1 text-xs font-bold ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
-                                                >{tag.name}</span>
-                                            ))}
 
-                                            <ChatOptions />
-                                        </div>
-
-                                        <div className="relative">
+                                        <div className="relative ms-4">
                                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                                 <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
                                             </div>
@@ -140,6 +128,19 @@ export const Chat = () => {
                                                 onChange={(e) => setSearchText(e.target.value)}
                                                 onKeyDown={handleKeyDown}
                                             />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
+                                        <div className='w-full mb-2 flex gap-2 flex-wrap items-center'>
+                                            {activeConversationState && activeConversationState.tags.map((tag: any) => (
+                                                <span
+                                                    key={`tag-${tag.id}`}
+                                                    style={{ backgroundColor: tag.color }}
+                                                    className={`rounded-full px-2 py-1 text-xs font-bold ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
+                                                >{tag.name}</span>
+                                            ))}
+
+                                            <ChatOptions />
                                         </div>
                                     </div>
                                 </div>

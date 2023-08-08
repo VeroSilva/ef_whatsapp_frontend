@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import useUser from "@/app/hooks/useUser"
 import { sendMessage as apiSendMessage } from "@/app/services/api"
-import { blobToBase64, dataURLtoMimeType, getFilenameFromBase64 } from "@/app/utils/blobToBase64"
 import { dataMessageToSend } from "../utils/messages";
 
 export const useMessage = () => {

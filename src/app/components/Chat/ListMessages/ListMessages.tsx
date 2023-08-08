@@ -93,10 +93,12 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     }, [userState.token])
 
     useEffect(() => {
-        if (activeConversationState.id !== 0) {
+        if (activeConversationState.id !== 0 && activeConversationState.id !== -1) {
             setMessages([]);
             loadMessages(true, activeConversationState.id)
-        };
+        } else if (activeConversationState.id === -1) {
+            setMessages([]);
+        }
     }, [activeConversationState])
 
     useEffect(() => {

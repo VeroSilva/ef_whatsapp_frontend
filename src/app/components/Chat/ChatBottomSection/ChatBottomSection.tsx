@@ -21,12 +21,15 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplate
 
     const handleSendMessage = async (type: string, data: any, resetData: Function) => {
         if (conversationId === -1) {
-            const dataToSend = await dataMessageToSend({ data, type })
+            const contentData: any = { content: data }
+            const dataToSend = await dataMessageToSend({ data: contentData, type })
 
             createConversation({ to: newConversationPhone, messageData: dataToSend }, userState.token)
                 .then((res) => console.log(res))
         } else {
-            sendMessage({ type, data, conversationId }).finally(() => resetData())
+            const contentData: any = { content: data }
+
+            sendMessage({ type, data: contentData, conversationId }).finally(() => resetData())
         }
     }
 

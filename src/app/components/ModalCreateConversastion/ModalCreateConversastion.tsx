@@ -5,10 +5,9 @@ import useActiveConversation from '@/app/hooks/useActiveConversation';
 interface ModalProps {
     show: boolean;
     handleOpenModal: Function;
-    setMessages: Function;
 }
 
-export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show, handleOpenModal, setMessages }) => {
+export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show, handleOpenModal }) => {
     //@ts-ignore
     const { setActiveConversation } = useActiveConversation();
     const [newPhone, setNewPhone] = useState<string>("");
@@ -21,12 +20,12 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
                 name: "",
                 phone: newPhone,
                 tag_id: "",
-                id: 0
+                id: 0,
             },
-            id: -1
+            id: -1,
+            tags: []
         });
 
-        setMessages([]);
         handleOpenModal(false);
     }, [newPhone]);
 
