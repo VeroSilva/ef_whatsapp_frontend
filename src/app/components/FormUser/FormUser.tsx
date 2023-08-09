@@ -15,7 +15,6 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         password: "",
         role: "",
     });
-    // @ts-ignore
     const { userState } = useUser();
 
     useEffect(() => {

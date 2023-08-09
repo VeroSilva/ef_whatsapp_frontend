@@ -35,8 +35,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setIsLoggedIn(true);
   };
 
-  const logoutUser = (user: User): void => {
-    dispatch({ type: "logout", payload: user });
+  const logoutUser = (): void => {
+    dispatch({ type: "logout" });
     setIsLoggedIn(false);
   };
 

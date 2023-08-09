@@ -17,7 +17,6 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplate
     const [audio, setAudio] = useState<Blob | null>(null)
     // @ts-ignore
     const { sendMessage, isLoading } = useMessage()
-    // @ts-ignore
     const { userState } = useUser()
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()

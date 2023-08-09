@@ -12,7 +12,7 @@ import { io, Socket } from 'socket.io-client';
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
 import { usePathname } from 'next/navigation';
 
-export const ChatSidebar = (load: boolean) => {
+export const ChatSidebar = () => {
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
     const [showModal, setShowModal] = useState<boolean>(false);
     const [pageConversation, setPageConversation] = useState(0);
@@ -22,7 +22,6 @@ export const ChatSidebar = (load: boolean) => {
     const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
     const loadingRefConversation = useRef(false);
-    //@ts-ignore
     const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState } = useActiveConversation();

@@ -4,7 +4,6 @@ import Select, { StylesConfig } from 'react-select';
 import chroma from 'chroma-js';
 // import { ColourOption } from './data';
 import { Tag } from '@/app/interfaces/conversations';
-import useActiveConversation from "@/app/hooks/useActiveConversation";
 import { getTags } from '@/app/services/api';
 import useUser from "@/app/hooks/useUser"
 
@@ -19,23 +18,7 @@ interface ColourOption {
 export const SelectTags = () => {
     const [tags, setTags] = useState<Tag[]>([])
     const [options, setOptions] = useState<ColourOption[]>([]);
-
-    // @ts-ignore
     const { userState } = useUser();
-    //@ts-ignore
-    const { activeConversationState } = useActiveConversation();
-    const colourOptions: readonly ColourOption[] = [
-        { value: 1, label: 'Ocean', color: '#00B8D9', isFixed: true },
-        { value: 1, label: 'Blue', color: '#0052CC', isDisabled: true },
-        { value: 1, label: 'Purple', color: '#5243AA' },
-        { value: 1, label: 'Red', color: '#FF5630', isFixed: true },
-        { value: 1, label: 'Orange', color: '#FF8B00' },
-        { value: 1, label: 'Yellow', color: '#FFC400' },
-        { value: 1, label: 'Green', color: '#36B37E' },
-        { value: 1, label: 'Forest', color: '#00875A' },
-        { value: 1, label: 'Slate', color: '#253858' },
-        { value: 1, label: 'Silver', color: '#666666' },
-    ];
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),

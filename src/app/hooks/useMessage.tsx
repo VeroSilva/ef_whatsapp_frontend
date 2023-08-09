@@ -5,7 +5,6 @@ import { dataMessageToSend } from "../utils/messages";
 
 export const useMessage = () => {
     const [isLoading, setIsLoading] = useState(false)
-    // @ts-ignore
     const { userState } = useUser()
 
     const sendMessage = async ({ type, data, conversationId }: { type: string, data: any, conversationId: number }) => {

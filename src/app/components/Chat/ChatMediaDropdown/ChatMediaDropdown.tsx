@@ -14,7 +14,6 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
     const [showImageSpan, setShowImageSpan] = useState<boolean>(false)
     const [showDocumentSpan, setShowDocumentSpan] = useState<boolean>(false)
     const [showTemplatesSpan, setShowTemplatesSpan] = useState<boolean>(false)
-    // @ts-ignore
     const { userState } = useUser()
 
     const handleImageIconClick = () => {

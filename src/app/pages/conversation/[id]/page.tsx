@@ -1,8 +1,6 @@
 "use client"
-import { useEffect, useState, useRef, memo } from 'react';
+import { useEffect, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { io, Socket } from 'socket.io-client';
-import { Message as IMessage } from '@/app/interfaces/conversations';
 import useUser from "../../../hooks/useUser";
 import useActiveConversation from "../../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
@@ -13,7 +11,6 @@ import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
-    //@ts-ignore
     const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();

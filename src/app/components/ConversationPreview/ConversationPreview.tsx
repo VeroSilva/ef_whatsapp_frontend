@@ -15,7 +15,6 @@ export const ConversationPreview = ({
     newConversationPhone
 }: { selectedFile: File | null, classifiedTemplates: any[], conversationId: number, setShowPreview: Function, newConversationPhone?: string }) => {
     const { sendMessage, isLoading, setIsLoading } = useMessage()
-    // @ts-ignore
     const { userState } = useUser()
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()

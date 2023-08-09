@@ -11,7 +11,6 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
         description: "",
         color: "",
     });
-    // @ts-ignore
     const { userState } = useUser();
 
     useEffect(() => {

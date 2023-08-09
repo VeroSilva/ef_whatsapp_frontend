@@ -29,7 +29,6 @@ const menuItems = [
 
 export const Sidebar = () => {
     const [open, setOpen] = useState(true);
-    //@ts-ignore
     const { logoutUser, userState } = useUser();
     const [active, setActive] = useState("");
 
@@ -43,20 +42,22 @@ export const Sidebar = () => {
     }, []);
 
     useEffect(() => {
-        userState?.company_phones.map((phone: CompanyPhones) => {
-            const idx = menuItems.findIndex((idx) => {
-                return idx.title == `+${phone.phone}`
-            });
-            if (idx == -1) {
-                menuItems.push(
-                    {
-                        title: `+${phone.phone}`,
-                        link: `/pages/conversation/${phone.company_phone_id}`,
-                        icon: <IconTemplates classes="w-6 h-6" />,
-                    }
-                )
-            }
-        })
+        if (userState?.company_phones) {
+            userState?.company_phones.map((phone: CompanyPhones) => {
+                const idx = menuItems.findIndex((idx) => {
+                    return idx.title == `+${phone.phone}`
+                });
+                if (idx == -1) {
+                    menuItems.push(
+                        {
+                            title: `+${phone.phone}`,
+                            link: `/pages/conversation/${phone.company_phone_id}`,
+                            icon: <IconTemplates classes="w-6 h-6" />,
+                        }
+                    )
+                }
+            })
+        }
     }, [menuItems, userState]);
 
     const handleActiveMenu = (menuTitle: string) => {

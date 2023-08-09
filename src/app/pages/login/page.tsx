@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect } from 'react'
-import { parseCookies } from 'nookies';
 import { useRouter } from 'next/navigation';
 import { LoginForm } from "@/app/components/LoginForm"
 import useUser from "../../hooks/useUser";
@@ -9,8 +8,6 @@ import Image from "next/image";
 
 const Login = () => {
     const router = useRouter();
-    const cookies = parseCookies();
-    // @ts-ignore
     const { userState } = useUser();
 
     useEffect(() => {
