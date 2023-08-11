@@ -6,6 +6,8 @@ import { createConversation } from "@/app/services/api";
 import useUser from "@/app/hooks/useUser";
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { usePathname } from "next/navigation";
+import { MessageDataToSend } from "@/app/interfaces/conversations";
+import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
 
 export const ConversationPreview = ({
     selectedFile,
@@ -21,6 +23,7 @@ export const ConversationPreview = ({
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
+    const { activeMessageReply } = useActiveMessageReply();
 
     const handleSendMessage = async (type: string, data: any) => {
         try {
@@ -36,7 +39,15 @@ export const ConversationPreview = ({
                         setActiveConversation({ contact, id, tags: [] })
                     })
             } else {
-                await sendMessage({ type, data, conversationId });
+                const messageData: MessageDataToSend = {
+                    type,
+                    data,
+                    conversationId
+                }
+
+                if (activeMessageReply.id !== 0) messageData["context"] = { message_id: activeMessageReply.message.id_whatsapp }
+
+                await sendMessage(messageData);
             }
         } catch (error) {
             console.error("Error al enviar el mensaje:", error);

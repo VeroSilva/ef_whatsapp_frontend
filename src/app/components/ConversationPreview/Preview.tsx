@@ -6,9 +6,14 @@ import { PreviewActions } from "./PreviewActions";
 import { getFileType } from "../../utils/fileType";
 import { useState } from "react";
 import { InputSendMessage } from "../InputSendMessage/InputSendMessage";
+import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
+import { MessageContent } from "../Message/MessageContent/MessageContent";
+import { IconX } from "../Icons/IconX";
+import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply/ActiveMessageReplyProvider";
 
 export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: { file: File, handleSendMessage: Function, isLoading: boolean, setShowPreview: Function }) => {
     const [caption, setCaption] = useState("");
+    const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
 
     const handleAccept = () => {
         const type = getFileType(file?.type)
@@ -18,6 +23,10 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
 
     const handleCancel = () => {
         setShowPreview(false)
+    }
+
+    const handleResetActiveMessageReply = () => {
+        setActiveMessageReply(initialStateActiveMessageReply)
     }
 
     return (
@@ -53,6 +62,15 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
             }
 
             <div className="w-9/12 m-auto">
+                {activeMessageReply.conversation_id !== 0 &&
+                    <div className="reply flex items-center justify-between m-4 p-2 border-2 border-teal-200 rounded-md border-l-teal-500 bg-teal-100 w-full">
+                        <MessageContent message={activeMessageReply} isReply={true} />
+
+                        <button onClick={handleResetActiveMessageReply}>
+                            <IconX classes="w-6 h-6" />
+                        </button>
+                    </div>
+                }
                 <InputSendMessage handleSendMessage={handleAccept} setMessageToSend={setCaption} messageToSend={caption} />
             </div>
 

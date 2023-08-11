@@ -1,6 +1,7 @@
+import { Context } from "../interfaces/conversations";
 import { blobToBase64, dataURLtoMimeType } from "./blobToBase64";
 
-export const dataMessageToSend = async ({ type, data }: { type: string, data: any }) => {
+export const dataMessageToSend = async ({ type, data, context }: { type: string, data: any, context?: Context | null }) => {
     let dataTransformed;
 
     if (type !== "text" && type !== "template") {
@@ -13,6 +14,8 @@ export const dataMessageToSend = async ({ type, data }: { type: string, data: an
         type: type,
         [type]: {} as any,
     };
+
+    if (context) dataToSend["context"] = context
 
     if (type !== "text" && type !== "template") {
         const mimeType = dataURLtoMimeType(dataTransformed);

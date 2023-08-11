@@ -1,7 +1,3 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
-import Image from "next/image"
-import ReactAudioPlayer from 'react-audio-player';
-import ReactPlayer from 'react-player'
 import { convertEpochToDateTime } from "../../utils/transformDate";
 import { IconCheck } from "../Icons/IconCheck";
 import { IconClock } from "../Icons/IconClock";
@@ -9,67 +5,13 @@ import { IconDoubleCheck } from "../Icons/IconDoubleCheck";
 import { IconExclamationCircle } from "../Icons/IconExclamationCircle";
 import { Message as IMessage } from "../../interfaces/conversations"
 import { Reaction } from "../../interfaces/reactions";
-import { ActiveConversationSkeleton } from "../Skeleton/ActiveConversation";
-import { validateBase64 } from "../../utils/validateBase64";
-import { IconDocument } from "../Icons/IconDocument";
-import { IconLink } from "../Icons/IconLink";
 import React from "react";
-import useActiveConversation from "../../hooks/useActiveConversation";
 import { MemoizedMessageOptions } from "./MessageOptions/MessageOptions";
 import { MessageContent } from "./MessageContent/MessageContent";
 
 const Message = ({ message, reaction, handleOpenModal, setModalImage, highlightedText }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function, highlightedText: string }) => {
     const isRead = message.read;
     const isFromClient = message.status === "client";
-
-    const TemplateReply = ({ template }: { template: any }) => {
-        const { body, footer, header } = template;
-
-        const renderHeader = () => {
-            if (header && header.type !== "") {
-                if (header.type === "image") {
-                    return <Image
-                        src={header.data}
-                        width={300}
-                        height={300}
-                        alt="Header Image"
-                        className="object-cover rounded-md w-full h-full"
-                        loading="lazy"
-                        decoding="async"
-                    />;
-                } else if (header.type === "text") {
-                    return <h2 className="font-semibold text-sm">{header.data}</h2>;
-                }
-            }
-            return null;
-        };
-
-        const renderContent = () => {
-            if (body !== "") {
-                return <p className="line-clamp-2 text-sm">{body}</p>;
-            } else if (footer !== "") {
-                return <p className="line-clamp-2 text-sm">{footer}</p>;
-            }
-            return null;
-        };
-
-        const renderLayout = () => {
-            if (header && header.type === "image") {
-                return (
-                    <div className="grid grid-cols-2">
-                        <div className="col-span-7/10">{renderContent()}</div>
-                        <div className="col-span-3/10">{renderHeader()}</div>
-                    </div>
-                );
-            } else {
-                return <>{renderHeader()} {renderContent()}</>;
-            }
-        };
-
-        return <>{renderLayout()}</>;
-    };
-
-    console.log(message)
 
     return (
         <>

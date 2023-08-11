@@ -25,7 +25,7 @@ export interface Conversation {
     last_message_time: string
 }
 
-interface MessageDetail {
+export interface MessageDetail {
     body: string,
     id: number,
     id_whatsapp: string,
@@ -55,5 +55,16 @@ export interface Message {
     message_type: string,
     read: boolean,
     status: string,
-    replied_message?: Message | null
+    replied_message?: Message | null,
+}
+
+export interface Context {
+    message_id: string
+}
+
+export interface MessageDataToSend {
+    type: string,
+    data: Message,
+    conversationId?: number,
+    context?: Context
 }
