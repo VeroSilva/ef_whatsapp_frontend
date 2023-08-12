@@ -84,7 +84,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         };
     };
 
-    const CreateConversationButton = () => (
+    const CreateUserButton = () => (
         <button
             onClick={handleCreateUser}
             className={
@@ -130,7 +130,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                         type={showPassword ? "text" : "password"}
                         id="input-group-1"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
-                        placeholder="Password"
+                        placeholder="Contraseña"
                         value={credentials.password ?? ""}
                         onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                     />
@@ -167,7 +167,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                 >
                     Cancelar
                 </button>
-                <CreateConversationButton />
+                <CreateUserButton />
             </div>
         </div>
     )

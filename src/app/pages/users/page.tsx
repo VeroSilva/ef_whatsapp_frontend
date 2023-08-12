@@ -14,6 +14,8 @@ import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
 import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { FormUser } from "@/app/components/FormUser/FormUser";
+import { FormEditPassword } from "@/app/components/FormUser/FormEditPassword/FormEditPassword";
+import { IconPassword } from "@/app/components/Icons/IconPassword";
 
 const Users = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -27,6 +29,7 @@ const Users = (): JSX.Element => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+    const [showEditPasswordModal, setShowEditPasswordModal] = useState<boolean>(false);
     const [alert, setAlert] = useState({
         type: "",
         message: "",
@@ -94,6 +97,10 @@ const Users = (): JSX.Element => {
         setShowEditModal(show);
     };
 
+    const handleOpenEditPasswordModal = (show: boolean) => {
+        setShowEditPasswordModal(show)
+    }
+
     const handleOpenDeleteModal = (show: boolean) => {
         setShowDeleteModal(show);
     };
@@ -104,7 +111,7 @@ const Users = (): JSX.Element => {
 
             <div className="flex-1 h-full p-8 bg-slate-200">
                 <button
-                    className="main-button"
+                    className="main-button mb-4"
                     onClick={() => handleOpenModal(true)}
                 >Nuevo usuario</button>
 
@@ -157,6 +164,19 @@ const Users = (): JSX.Element => {
                                                         <IconEdit classes="w-5 h-5" />
                                                         Editar
                                                     </a>
+
+                                                    <a
+                                                        className="flex items-center mr-3 text-xs"
+                                                        href="#"
+                                                        onClick={() => {
+                                                            setShowEditPasswordModal(true);
+                                                            setUserData(user);
+                                                        }}
+                                                    >
+                                                        <IconPassword classes="w-5 h-5" />
+                                                        Editar contraseña
+                                                    </a>
+
                                                     <a
                                                         className="flex items-center text-danger text-xs"
                                                         href="#"
@@ -232,6 +252,22 @@ const Users = (): JSX.Element => {
                     data={userData}
                 />
             </Modal>
+            {/* END: Edit User Modal */}
+
+            {/* BEGIN: Edit Password User Modal */}
+            <Modal
+                title="Editar contraseña de usuario"
+                onClose={() => handleOpenEditPasswordModal(false)}
+                show={showEditPasswordModal}
+                width="500px"
+            >
+                <FormEditPassword
+                    handleOpenModal={handleOpenEditPasswordModal}
+                    setAlert={setAlert}
+                    data={userData}
+                />
+            </Modal>
+            {/* END: Edit Password User Modal */}
 
             {/* END: Delete User Modal */}
             <Modal
