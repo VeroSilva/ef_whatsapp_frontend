@@ -97,8 +97,8 @@ export const MessageContent = ({ message, handleOpenModal, setModalImage, highli
     };
 
     const TemplateMessage = ({ message }: { message: any }) => {
-        const highlightedBody = (highlightedText && highlightedText == '') ? message.body : message.body.replace(highlightedText, '<mark>$1</mark>');
-        const highlightedFooter = (highlightedText && highlightedText == '') ? message.footer : message.footer.replace(highlightedText, '<mark>$1</mark>');
+        const highlightedBody = (highlightedText === '') ? message.body : message.body.replace(highlightedText, '<mark>$1</mark>');
+        const highlightedFooter = (highlightedText === '') ? message.footer : message.footer.replace(highlightedText, '<mark>$1</mark>');
 
         return (
             <div className="w-[300px]">
