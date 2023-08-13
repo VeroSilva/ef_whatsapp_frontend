@@ -12,7 +12,7 @@ import { io, Socket } from 'socket.io-client';
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
 import { usePathname } from 'next/navigation';
 
-export const ChatSidebar = (load: boolean) => {
+export const ChatSidebar = () => {
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
     const [showModal, setShowModal] = useState<boolean>(false);
     const [pageConversation, setPageConversation] = useState(0);
