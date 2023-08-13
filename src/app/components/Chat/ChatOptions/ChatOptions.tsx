@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { IconEllipsisVertical } from "../../Icons/IconEllipsisVertical"
 import { IconTag } from "../../Icons/IconTag";
 import { Modal } from "@/app/components/Modal/Modal";
-import { IconSearch } from "../../Icons/IconSearch";
 import { Tag } from "@/app/interfaces/conversations";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
-import { isColorDark } from "@/app/utils/functions";
 //@ts-ignore
 import chroma from 'chroma-js';
 import { addTagToConversation, getTags, removeTagToConversation } from "@/app/services/api";
@@ -15,13 +13,11 @@ import { IconX } from "../../Icons/IconX";
 export const ChatOptions = () => {
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
-    const [isSelectedTagDifferent, setIsSelectedTagDifferent] = useState<boolean>(false)
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
     const [tags, setTags] = useState<Tag[]>([])
     const dropdownRef = useRef<HTMLDivElement>(null);
     //@ts-ignore
     const { activeConversationState } = useActiveConversation();
-    // @ts-ignore
     const { userState } = useUser();
 
     const handleOpenDropdown = () => {
@@ -48,10 +44,6 @@ export const ChatOptions = () => {
         removeTagToConversation(activeConversationState.id, id, userState.token)
     }
 
-    const containsAllElements = () => {
-        return activeConversationState.tags.every((tag: any) => selectedTags.some((selected) => selected.id === tag.id));
-    };
-
     useEffect(() => {
         setSelectedTags(activeConversationState.tags)
 
@@ -61,8 +53,26 @@ export const ChatOptions = () => {
     }, [])
 
     useEffect(() => {
-        setIsSelectedTagDifferent(containsAllElements())
-    }, [selectedTags])
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscapeKey);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, []);
 
     return (
         <div

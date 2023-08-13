@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import useUser from "@/app/hooks/useUser"
 import { sendMessage as apiSendMessage } from "@/app/services/api"
 import { dataMessageToSend } from "../utils/messages";
+import { MessageDataToSend } from "../interfaces/conversations";
 
 export const useMessage = () => {
     const [isLoading, setIsLoading] = useState(false)
-    // @ts-ignore
     const { userState } = useUser()
 
-    const sendMessage = async ({ type, data, conversationId }: { type: string, data: any, conversationId: number }) => {
+    const sendMessage = async ({ type, data, conversationId, context }: MessageDataToSend) => {
         //types: text, documento, imagen, audio, template, reactions
         try {
-            const dataToSend = await dataMessageToSend({ data, type });
+            const dataToSend = await dataMessageToSend({ data, type, context: context ?? null });
             setIsLoading(true);
 
             await apiSendMessage(conversationId, {

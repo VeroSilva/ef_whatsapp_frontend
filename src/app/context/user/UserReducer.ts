@@ -3,7 +3,7 @@ import { INITIAL_STATE, LS_USER_ID, LS_USER_DATA } from './UserProvider'
 
 type UserAction =
   | { type: 'login'; payload: User }
-  | { type: 'logout'; payload: User }
+  | { type: 'logout'; }
   | { type: 'set'; payload: User }
 
 export const UserReducer = (state: User, action: UserAction) => {

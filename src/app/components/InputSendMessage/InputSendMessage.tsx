@@ -1,10 +1,16 @@
+import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply/ActiveMessageReplyProvider";
+import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
 import { EmojiDropdown } from "../EmojiDropdown/EmojiDropdown"
 
 export const InputSendMessage = ({ handleSendMessage, setMessageToSend, messageToSend }: { handleSendMessage: Function, setMessageToSend: Function, messageToSend: string }) => {
+    const { setActiveMessageReply } = useActiveMessageReply();
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault()
-            handleSendMessage("text", messageToSend, () => { })
+            handleSendMessage("text", messageToSend, () => {
+                setActiveMessageReply(initialStateActiveMessageReply)
+            })
             setMessageToSend("")
         }
     }

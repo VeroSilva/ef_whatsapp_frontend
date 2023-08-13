@@ -27,7 +27,6 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     const [unreadCount, setUnreadCount] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
-    // @ts-ignore
     const { userState } = useUser();
 
     useEffect(() => {

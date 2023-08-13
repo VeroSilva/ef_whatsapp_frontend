@@ -3,7 +3,7 @@ import { Modal, Spinner } from 'flowbite-react';
 import Image from "next/image";
 import { Message as IMessage } from "../../../interfaces/conversations";
 import { Reaction } from "../../../interfaces/reactions";
-import { MemoizedMessage } from "../../Message";
+import { MemoizedMessage } from "../../Message/Message";
 import { IconX } from "../../Icons/IconX";
 import React from "react";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
@@ -31,7 +31,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     //@ts-ignore
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const socketRef = useRef<Socket | null>(null);
-    //@ts-ignore
     const { userState } = useUser();
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);

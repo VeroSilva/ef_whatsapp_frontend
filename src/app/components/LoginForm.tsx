@@ -10,8 +10,7 @@ import { login } from "../services/api";
 import useUser from "../hooks/useUser";
 
 export const LoginForm = () => {
-    // @ts-ignore
-    const { userState, loginUser } = useUser();
+    const { loginUser } = useUser();
     const [showPassword, setShowPassword] = useState(false)
     const [disabled, setDisabled] = useState(false)
     const [error, setError] = useState(false)

@@ -22,7 +22,6 @@ export const ChatSidebar = () => {
     const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
     const loadingRefConversation = useRef(false);
-    //@ts-ignore
     const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState } = useActiveConversation();

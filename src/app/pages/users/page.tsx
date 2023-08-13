@@ -23,7 +23,6 @@ const Users = (): JSX.Element => {
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: users, page, rowsPerPage });
-    // @ts-ignore
     const { userState } = useUser();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
