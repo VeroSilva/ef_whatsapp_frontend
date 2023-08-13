@@ -8,12 +8,14 @@ import { IconUsers } from "../Icons/IconUsers";
 import { IconTag } from "../Icons/IconTag";
 import Image from "next/image";
 import { CompanyPhones } from "@/app/interfaces/user";
+import { IconHome } from "../Icons/IconHome";
+import { IconPhone } from "../Icons/IconPhone";
 
 const menuItems = [
     {
         title: "Inicio",
         link: "/pages/home",
-        icon: <IconUsers classes="w-6 h-6" />
+        icon: <IconHome classes="w-6 h-6" />
     },
     {
         title: "Usuarios",
@@ -24,6 +26,11 @@ const menuItems = [
         title: "Etiquetas",
         link: "/pages/tags",
         icon: <IconTag classes="w-6 h-6" />
+    },
+    {
+        title: "Teléfonos",
+        link: "/pages/phones",
+        icon: <IconPhone classes="w-6 h-6" />
     }
 ]
 
