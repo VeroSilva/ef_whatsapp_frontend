@@ -6,5 +6,6 @@ export interface User {
 
 export interface CompanyPhones {
     company_phone_id: number,
-    phone: string
+    phone: string,
+    alias: string,
 }

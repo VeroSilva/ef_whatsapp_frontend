@@ -1,20 +1,21 @@
 "use client"
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { LoginForm } from "@/app/components/LoginForm"
 import useUser from "../../hooks/useUser";
 import Image from "next/image";
 
 const Login = () => {
-    const router = useRouter();
     const { userState } = useUser();
 
     useEffect(() => {
-        if (userState && userState.token) {
-            router.push('./pages/home')
+        if (userState && userState.token !== "") {
+            redirect('/pages/home')
         }
-    }, [userState])
+    }, [userState]);
+
+
 
     return (
         <div className="w-full min-h-screen p-5 md:p-20 flex items-center justify-center">

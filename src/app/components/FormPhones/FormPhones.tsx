@@ -8,7 +8,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
     const [loadingCreate, setLoadingCreate] = useState(false);
     const [phoneData, setPhoneData] = useState({
         phone: "",
-        company_id: "",
+        company_id: "1",
         wp_phone_id: "",
         waba_id: "",
         bussines_id: "",
@@ -92,7 +92,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
         <button
             onClick={handleCreateUser}
             className={
-                "main-button transition ease-in-out delay-50 flex " +
+                "main-button transition ease-in-out delay-50 flex mb-8 " +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}
@@ -126,7 +126,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
                 />
             </div>
 
-            <div className="relative">
+            {/* <div className="relative">
                 <input
                     type="text"
                     id="input-group-1"
@@ -135,7 +135,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
                     value={phoneData.company_id ?? ""}
                     onChange={(e) => setPhoneData({ ...phoneData, company_id: e.target.value })}
                 />
-            </div>
+            </div> */}
 
             <div className="relative">
                 <input
@@ -193,7 +193,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button"
+                    className="second-button mb-8"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar

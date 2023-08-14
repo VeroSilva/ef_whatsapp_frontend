@@ -6,13 +6,17 @@ import { IconUnread } from "../../components/Icons/IconUnread"
 import { IconMessage } from "../../components/Icons/IconMessage"
 import { IconSearch } from "../../components/Icons/IconSearch"
 import useUser from "@/app/hooks/useUser";
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation'
+import { useEffect } from "react";
 
 const Home = (): JSX.Element => {
-    const router = useRouter();
-    const { isLoggedIn } = useUser();
+    const { userState } = useUser();
 
-    if (!isLoggedIn) router.push('/pages/login');
+    useEffect(() => {
+        if (!userState || userState.token === "") {
+            redirect('/pages/login')
+        }
+    }, [userState]);
 
     return (
         <>

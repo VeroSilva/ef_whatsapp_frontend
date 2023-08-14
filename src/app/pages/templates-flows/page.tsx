@@ -1,6 +1,3 @@
-//@ts-ignore
-// @ts-nocheck
-
 "use client"
 
 import { useEffect } from 'react';
@@ -10,14 +7,17 @@ import TemplatesDragAndDrop from '@/app/components/TemplatesDragAndDrop/Template
 import useTemplates from "../../hooks/useTemplates"
 import { getTemplates } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const TemplatesFlows = () => {
     const { setTemplatesState } = useTemplates();
-    const { userState, isLoggedIn } = useUser();
-    const router = useRouter();
+    const { userState } = useUser();
 
-    if (!isLoggedIn) router.push('/pages/login');
+    useEffect(() => {
+        if (!userState || userState.token === "") {
+            redirect('/pages/login')
+        }
+    }, [userState]);
 
     useEffect(() => {
         getTemplates(userState.token).then((res) => {
