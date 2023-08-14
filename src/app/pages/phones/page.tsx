@@ -16,9 +16,10 @@ import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { IconFacebook } from "@/app/components/Icons/IconFacebook";
 import { IconCopy } from "@/app/components/Icons/IconCopy";
 import { FormPhones } from "@/app/components/FormPhones/FormPhones";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const Users = (): JSX.Element => {
+
     const [loading, setLoading] = useState(false);
     const [loadingDeletePhone, setLoadingDeletePhone] = useState(false);
     const [phones, setPhones] = useState([]);
@@ -36,10 +37,11 @@ const Users = (): JSX.Element => {
         show: false
     });
 
-    const router = useRouter();
-    const { isLoggedIn } = useUser();
-
-    if (!isLoggedIn) router.push('/pages/login');
+    useEffect(() => {
+        if (!userState || userState.token === "") {
+            redirect('/pages/login')
+        }
+    }, [userState]);
 
     useEffect(() => {
         handleLoadPhones()
@@ -120,7 +122,7 @@ const Users = (): JSX.Element => {
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b border-gray-300">
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
-                                    ID
+
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
                                     Alias
@@ -128,9 +130,9 @@ const Users = (): JSX.Element => {
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
                                     Teléfono
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-center text-xs">
+                                {/* <th scope="col" className="px-6 py-3 text-center text-xs">
                                     Compañía ID
-                                </th>
+                                </th> */}
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
                                     <span className="flex items-center justify-center gap-1"><span><IconFacebook classes="w-4 h-4" /></span> Whatsapp teléfono ID</span>
                                 </th>
@@ -155,10 +157,10 @@ const Users = (): JSX.Element => {
                                 slice.map((phone, index) => {
                                     return (
                                         <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{phone.id}</th>
+                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{index + 1}</th>
                                             <td className="px-6 py-4 text-center text-xs">{phone.phone}</td>
                                             <td className="px-6 py-4 text-center text-xs">{phone.alias}</td>
-                                            <td className="px-6 py-4 text-center text-xs">{phone.company_id}</td>
+                                            {/* <td className="px-6 py-4 text-center text-xs">{phone.company_id}</td> */}
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.wp_phone_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.waba_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.bussines_id}</td>
@@ -179,7 +181,6 @@ const Users = (): JSX.Element => {
                                                         }}
                                                     >
                                                         <IconEdit classes="w-5 h-5" />
-                                                        Editar
                                                     </a>
 
                                                     <a
@@ -191,7 +192,6 @@ const Users = (): JSX.Element => {
                                                         }}
                                                     >
                                                         <IconTrash classes="w-5 h-5 text-rose-600" />
-                                                        Eliminar
                                                     </a>
                                                 </div>
                                             </td>
@@ -273,7 +273,7 @@ const Users = (): JSX.Element => {
 
                 <div className="flex justify-center space-x-4 mt-4">
                     <button
-                        className="second-button"
+                        className="second-button mb-8"
                         onClick={() => handleOpenModal(false)}
                     >
                         Cancelar
@@ -286,7 +286,7 @@ const Users = (): JSX.Element => {
                         Sí, eliminar
                     </button>
                 </div>
-            </Modal>
+            </Modal >
             {/* END: Delete User Modal */}
 
             {/* {alert.show && */}

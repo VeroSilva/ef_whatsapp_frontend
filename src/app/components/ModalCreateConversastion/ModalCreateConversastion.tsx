@@ -37,7 +37,7 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
         <button
             onClick={handleCreateConversation}
             className={
-                "main-button transition ease-in-out delay-50 " +
+                "main-button transition ease-in-out delay-50 mb-4" +
                 (newPhone === "" ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-teal-600 hover:text-white")
             }
             disabled={newPhone === ""}
@@ -72,7 +72,7 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button"
+                    className="second-button mb-8"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar

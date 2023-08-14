@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, memo } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import useUser from "../../../hooks/useUser";
 import useActiveConversation from "../../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
@@ -10,16 +10,13 @@ import { Chat } from '@/app/components/Chat/Chat';
 import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
 
 const Conversation = (): JSX.Element => {
-    const router = useRouter();
-    const { userState, isLoggedIn } = useUser();
+    const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
 
-    if (!isLoggedIn) router.push('/pages/login');
-
     useEffect(() => {
         if (!userState || userState.token === "") {
-            router.push('./pages/login');
+            redirect('/pages/login')
         }
     }, [userState]);
 
