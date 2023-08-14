@@ -7,7 +7,7 @@ export const dataMessageToSend = async ({ type, data, context }: { type: string,
     if (type !== "text" && type !== "template") {
         dataTransformed = await blobToBase64(type === "audio" ? data : data.content);
     } else {
-        dataTransformed = type === "text" ? data : data.content;
+        dataTransformed = (type === "text" || type === "template") ? data : data.content;
     }
 
     const dataToSend = {
