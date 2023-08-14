@@ -88,7 +88,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         <button
             onClick={handleCreateUser}
             className={
-                "main-button transition ease-in-out delay-50 flex " +
+                "main-button transition ease-in-out delay-50 flex mb-8 " +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}
@@ -162,7 +162,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button"
+                    className="second-button mb-8"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar

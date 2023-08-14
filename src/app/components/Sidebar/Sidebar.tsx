@@ -58,12 +58,12 @@ export const Sidebar = () => {
         if (userState?.company_phones) {
             userState?.company_phones.map((phone: CompanyPhones) => {
                 const idx = menuItems.findIndex((idx) => {
-                    return idx.title == `+${phone.phone}`
+                    return idx.title == `${phone.alias} +${phone.phone} `
                 });
                 if (idx == -1) {
                     menuItems.push(
                         {
-                            title: `+${phone.phone}`,
+                            title: `${phone.alias} +${phone.phone} `,
                             link: `/pages/conversation/${phone.company_phone_id}`,
                             icon: <IconTemplates classes="w-6 h-6" />,
                         }
