@@ -202,6 +202,21 @@ export const editUser = async (data, id, token) => {
   return response;
 };
 
+export const editUserPassword = async (data, id, token) => {
+  const response = await fetch(`${process.env.API_URL}/user/password/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
 export const deleteUser = async (id, token) => {
   const response = await fetch(`${process.env.API_URL}/user/${id}`, {
     method: "DELETE",
@@ -300,6 +315,64 @@ export const removeTagToConversation = async (idConversation, idTag, token) => {
       },
     }
   ).then((res) => res.json());
+
+  return response;
+};
+
+export const getPhones = async (token) => {
+  const response = await fetch(`${process.env.API_URL}/phone`, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const createPhone = async (data, token) => {
+  const response = await fetch(`${process.env.API_URL}/phone`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const editPhone = async (data, id, token) => {
+  const response = await fetch(`${process.env.API_URL}/phone/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const deletePhone = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/phone/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
 
   return response;
 };

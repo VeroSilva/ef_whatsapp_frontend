@@ -5,13 +5,12 @@ import { IconLink } from "../../Icons/IconLink";
 import Image from "next/image"
 import { getVariables } from "@/app/utils/fileType";
 
-export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend, setTemplateToSend }: { template: Template, setSelectedTemplate: Function, setIsReadyToSend: Function, setTemplateToSend: Function }) => {
+export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend, setTemplateToSend }: { template: Template, setSelectedTemplate?: Function, setIsReadyToSend: Function, setTemplateToSend: Function }) => {
     const [inputsBodyVariables, setInputsBodyVariables] = useState([]);
     const [inputHeaderVariable, setInputHeaderVariable] = useState("");
     const [inputButtonVariable, setInputButtonVariable] = useState("");
     const [matchesBody, setMatchesBody] = useState<any>([]);
     const [matchesHeader, setMatchesHeader] = useState<any>([]);
-    const [selectedImageSrc, setSelectedImageSrc] = useState("");
     const headerData = template.components.filter((component) => component.type === "HEADER")[0];
     const bodyData = template.components.filter((component) => component.type === "BODY")[0];
     const buttonsData = template.components.filter((component) => component.type === "BUTTONS")[0];
@@ -39,34 +38,18 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
         setInputButtonVariable(value);
     };
 
-    const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setSelectedImageSrc(e.target.value)
-    };
-
     const areInputsFilled = () => {
-        // Verificar los inputs necesarios para tu validación
-        if (headerData && headerData.example && headerData.format === "TEXT") {
-            if (!inputHeaderVariable) {
-                return false;
-            }
-        }
-
-        if (bodyData && bodyData.example) {
-            if (inputsBodyVariables.some((variable) => variable === "")) {
-                return false;
-            }
-        }
-
-        if (buttonsData && buttonsUrl.length) {
-            if (!inputButtonVariable) {
-                return false;
-            }
-        }
-
-        return true;
+        if (
+            (headerData && headerData.example && inputHeaderVariable === "") ||
+            ((bodyData && bodyData.example && (bodyData.example.body_text[0].length !== inputsBodyVariables.length) || (inputsBodyVariables.findIndex((variable) => variable === "") !== -1))) ||
+            (buttonsData && buttonsUrl.length && inputButtonVariable === "")
+        ) return false
+        else return true
     };
 
     useEffect(() => {
+        setIsReadyToSend(false)
+
         if (areInputsFilled()) {
             setIsReadyToSend(true)
 
@@ -80,7 +63,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
             })
 
             if (headerData && headerData.example) {
-                const parameterData = headerData.format.toLowerCase() === "image" ? { link: selectedImageSrc } : inputHeaderVariable
+                const parameterData = headerData.format.toLowerCase() === "image" ? { link: inputHeaderVariable } : inputHeaderVariable
 
                 setTemplateToSend((prevState: any) => ({
                     ...prevState,
@@ -169,17 +152,19 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
 
     return (
         <>
-            <button
-                className="text-slate-500"
-                onClick={() => setSelectedTemplate()}
-            >
-                <IconChevron classes="w-6 h-6 rotate-180 float-left" />
-                <span>Atrás</span>
-            </button>
+            {setSelectedTemplate &&
+                <button
+                    className="text-slate-500"
+                    onClick={() => setSelectedTemplate()}
+                >
+                    <IconChevron classes="w-6 h-6 rotate-180 float-left" />
+                    <span>Atrás</span>
+                </button>
+            }
 
             <h3 className="mb-4 font-bold text-center text-slate-700">{template.name}</h3>
 
-            <div className={templateIsEditable ? "grid grid-cols-2 grid-flow-row gap-8" : "flex justify-center"}>
+            <div className={"template-detail " + (templateIsEditable ? "grid grid-cols-2 grid-flow-row gap-8" : "flex justify-center")}>
                 {templateIsEditable &&
                     <div className="mb-4">
                         {headerData && headerData.example &&
@@ -192,7 +177,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                         id="file-input-image"
                                         className="border border-slate-300 rounded-md m-2 w-full mb-6"
                                         placeholder="Link de imagen"
-                                        onChange={handleTextChange}
+                                        onChange={e => handleInputHeaderChange(e)}
                                     /> :
                                     headerData.format === "TEXT" && headerData.example &&
                                     <div className="md:flex md:items-center mb-3">
@@ -306,7 +291,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                 BodyComponent = (
                                     <p className="py-4">
                                         {substrings.map((substring, index) => (
-                                            <React.Fragment key={index}>
+                                            <React.Fragment key={`body-item-${index}`}>
                                                 {substring}
                                                 {component.example && <strong>{inputsBodyVariables[index] ?? matchesBody[index]}</strong>}
                                             </React.Fragment>
