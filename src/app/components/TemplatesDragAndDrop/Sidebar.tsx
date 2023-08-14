@@ -14,7 +14,7 @@ const DndNodes = () => {
 
     return (
         <aside>
-            {
+            {templatesState &&
                 templatesState.map((template, index) => {
                     return (
                         <div key={index} className="dndnode" onDragStart={(event) => onDragStart(event, 'default', template)} draggable>

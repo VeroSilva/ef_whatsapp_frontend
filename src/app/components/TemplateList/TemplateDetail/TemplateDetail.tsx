@@ -41,13 +41,15 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
     const areInputsFilled = () => {
         if (
             (headerData && headerData.example && inputHeaderVariable === "") ||
-            (bodyData && bodyData.example && !inputsBodyVariables.length) ||
+            ((bodyData && bodyData.example && (bodyData.example.body_text[0].length !== inputsBodyVariables.length) || (inputsBodyVariables.findIndex((variable) => variable === "") !== -1))) ||
             (buttonsData && buttonsUrl.length && inputButtonVariable === "")
         ) return false
         else return true
     };
 
     useEffect(() => {
+        setIsReadyToSend(false)
+
         if (areInputsFilled()) {
             setIsReadyToSend(true)
 

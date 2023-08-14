@@ -34,7 +34,7 @@ const menuItems = [
         icon: <IconPhone classes="w-6 h-6" />
     },
     {
-        title: "Flujo de templates",
+        title: "Chatbot",
         link: "/pages/templates-flows",
         icon: <IconFlow classes="w-5 h-5" />
     }

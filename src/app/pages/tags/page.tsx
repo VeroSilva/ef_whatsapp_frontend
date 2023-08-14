@@ -14,6 +14,7 @@ import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
 import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { FormTag } from "@/app/components/FormTag/FormTag";
+import { useRouter } from "next/navigation";
 
 const Tags = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -32,6 +33,10 @@ const Tags = (): JSX.Element => {
         message: "",
         show: false
     });
+    const router = useRouter();
+    const { isLoggedIn } = useUser();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     useEffect(() => {
         handleLoadTags()

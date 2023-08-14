@@ -16,6 +16,7 @@ import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { FormUser } from "@/app/components/FormUser/FormUser";
 import { FormEditPassword } from "@/app/components/FormUser/FormEditPassword/FormEditPassword";
 import { IconPassword } from "@/app/components/Icons/IconPassword";
+import { useRouter } from "next/navigation";
 
 const Users = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ const Users = (): JSX.Element => {
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: users, page, rowsPerPage });
-    const { userState } = useUser();
+    const { userState, isLoggedIn } = useUser();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -40,6 +41,9 @@ const Users = (): JSX.Element => {
         { id: "2", name: "Call Center", classes: "bg-indigo-500" },
         { id: "3", name: "Soporte", classes: "bg-violet-500" },
     ]
+    const router = useRouter();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     useEffect(() => {
         handleLoadUsers()

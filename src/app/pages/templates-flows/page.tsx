@@ -10,10 +10,14 @@ import TemplatesDragAndDrop from '@/app/components/TemplatesDragAndDrop/Template
 import useTemplates from "../../hooks/useTemplates"
 import { getTemplates } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
+import { useRouter } from "next/navigation";
 
 const TemplatesFlows = () => {
     const { setTemplatesState } = useTemplates();
-    const { userState } = useUser();
+    const { userState, isLoggedIn } = useUser();
+    const router = useRouter();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     useEffect(() => {
         getTemplates(userState.token).then((res) => {
@@ -24,7 +28,6 @@ const TemplatesFlows = () => {
     return (
         <>
             <Sidebar />
-
             <div className="flex-1 h-full p-8 bg-slate-200">
                 <TemplatesDragAndDrop />
             </div>

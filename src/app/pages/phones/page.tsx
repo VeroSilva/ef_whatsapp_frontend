@@ -16,6 +16,7 @@ import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { IconFacebook } from "@/app/components/Icons/IconFacebook";
 import { IconCopy } from "@/app/components/Icons/IconCopy";
 import { FormPhones } from "@/app/components/FormPhones/FormPhones";
+import { useRouter } from "next/navigation";
 
 const Users = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -34,6 +35,11 @@ const Users = (): JSX.Element => {
         message: "",
         show: false
     });
+
+    const router = useRouter();
+    const { isLoggedIn } = useUser();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     useEffect(() => {
         handleLoadPhones()

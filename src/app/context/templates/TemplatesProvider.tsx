@@ -34,8 +34,9 @@ export const TemplatesProvider: React.FC<TemplatesProviderProps> = ({ children }
   const getIntialState = (): TemplatesType[] => {
     if (typeof window !== "undefined") {
       const templates = window.localStorage.getItem(TEMPLATES_DATA);
-      if (templates) {
-        const templatesData = JSON.parse(templates) as TemplatesType[];
+
+      if (templates !== "undefined") {
+        const templatesData = JSON.parse(templates as string);
         if (templatesData) return templatesData;
       }
     }

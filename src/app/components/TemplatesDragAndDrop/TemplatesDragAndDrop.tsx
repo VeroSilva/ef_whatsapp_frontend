@@ -16,6 +16,7 @@ import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
 import TextUpdaterNode from './TextUpdaterNode.tsx';
 import './index.scss';
+import useTemplatesToSend from '../../hooks/useTemplatesToSend'
 
 const initialNodes = [
     { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
@@ -28,10 +29,8 @@ const TemplatesDragAndDrop = () => {
     const [nodes, setNodes] = useState(initialNodes);
     const [edges, setEdges] = useState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    const [templateToSend, setTemplateToSend] = useState({});
     const [jsonToSend, setJsonToSend] = useState([]);
-    const [data, setData] = useState([]);
-    const [readyToSend, setIsReadyToSend] = useState(false);
+    const { templatesToSendState } = useTemplatesToSend();
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
@@ -55,25 +54,17 @@ const TemplatesDragAndDrop = () => {
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
+
             const newNode = {
                 id: templateData.name,
                 type: 'textUpdater',
                 position,
-                data: { template: templateData, setTemplateToSend, setIsReadyToSend },
+                data: { template: templateData },
             };
 
             setNodes((nds) => nds.concat(newNode));
-            setData((data) => [...data,
-            {
-                readyToSend,
-                template: {
-                    id: templateData.id,
-                    templateToSend: {}
-                }
-            }
-            ])
         },
-        [reactFlowInstance, readyToSend]
+        [reactFlowInstance]
     );
 
     const onNodesChange = useCallback(
@@ -88,6 +79,38 @@ const TemplatesDragAndDrop = () => {
         (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
     );
+
+    useEffect(() => {
+        const edgeData = [];
+        edges.map((edge) => {
+            const { id, source, sourceHandle, target, targetHandle } = edge
+            const templateData = templatesToSendState.filter((template) => template.name === target)[0]
+            const { position, height, width } = nodes.filter((node) => node.id === target)[0]
+
+            edgeData.push({
+                id,
+                source,
+                sourceHandle: sourceHandle ?? "NA",
+                target,
+                targetHandle,
+                template_data: {
+                    type: "template",
+                    template: templateData
+                },
+                node: {
+                    position,
+                    width,
+                    height
+                }
+            })
+        })
+
+        setJsonToSend()
+    }, [edges, templatesToSendState, nodes])
+
+    useCallback(() => {
+        setCount(prevCount => prevCount + 1);
+    }, []);
 
     return (
         <div className="dndflow">

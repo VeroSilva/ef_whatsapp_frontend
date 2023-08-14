@@ -5,8 +5,14 @@ import { ConversationSkeleton } from "../../components/Skeleton/Conversation";
 import { IconUnread } from "../../components/Icons/IconUnread"
 import { IconMessage } from "../../components/Icons/IconMessage"
 import { IconSearch } from "../../components/Icons/IconSearch"
+import useUser from "@/app/hooks/useUser";
+import { useRouter } from 'next/navigation';
 
 const Home = (): JSX.Element => {
+    const router = useRouter();
+    const { isLoggedIn } = useUser();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     return (
         <>

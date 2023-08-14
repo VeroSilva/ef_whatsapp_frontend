@@ -1,3 +1,4 @@
+import useTemplatesToSend from '@/app/hooks/useTemplatesToSend';
 import { FC, useState, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { TemplateDetail } from '../TemplateList/TemplateDetail/TemplateDetail';
@@ -5,12 +6,14 @@ import { TemplateDetail } from '../TemplateList/TemplateDetail/TemplateDetail';
 interface TextUpdaterNodeProps {
     data: any;
     isConnectable: boolean;
-    setTemplateToSend: () => void;
 }
 
 const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const [dimensions, setDimensions] = useState({ width: 150, height: 50 });
-    const { template, setTemplateToSend, setIsReadyToSend } = data;
+    const { template } = data;
+    const [readyToSend, setReadyToSend] = useState(false);
+    const [templateToSend, setTemplateToSend] = useState<any>({});
+    const { templatesToSendState, setTemplatesToSendState } = useTemplatesToSend();
 
     const buttons = template.components.find((item: any) => item.type === "BUTTONS");
     const buttonsData = buttons ? buttons.buttons.filter((btn: any) => btn.type === "QUICK_REPLY") : []
@@ -25,11 +28,25 @@ const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
         }
     }
 
+    useEffect(() => {
+        const templateIndex = templatesToSendState.findIndex((template: any) => template.id === templateToSend.id);
+        const updatedTemplates = [...templatesToSendState];
+
+        if (readyToSend) {
+            if (templateIndex !== -1) {
+                updatedTemplates[templateIndex] = templateToSend;
+            } else {
+                updatedTemplates.push(templateToSend);
+            }
+            setTemplatesToSendState(updatedTemplates);
+        }
+    }, [readyToSend, templateToSend]);
+
     return (
         <div className="text-updater-node">
             <Handle type="target" position={Position.Top} id={template.name} isConnectable={isConnectable} />
 
-            <TemplateDetail template={template} setIsReadyToSend={setIsReadyToSend} setTemplateToSend={setTemplateToSend} />
+            <TemplateDetail template={template} setIsReadyToSend={setReadyToSend} setTemplateToSend={setTemplateToSend} />
 
             {
                 buttonsData.map((button: any, index: number) => (

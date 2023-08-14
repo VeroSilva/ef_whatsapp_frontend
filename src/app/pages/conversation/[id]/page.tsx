@@ -11,9 +11,11 @@ import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
 
 const Conversation = (): JSX.Element => {
     const router = useRouter();
-    const { userState } = useUser();
+    const { userState, isLoggedIn } = useUser();
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
+
+    if (!isLoggedIn) router.push('/pages/login');
 
     useEffect(() => {
         if (!userState || userState.token === "") {
