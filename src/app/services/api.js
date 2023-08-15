@@ -144,16 +144,19 @@ export const getContact = async (id, token) => {
   return response;
 };
 
-export const getTemplates = async (token) => {
-  const response = await fetch(`${process.env.API_URL}/template`, {
-    method: "GET",
-    headers: {
-      Accept: "*/*",
-      Authorization: token,
-      "Content-Type": "application/json",
-      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-    },
-  }).then((res) => res.json());
+export const getTemplates = async (token, company_phone_id) => {
+  const response = await fetch(
+    `${process.env.API_URL}/template/${company_phone_id}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
 
   return response;
 };

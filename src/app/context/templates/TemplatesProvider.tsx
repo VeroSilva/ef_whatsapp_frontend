@@ -1,6 +1,5 @@
-import React, { useReducer } from "react";
+import React, { useState } from "react";
 import TemplatesContext from "./TemplatesContext";
-import { ActiveConversationReducer } from "./TemplatesReducer";
 
 interface TemplatesProviderProps {
   children: React.ReactNode;
@@ -31,23 +30,7 @@ export const INITIAL_STATE: TemplatesType[] = [
 export const TEMPLATES_DATA = "templates";
 
 export const TemplatesProvider: React.FC<TemplatesProviderProps> = ({ children }) => {
-  const getIntialState = (): TemplatesType[] => {
-    if (typeof window !== "undefined") {
-      const templates = window.localStorage.getItem(TEMPLATES_DATA);
-
-      if (templates !== "undefined") {
-        const templatesData = JSON.parse(templates as string);
-        if (templatesData) return templatesData;
-      }
-    }
-    return INITIAL_STATE;
-  };
-
-  const [templatesState, dispatch] = useReducer(ActiveConversationReducer, getIntialState());
-
-  const setTemplatesState = (templatesPayload: TemplatesType[]): void => {
-    dispatch({ type: "setTemplates", payload: templatesPayload });
-  };
+  const [templatesState, setTemplatesState] = useState(INITIAL_STATE);
 
   return (
     <TemplatesContext.Provider

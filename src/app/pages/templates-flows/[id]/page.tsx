@@ -4,14 +4,18 @@ import { useEffect } from 'react';
 import 'reactflow/dist/style.css';
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 import TemplatesDragAndDrop from '@/app/components/TemplatesDragAndDrop/TemplatesDragAndDrop';
-import useTemplates from "../../hooks/useTemplates"
+import useTemplates from "../../../hooks/useTemplates"
 import { getTemplates } from '@/app/services/api';
-import useUser from "../../hooks/useUser";
+import useUser from "../../../hooks/useUser";
 import { redirect } from "next/navigation";
+import { usePathname } from 'next/navigation';
 
 const TemplatesFlows = () => {
     const { setTemplatesState } = useTemplates();
     const { userState } = useUser();
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     useEffect(() => {
         if (!userState || userState.token === "") {
@@ -20,7 +24,7 @@ const TemplatesFlows = () => {
     }, [userState]);
 
     useEffect(() => {
-        getTemplates(userState.token).then((res) => {
+        getTemplates(userState.token, phoneId).then((res) => {
             setTemplatesState(res.templates)
         })
     }, [])
