@@ -90,7 +90,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 socketRef.current = null;
             }
         }
-    }, [userState.token])
+    }, [userState.token, messages])
 
     useEffect(() => {
         if (activeConversationState.id !== 0 && activeConversationState.id !== -1) {
