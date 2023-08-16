@@ -5,6 +5,7 @@ import { IconPaperClip } from "../../Icons/IconPaperClip";
 import { IconTemplates } from "../../Icons/IconTemplates";
 import { getTemplates } from "@/app/services/api";
 import useUser from "../../../hooks/useUser";
+import { usePathname } from "next/navigation";
 
 export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFile: Function, setTemplates: Function }) => {
     const imageInputRef = useRef<HTMLInputElement>(null)
@@ -15,6 +16,9 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
     const [showDocumentSpan, setShowDocumentSpan] = useState<boolean>(false)
     const [showTemplatesSpan, setShowTemplatesSpan] = useState<boolean>(false)
     const { userState } = useUser()
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     const handleImageIconClick = () => {
         if (imageInputRef.current) {
@@ -38,7 +42,7 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
     };
 
     const handleClickTemplates = () => {
-        getTemplates(userState.token).then((res) => setTemplates(res.templates))
+        getTemplates(userState.token, phoneId).then((res) => setTemplates(res.templates))
     }
 
     const handleOpenDropdown = () => {
