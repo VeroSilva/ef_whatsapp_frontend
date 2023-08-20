@@ -379,3 +379,38 @@ export const deletePhone = async (id, token) => {
 
   return response;
 };
+
+export const getFlows = async (token, company_phone_id) => {
+  const response = await fetch(
+    `${process.env.API_URL}/flow/${company_phone_id}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};
+
+export const updateFlows = async (token, company_phone_id, data) => {
+  const response = await fetch(
+    `${process.env.API_URL}/flow/${company_phone_id}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ flow: data }),
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};

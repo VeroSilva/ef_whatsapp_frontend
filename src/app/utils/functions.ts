@@ -8,3 +8,10 @@ export const isColorDark = (color: any) => {
 
     return relativeBrightness < 0.5;
 }
+
+export const uniqueIdGenerator = () => {
+  const uniqueTime = Date.now();
+  const random = Math.floor(Math.random() * 10000); // Número random entre 0 y 9999
+  const uniqueId = `${uniqueTime}-${random}`;
+  return uniqueId;
+}

@@ -1,22 +1,22 @@
 import useTemplatesToSend from '@/app/hooks/useTemplatesToSend';
 import { FC, useState, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
-import { TemplateDetail } from '../TemplateList/TemplateDetail/TemplateDetail';
+import { TemplateDetail } from '../../TemplateList/TemplateDetail/TemplateDetail';
 
 interface TextUpdaterNodeProps {
     data: any;
     isConnectable: boolean;
 }
 
-const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
+const TemplateNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const [dimensions, setDimensions] = useState({ width: 150, height: 50 });
     const { template } = data;
     const [readyToSend, setReadyToSend] = useState(false);
     const [templateToSend, setTemplateToSend] = useState<any>({});
-    const { templatesToSendState, setTemplatesToSendState } = useTemplatesToSend();
+    const { setTemplatesToSendState } = useTemplatesToSend();
 
-    const buttons = template.components.find((item: any) => item.type === "BUTTONS");
-    const buttonsData = buttons ? buttons.buttons.filter((btn: any) => btn.type === "QUICK_REPLY") : []
+    const buttons = template ? template.components.find((item: any) => item.type === "BUTTONS") : [];
+    const buttonsData = buttons && buttons.buttons ? buttons.buttons.filter((btn: any) => btn.type === "QUICK_REPLY") : []
 
     const positionHandle = (index: number) => {
         if (index === 1 || index === 2) {
@@ -29,16 +29,18 @@ const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     }
 
     useEffect(() => {
-        const templateIndex = templatesToSendState.findIndex((template: any) => template.id === templateToSend.id);
-        const updatedTemplates = [...templatesToSendState];
-
         if (readyToSend) {
-            if (templateIndex !== -1) {
-                updatedTemplates[templateIndex] = templateToSend;
-            } else {
-                updatedTemplates.push(templateToSend);
-            }
-            setTemplatesToSendState(updatedTemplates);
+            setTemplatesToSendState((prev: any) => {
+                const exists = prev.some((template: any) => template.id === templateToSend.id);
+
+                if (exists) {
+                    return prev.map((template: any) =>
+                        template.id === templateToSend.id ? templateToSend : template
+                    );
+                } else {
+                    return [...prev, templateToSend];
+                }
+            });
         }
     }, [readyToSend, templateToSend]);
 
@@ -67,4 +69,4 @@ const TextUpdaterNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 };
 
 
-export default TextUpdaterNode
+export default TemplateNode

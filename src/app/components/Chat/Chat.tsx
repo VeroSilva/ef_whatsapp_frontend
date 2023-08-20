@@ -11,8 +11,6 @@ import { Template } from "@/app/interfaces/template";
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { isColorDark } from "@/app/utils/functions";
-import { IconEllipsisVertical } from "../Icons/IconEllipsisVertical";
-import { SelectTags } from "./SelectTags/SelectTags";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
 
 export const Chat = () => {

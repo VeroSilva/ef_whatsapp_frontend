@@ -14,15 +14,20 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
-import TextUpdaterNode from './TextUpdaterNode.tsx';
+import TemplateNode from './CustomNodes/TemplateNode.tsx';
 import './index.scss';
 import useTemplatesToSend from '../../hooks/useTemplatesToSend'
+import useUser from "../../hooks/useUser"
+import useTemplates from "../../hooks/useTemplates"
+import { usePathname } from "next/navigation"
+import { getFlows, updateFlows } from '@/app/services/api';
+import { uniqueIdGenerator } from '@/app/utils/functions';
 
 const initialNodes = [
     { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
 ];
 
-const nodeTypes = { textUpdater: TextUpdaterNode };
+const nodeTypes = { templateNode: TemplateNode };
 
 const TemplatesDragAndDrop = () => {
     const reactFlowWrapper = useRef(null);
@@ -31,6 +36,11 @@ const TemplatesDragAndDrop = () => {
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [jsonToSend, setJsonToSend] = useState([]);
     const { templatesToSendState } = useTemplatesToSend();
+    const { userState } = useUser();
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
+    const { templatesState } = useTemplates();
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
@@ -56,8 +66,8 @@ const TemplatesDragAndDrop = () => {
             });
 
             const newNode = {
-                id: templateData.name,
-                type: 'textUpdater',
+                id: uniqueIdGenerator(),
+                type: 'templateNode',
                 position,
                 data: { template: templateData },
             };
@@ -66,7 +76,6 @@ const TemplatesDragAndDrop = () => {
         },
         [reactFlowInstance]
     );
-
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [setNodes]
@@ -79,34 +88,80 @@ const TemplatesDragAndDrop = () => {
         (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
     );
+    const handleSaveFlow = () => {
+        updateFlows(userState.token, phoneId, jsonToSend).then((res) => {
+            setJsonToSend([])
+            console.log(res)
+        })
+    }
 
     useEffect(() => {
-        const edgeData = [];
-        edges.map((edge) => {
-            const { id, source, sourceHandle, target, targetHandle } = edge
-            const templateData = templatesToSendState.filter((template) => template.name === target)[0]
-            const { position, height, width } = nodes.filter((node) => node.id === target)[0]
+        if (templatesToSendState.length > 1) {
+            const jsonData = [];
 
-            edgeData.push({
-                id,
-                source,
-                sourceHandle: sourceHandle ?? "NA",
-                target,
-                targetHandle,
-                template_data: {
-                    type: "template",
-                    template: templateData
-                },
-                node: {
-                    position,
-                    width,
-                    height
-                }
+            edges.map((edge) => {
+                const { id: edgeID, source, sourceHandle, target, targetHandle } = edge
+                const targetNode = nodes.filter((node) => node.id === target)[0]
+                const sourceNode = nodes.filter((node) => node.id === source)[0]
+                const templateData = templatesToSendState.filter((t) => t.id === targetNode.data.template.id)[0]
+
+                jsonData.push({
+                    id: edgeID,
+                    source: sourceNode.data.template ? sourceNode.data.template.name : "client-message",
+                    sourceHandle: sourceHandle ?? "manually",
+                    target: targetNode.data.template.name,
+                    targetHandle: targetHandle,
+                    template_data: {
+                        type: "template",
+                        template: templateData
+                    },
+                    node: {
+                        position: targetNode.position,
+                        type: 'templateNode',
+                        id: targetNode.id,
+                        targetEdgeId: target,
+                        sourceEdgeId: source
+                    }
+                })
             })
-        })
 
-        setJsonToSend()
-    }, [edges, templatesToSendState, nodes])
+            setJsonToSend(jsonData)
+        }
+    }, [edges, templatesToSendState, nodes]);
+
+    useEffect(() => {
+        if (!(templatesState.length === 1 && templatesState[0].id === 0)) {
+            getFlows(userState.token, phoneId).then((res) => {
+                res.map((item) => {
+                    const template = templatesState.find(template => template.id === item.template_data.template.id);
+                    const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
+
+                    setNodes((oldNodes) => [
+                        ...oldNodes,
+                        {
+                            id,
+                            position,
+                            type,
+                            data: {
+                                template,
+                            }
+                        }
+                    ])
+
+                    setEdges((oldEdges) => [
+                        ...oldEdges,
+                        {
+                            id: item.id,
+                            source: sourceEdgeId,
+                            sourceHandle: item.sourceHandle,
+                            target: targetEdgeId,
+                            targetHandle: item.targetHandle
+                        }
+                    ])
+                })
+            })
+        }
+    }, [templatesState])
 
     useCallback(() => {
         setCount(prevCount => prevCount + 1);
@@ -133,7 +188,7 @@ const TemplatesDragAndDrop = () => {
                     </ReactFlow>
                 </div>
 
-                <button className='main-button absolute'>Guardar cambios</button>
+                <button className='main-button absolute' onClick={handleSaveFlow}>Guardar cambios</button>
 
                 <Sidebar />
             </ReactFlowProvider>

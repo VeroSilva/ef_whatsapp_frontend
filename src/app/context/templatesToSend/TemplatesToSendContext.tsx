@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 export type TemplatesToSendContextProps = {
     templatesToSendState: any[],
-    setTemplatesToSendState: (templates: any[]) => void
+    setTemplatesToSendState: Function
 };
 
 const TemplatesToSendContext = createContext<TemplatesToSendContextProps>({} as TemplatesToSendContextProps);
