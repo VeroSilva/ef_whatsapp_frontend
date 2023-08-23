@@ -21,17 +21,23 @@ import { markAsRead } from '@/app/services/api';
 
 import useUser from "../hooks/useUser"
 import useActiveConversation from "../hooks/useActiveConversation";
+import useChatsRead from "../hooks/useChatsRead";
 import { isColorDark } from '../utils/functions';
+import React from 'react';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
-    const [unreadCount, setUnreadCount] = useState(false)
+    const [isUnread, setIsUnread] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
-    const { userState } = useUser();
+    const { chatsReadState, setChatsRead } = useChatsRead()
+
+    const { userState } = useUser()
 
     useEffect(() => {
-        setUnreadCount(parseInt(conversation.unread_count) > 0)
-    }, [conversation])
+        const isRead = chatsReadState.includes(conversation.id)
+
+        setIsUnread(!isRead && (parseInt(conversation.unread_count) > 0))
+    }, [conversation, chatsReadState])
 
     const handleClick = () => {
         if (activeConversation !== conversation.id) {
@@ -44,7 +50,12 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             handleOpenConversation(conversation.id)
         }
 
-        setUnreadCount(false)
+        setChatsRead((prevChatsRead: string[]) => {
+            if (prevChatsRead.includes(conversation.id)) {
+                return prevChatsRead;
+            }
+            return [...prevChatsRead, conversation.id];
+        });
     }
 
     const highlightText = (text: string, filter: string) => {
@@ -63,7 +74,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
         <div
             className={
                 "cursor-pointer flex flex-wrap items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
-                (unreadCount ? "bg-teal-100" : "hover:bg-slate-100")
+                (isUnread ? "bg-teal-100" : "hover:bg-slate-100")
             }
             onClick={handleClick}
         >
@@ -85,7 +96,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                         {highlightText(conversation.contact.name, filter)}
                     </a>
                     <div className="text-xs text-right text-slate-500 ml-auto whitespace-nowrap">
-                        <p className={(unreadCount ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</p>
+                        <p className={(isUnread ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</p>
                         {
                             Math.floor((Date.now() - conversation.message_created_at * 1000) / (1000 * 60 * 60)) >= 24 && (
                                 <div className="group relative">
@@ -140,7 +151,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                             //falta contact 
                         }
                     </div>
-                    {unreadCount && (
+                    {isUnread && (
                         <div className="w-5 h-5 flex items-center justify-center bg-teal-500 text-xs text-white rounded-full bg-primary font-medium -mt-1">
                             {conversation.unread_count}
                         </div>

@@ -11,6 +11,7 @@ import { ItemListConversation } from "../ItemListConversation";
 import { io, Socket } from 'socket.io-client';
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
 import { usePathname } from 'next/navigation';
+import useChatsRead from "@/app/hooks/useChatsRead";
 
 export const ChatSidebar = () => {
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
@@ -30,6 +31,7 @@ export const ChatSidebar = () => {
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
+    const { chatsReadState, setChatsRead } = useChatsRead()
 
     useEffect(() => {
         setPageConversation(0);
@@ -68,24 +70,43 @@ export const ChatSidebar = () => {
                 console.log("Evento 'update_conversation' recibido:", payload);
 
                 if (payload.table === "messages" && payload.action === "insert") {
-                    const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
+                    if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                        setConversations(prevConversations => {
+                            const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation.id);
 
-                    if (chatIndex !== -1) {
-                        const updatedArray = [...conversations];
-                        updatedArray[chatIndex] = payload.data.conversation;
+                            if (chatIndex !== -1) {
+                                const updatedArray = [...prevConversations];
+                                updatedArray[chatIndex] = payload.data.conversation;
 
-                        setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
-                    } else if (!!filter.unread) {
-                        setConversations([...conversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
+                                return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                            } else if (!!filter.unread) {
+                                return [...prevConversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                            }
+
+                            return prevConversations;
+                        });
+
+                        setChatsRead((prevChatsRead: string[]) => {
+                            const isRead = prevChatsRead.includes(payload.data.conversation.id);
+
+                            if (isRead) {
+                                const chatsFiltered = prevChatsRead.filter(id => id !== payload.data.conversation.id);
+                                return chatsFiltered;
+                            }
+
+                            return prevChatsRead;
+                        });
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
-                    const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
+                    if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                        const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
-                    if (chatIndex !== -1) {
-                        const updatedArray = [...conversations];
-                        updatedArray[chatIndex] = payload.data.conversation;
+                        if (chatIndex !== -1) {
+                            const updatedArray = [...conversations];
+                            updatedArray[chatIndex] = payload.data.conversation;
 
-                        setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
+                            setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
+                        }
                     }
                 }
             });
@@ -103,7 +124,7 @@ export const ChatSidebar = () => {
                 socketRef.current = null;
             }
         };
-    }, [conversations]);
+    }, [conversations, chatsReadState]);
 
     const handleScroll = () => {
         const container = containerRef.current;

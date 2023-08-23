@@ -12,6 +12,7 @@ import useUser from "@/app/hooks/useUser";
 //@ts-ignore
 import newMessageAudio from '../../../../../sounds/receive.mp3';
 import { getMessagesByConversation } from '@/app/services/api';
+import { usePathname } from "next/navigation";
 
 interface ActiveConversationProps {
     highlightedText: string
@@ -40,6 +41,9 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const [limitMessage, setLimitMessage] = useState(50);
     const [lastConversation, setLastConversation] = useState(0);
     const [loadingInitialMessages, setLoadingInitialMessages] = useState<boolean>(false);
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     useEffect(() => {
         if (!socketRef.current) {
@@ -52,34 +56,36 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
             socketRef.current.on('new_message', (payload) => {
                 console.log("Evento 'new_message' recibido:", payload);
 
-                if (activeConversationState.id === payload.data.conversation.id) {
-                    setMessages((currentMessages) => [...currentMessages, payload.data.message]);
+                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                    if (activeConversationState.id === payload.data.conversation.id) {
+                        setMessages((currentMessages) => [...currentMessages, payload.data.message]);
+                    }
+
+                    if (payload.data.message.status === "client") playSound();
                 }
-
-                if (payload.data.message.status === "client") playSound();
-
-                // setMessages((currentMessages) => [...currentMessages, payload.data.message]);
             });
 
             socketRef.current.on('update_message', (payload) => {
                 console.log("Evento 'update_message' recibido:", payload);
 
-                const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
+                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                    const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
 
-                if (messageIndex !== -1) {
-                    const updatedMessages = [...messages];
-                    const message = updatedMessages[messageIndex];
+                    if (messageIndex !== -1) {
+                        const updatedMessages = [...messages];
+                        const message = updatedMessages[messageIndex];
 
-                    if (
-                        (message.status === "read") ||
-                        (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
-                        (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
-                    ) {
-                        return;
+                        if (
+                            (message.status === "read") ||
+                            (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
+                            (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
+                        ) {
+                            return;
+                        }
+
+                        message.status = payload.data.message.status;
+                        setMessages(updatedMessages);
                     }
-
-                    message.status = payload.data.message.status;
-                    setMessages(updatedMessages);
                 }
             });
         }
