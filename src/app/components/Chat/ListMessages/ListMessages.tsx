@@ -69,23 +69,27 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 console.log("Evento 'update_message' recibido:", payload);
 
                 if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                    const messageIndex = [...messages].findIndex((message) => message.id === payload.data.message.id);
+                    setMessages(prevMessages => {
+                        const messageIndex = prevMessages.findIndex(message => message.id === payload.data.message.id);
 
-                    if (messageIndex !== -1) {
-                        const updatedMessages = [...messages];
-                        const message = updatedMessages[messageIndex];
+                        if (messageIndex !== -1) {
+                            const updatedMessages = [...prevMessages];
+                            const message = updatedMessages[messageIndex];
 
-                        if (
-                            (message.status === "read") ||
-                            (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
-                            (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
-                        ) {
-                            return;
+                            if (
+                                (message.status === "read") ||
+                                (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
+                                (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
+                            ) {
+                                return prevMessages;
+                            }
+
+                            message.status = payload.data.message.status;
+                            return updatedMessages;
                         }
 
-                        message.status = payload.data.message.status;
-                        setMessages(updatedMessages);
-                    }
+                        return prevMessages;
+                    });
                 }
             });
         }

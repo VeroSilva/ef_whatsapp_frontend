@@ -99,14 +99,17 @@ export const ChatSidebar = () => {
                     }
                 } else if (payload.table === "messages" && payload.action === "update") {
                     if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                        const chatIndex = conversations.findIndex((chat) => chat.id === payload.data.conversation.id);
+                        setConversations((prevConversations) => {
+                            const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
-                        if (chatIndex !== -1) {
-                            const updatedArray = [...conversations];
-                            updatedArray[chatIndex] = payload.data.conversation;
+                            if (chatIndex !== -1) {
+                                const updatedArray = [...prevConversations];
+                                updatedArray[chatIndex] = payload.data.conversation;
+                                return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at))
+                            }
 
-                            setConversations(updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at)));
-                        }
+                            return prevConversations
+                        });
                     }
                 }
             });
@@ -114,7 +117,7 @@ export const ChatSidebar = () => {
             socketRef.current.on('new_conversation', (payload) => {
                 console.log("Evento 'new_conversation' recibido:", payload);
 
-                setConversations([payload.data, ...conversations]);
+                setConversations((prevConversations) => [payload.data, ...prevConversations]);
             });
         }
 
