@@ -19,13 +19,11 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
         bodyData && bodyData.example ||
         buttonsData && !!buttonsUrl.length
 
-    const handleInputHeaderChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setInputHeaderVariable(e.target.value)
+    const handleInputHeaderChange = (value: string) => {
+        setInputHeaderVariable(value)
     }
 
-    const handleInputBodyChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
-        const { value } = e.target;
-
+    const handleInputBodyChange = (value: string, index: number) => {
         setInputsBodyVariables(prevState => {
             const newState: any = [...prevState];
             newState[index] = value;
@@ -33,8 +31,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
         });
     };
 
-    const handleInputButtonsChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.target;
+    const handleInputButtonsChange = (value: string) => {
         setInputButtonVariable(value);
     };
 
@@ -46,6 +43,29 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
         ) return false
         else return true
     };
+
+    useEffect(() => {
+        template.components.map((component) => {
+            if (component.example || (component.buttons && component.buttons.some((button: any) => "example" in button))) {
+                if (component.type === "HEADER") {
+                    if (component.example.header_handle) {
+                        handleInputHeaderChange(component.example.header_handle[0])
+                    } else if (component.example.header_text) {
+                        handleInputHeaderChange(component.example.header_text[0])
+                    }
+                }
+                else if (component.type === "BODY") {
+                    component.example.body_text[0].map((text: string, index: number) => {
+                        handleInputBodyChange(text, index)
+                    })
+                }
+                else if (component.type === "BUTTONS") {
+                    const itemWithExample = component.buttons.find((button: any) => "example" in button);
+                    handleInputButtonsChange(itemWithExample.example)
+                }
+            }
+        })
+    }, [])
 
     useEffect(() => {
         setIsReadyToSend(false)
@@ -177,7 +197,8 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                         id="file-input-image"
                                         className="border border-slate-300 rounded-md m-2 w-full mb-6"
                                         placeholder="Link de imagen"
-                                        onChange={e => handleInputHeaderChange(e)}
+                                        value={inputHeaderVariable ?? ""}
+                                        onChange={e => handleInputHeaderChange(e.target.value)}
                                     /> :
                                     headerData.format === "TEXT" && headerData.example &&
                                     <div className="md:flex md:items-center mb-3">
@@ -190,7 +211,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                             <input
                                                 type="text"
                                                 value={inputHeaderVariable ?? ""}
-                                                onChange={e => handleInputHeaderChange(e)}
+                                                onChange={e => handleInputHeaderChange(e.target.value)}
                                                 className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                             />
                                         </div>
@@ -216,7 +237,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                                     key={`variable-${index}`}
                                                     type="text"
                                                     value={inputsBodyVariables[index] ?? ""}
-                                                    onChange={e => handleInputBodyChange(e, index)}
+                                                    onChange={e => handleInputBodyChange(e.target.value, index)}
                                                     className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                                 />
                                             </div>
@@ -235,7 +256,7 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
                                         type="text"
                                         placeholder={`Link para: ${buttonsUrl[0].text}`}
                                         value={inputButtonVariable}
-                                        onChange={e => handleInputButtonsChange(e)}
+                                        onChange={e => handleInputButtonsChange(e.target.value)}
                                         className="border border-slate-300 rounded-md my-2 w-full input-sky"
                                     />
                                 </div>
