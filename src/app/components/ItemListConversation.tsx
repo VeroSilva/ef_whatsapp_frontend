@@ -1,6 +1,6 @@
 // "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MemoizedGenerateInitialsImage } from '../utils/generateUserImage';
 import { IconCheck } from './Icons/IconCheck';
 import { IconClock } from './Icons/IconClock';
@@ -22,15 +22,17 @@ import { markAsRead } from '@/app/services/api';
 import useUser from "../hooks/useUser"
 import useActiveConversation from "../hooks/useActiveConversation";
 import useChatsRead from "../hooks/useChatsRead";
-import { isColorDark } from '../utils/functions';
 import React from 'react';
+import { SelectedTags } from './Chat/SelectedTags/SelectedTags';
+import { Socket, io } from 'socket.io-client';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
     const [isUnread, setIsUnread] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
     const { chatsReadState, setChatsRead } = useChatsRead()
-
+    const [updatedTags, setUpdatedTags] = useState(conversation.tags)
+    const socketRef = useRef<Socket | null>(null)
     const { userState } = useUser()
 
     useEffect(() => {
@@ -38,6 +40,30 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
 
         setIsUnread(!isRead && (parseInt(conversation.unread_count) > 0))
     }, [conversation, chatsReadState])
+
+    useEffect(() => {
+        if (!socketRef.current) {
+            const apiUrl: string = process.env.API_SOCKET ?? "";
+            socketRef.current = io(apiUrl, {
+                auth: { token: userState.token },
+            });
+            socketRef.current.emit('join_new_channel');
+
+            socketRef.current.on('conversation_tags', (payload) => {
+                if (payload.data.tags) {
+                    if (conversation.id === payload.data.id)
+                        setUpdatedTags(payload.data.tags)
+                }
+            })
+        }
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+        }
+    }, [userState.token, conversation.tags])
 
     const handleClick = () => {
         if (activeConversation !== conversation.id) {
@@ -79,13 +105,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             onClick={handleClick}
         >
             <div className='w-full mb-2 flex gap-2 flex-wrap'>
-                {conversation.tags.map((tag: any) => (
-                    <span
-                        key={`tag-${tag.id}`}
-                        style={{ backgroundColor: tag.color }}
-                        className={`rounded-full px-2 py-1 text-xs font-bold ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
-                    >{tag.name}</span>
-                ))}
+                <SelectedTags tags={updatedTags} />
             </div>
             <div className="w-14 h-14 flex-none image-fit mr-1">
                 <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />

@@ -10,8 +10,11 @@ import React from "react";
 import { Template } from "@/app/interfaces/template";
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
-import { isColorDark } from "@/app/utils/functions";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
+import { SelectedTags } from "./SelectedTags/SelectedTags";
+import useUser from "@/app/hooks/useUser";
+import { Socket, io } from "socket.io-client";
+import { Tag } from "@/app/interfaces/conversations";
 
 export const Chat = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -22,8 +25,10 @@ export const Chat = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [templates, setTemplates] = useState<Template[]>([]);
     const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
-    //@ts-ignore
-    const { activeConversationState } = useActiveConversation();
+    const { activeConversationState, setActiveConversation } = useActiveConversation();
+    const { userState } = useUser()
+    const socketRef = useRef<Socket | null>(null);
+    const [updatedTags, setUpdatedTags] = useState<Tag[]>([])
 
     useEffect(() => {
         if (!!templates.length) {
@@ -66,6 +71,41 @@ export const Chat = () => {
             setTemplates([]);
         }
     }, [showPreview]);
+
+    useEffect(() => {
+        if (activeConversationState.id !== 0) setUpdatedTags(activeConversationState.tags)
+    }, [activeConversationState])
+
+    useEffect(() => {
+        if (!socketRef.current) {
+            const apiUrl: string = process.env.API_SOCKET ?? "";
+            socketRef.current = io(apiUrl, {
+                auth: { token: userState.token },
+            });
+            socketRef.current.emit('join_new_channel');
+
+            socketRef.current.on('conversation_tags', (payload) => {
+                if (payload.data.tags) {
+                    if (activeConversationState.id === payload.data.id) {
+                        setUpdatedTags(payload.data.tags)
+                        setActiveConversation((prevActiveConversation: any) => (
+                            {
+                                ...prevActiveConversation,
+                                tags: payload.data.tags
+                            }
+                        ))
+                    }
+                }
+            })
+        }
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+        }
+    }, [userState.token, activeConversationState.tags])
 
     function handleSearchTextChange() {
         if (searchText !== '') {
@@ -130,13 +170,7 @@ export const Chat = () => {
                                     </div>
                                     <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
                                         <div className='w-full mb-2 flex gap-2 flex-wrap items-center'>
-                                            {activeConversationState && activeConversationState.tags.map((tag: any) => (
-                                                <span
-                                                    key={`tag-${tag.id}`}
-                                                    style={{ backgroundColor: tag.color }}
-                                                    className={`rounded-full px-2 py-1 text-xs font-bold ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
-                                                >{tag.name}</span>
-                                            ))}
+                                            {activeConversationState && <SelectedTags tags={updatedTags} />}
 
                                             <ChatOptions />
                                         </div>

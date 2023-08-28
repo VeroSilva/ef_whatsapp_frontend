@@ -25,11 +25,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalImage, setModalImage] = useState<string>("");
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
-    const [isScrolledToTop, setIsScrolledToTop] = useState(false);
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
-    const [currentTopMessage, setCurrentTopMessage] = useState(0);
-    //@ts-ignore
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const socketRef = useRef<Socket | null>(null);
     const { userState } = useUser();
@@ -109,7 +105,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         } else if (activeConversationState.id === -1) {
             setMessages([]);
         }
-    }, [activeConversationState])
+    }, [activeConversationState.id])
 
     useEffect(() => {
         setReactions([]);
@@ -145,23 +141,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
 
         setUpdatedMessages(newMessages);
     }, [messages]);
-
-    useEffect(() => {
-        if (!isScrolledToBottom && updatedMessages.length) {
-            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
-        } else if (isScrolledToTop && updatedMessages.length) {
-            scrollToElement(currentTopMessage);
-        } else if (isScrolledToBottom && updatedMessages.length) {
-            scrollToElement(updatedMessages[updatedMessages.length - 1].id);
-        }
-    }, [updatedMessages]);
-
-    useEffect(() => {
-        if (isScrolledToTop && updatedMessages.length) {
-            setCurrentTopMessage(updatedMessages[0].id)
-            loadMessages(false, activeConversationState.id)
-        }
-    }, [isScrolledToTop]);
 
     const loadMessages = (clear: boolean, id: number) => {
         if (loadingRefMessage.current || (pageMessage == totalPagesMessage && id == lastConversation)) {
@@ -204,18 +183,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         audioElement.play();
     };
 
-    const handleScroll = () => {
-        const container = messagesContainerRef.current;
-
-        if (container) {
-            const { scrollTop, scrollHeight, clientHeight } = container;
-            const isAtTop = scrollTop <= 3;
-            const isAtBottom = scrollHeight - scrollTop >= clientHeight - 1.5;
-            setIsScrolledToTop(isAtTop);
-            setIsScrolledToBottom(isAtBottom);
-        }
-    };
-
     const scrollToElement = (id: Number) => {
         const element = document.querySelector(`[data-id="${id}"]`);
         if (element) {
@@ -229,18 +196,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
 
     return (
         <>
-            <div ref={messagesContainerRef} onScroll={handleScroll} className="flex flex-col overflow-y-auto scrollbar-hidden px-5 pt-5 flex-1 h-full">
-                {
-
-                    (isScrolledToTop && loadingMessages) && (
-                        <div className="flex justify-center items-center h-screen">
-                            <Spinner
-                                aria-label="Extra large spinner example"
-                                size="xl"
-                            />
-                        </div>
-                    )
-                }
+            <div ref={messagesContainerRef} className="flex flex-col overflow-y-auto px-5 pt-5 flex-1 h-full">
 
                 {updatedMessages.map((message, index) =>
                     message.message_type !== "reaction" ? (

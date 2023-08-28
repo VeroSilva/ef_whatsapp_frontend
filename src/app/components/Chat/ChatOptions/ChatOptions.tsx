@@ -45,12 +45,15 @@ export const ChatOptions = () => {
     }
 
     useEffect(() => {
-        setSelectedTags(activeConversationState.tags)
-
         getTags(userState.token).then((res => {
             setTags(res)
         }))
     }, [])
+
+    useEffect(() => {
+        setSelectedTags(activeConversationState.tags)
+    }, [activeConversationState.tags])
+
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

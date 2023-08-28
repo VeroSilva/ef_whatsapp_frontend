@@ -1,13 +1,12 @@
-import { Contact } from "@/app/interfaces/conversations";
 import { createContext } from "react";
+import { ContainerActiveConversation } from "./ActiveConversationProvider";
 
 export type ActiveConversationContextProps = {
-  activeContact: Contact;
-  conversationId: number;
-  reset: () => void;
-  setActive: () => void;
+  activeConversationState: ContainerActiveConversation;
+  resetActiveConversation: () => void;
+  setActiveConversation: Function;
 };
 
-const ActiveConversationContext = createContext({});
+const ActiveConversationContext = createContext({} as ActiveConversationContextProps);
 
 export default ActiveConversationContext;
