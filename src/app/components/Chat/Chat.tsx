@@ -13,8 +13,8 @@ import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
 import { SelectedTags } from "./SelectedTags/SelectedTags";
 import useUser from "@/app/hooks/useUser";
-import { Socket, io } from "socket.io-client";
 import { Tag } from "@/app/interfaces/conversations";
+import { useSocket } from "@/app/context/socket/SocketContext";
 
 export const Chat = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -27,8 +27,8 @@ export const Chat = () => {
     const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
     const { activeConversationState, setActiveConversation } = useActiveConversation();
     const { userState } = useUser()
-    const socketRef = useRef<Socket | null>(null);
     const [updatedTags, setUpdatedTags] = useState<Tag[]>([])
+    const { socketInstance } = useSocket();
 
     useEffect(() => {
         if (!!templates.length) {
@@ -77,35 +77,32 @@ export const Chat = () => {
     }, [activeConversationState])
 
     useEffect(() => {
-        if (!socketRef.current) {
-            const apiUrl: string = process.env.API_SOCKET ?? "";
-            socketRef.current = io(apiUrl, {
-                auth: { token: userState.token },
-            });
-            socketRef.current.emit('join_new_channel');
-
-            socketRef.current.on('conversation_tags', (payload) => {
-                if (payload.data.tags) {
-                    if (activeConversationState.id === payload.data.id) {
-                        setUpdatedTags(payload.data.tags)
-                        setActiveConversation((prevActiveConversation: any) => (
-                            {
-                                ...prevActiveConversation,
-                                tags: payload.data.tags
-                            }
-                        ))
-                    }
-                }
-            })
+        if (!socketInstance) {
+            return;
         }
 
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
+        const conversationTagListener = (payload: any) => {
+            if (payload.data.tags) {
+                if (activeConversationState.id === payload.data.id) {
+                    setUpdatedTags(payload.data.tags)
+                    setActiveConversation((prevActiveConversation: any) => (
+                        {
+                            ...prevActiveConversation,
+                            tags: payload.data.tags
+                        }
+                    ))
+                }
             }
         }
-    }, [userState.token, activeConversationState.tags])
+
+        const socket = socketInstance;
+
+        socket.on('conversation_tags', conversationTagListener);
+
+        return () => {
+            socket.off('conversation_tags', conversationTagListener);
+        }
+    }, [userState.token, activeConversationState.tags, socketInstance])
 
     function handleSearchTextChange() {
         if (searchText !== '') {

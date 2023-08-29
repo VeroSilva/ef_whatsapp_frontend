@@ -24,7 +24,7 @@ import useActiveConversation from "../hooks/useActiveConversation";
 import useChatsRead from "../hooks/useChatsRead";
 import React from 'react';
 import { SelectedTags } from './Chat/SelectedTags/SelectedTags';
-import { Socket, io } from 'socket.io-client';
+import { useSocket } from '../context/socket/SocketContext';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
     const [isUnread, setIsUnread] = useState(false)
@@ -32,8 +32,8 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     const { setActiveConversation } = useActiveConversation()
     const { chatsReadState, setChatsRead } = useChatsRead()
     const [updatedTags, setUpdatedTags] = useState(conversation.tags)
-    const socketRef = useRef<Socket | null>(null)
     const { userState } = useUser()
+    const { socketInstance } = useSocket();
 
     useEffect(() => {
         const isRead = chatsReadState.includes(conversation.id)
@@ -42,28 +42,25 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     }, [conversation, chatsReadState])
 
     useEffect(() => {
-        if (!socketRef.current) {
-            const apiUrl: string = process.env.API_SOCKET ?? "";
-            socketRef.current = io(apiUrl, {
-                auth: { token: userState.token },
-            });
-            socketRef.current.emit('join_new_channel');
-
-            socketRef.current.on('conversation_tags', (payload) => {
-                if (payload.data.tags) {
-                    if (conversation.id === payload.data.id)
-                        setUpdatedTags(payload.data.tags)
-                }
-            })
+        if (!socketInstance) {
+            return;
         }
 
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
+        const conversationTagListener = (payload: any) => {
+            if (payload.data.tags) {
+                if (conversation.id === payload.data.id)
+                    setUpdatedTags(payload.data.tags)
             }
         }
-    }, [userState.token, conversation.tags])
+
+        const socket = socketInstance;
+
+        socket.on('conversation_tags', conversationTagListener);
+
+        return () => {
+            socket.off('conversation_tags', conversationTagListener);
+        }
+    }, [userState.token, conversation.tags, socketInstance])
 
     const handleClick = () => {
         if (activeConversation !== conversation.id) {

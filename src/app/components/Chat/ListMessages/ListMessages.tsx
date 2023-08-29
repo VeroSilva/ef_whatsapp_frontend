@@ -7,12 +7,12 @@ import { MemoizedMessage } from "../../Message/Message";
 import { IconX } from "../../Icons/IconX";
 import React from "react";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
-import { io, Socket } from 'socket.io-client';
 import useUser from "@/app/hooks/useUser";
 //@ts-ignore
 import newMessageAudio from '../../../../../sounds/receive.mp3';
 import { getMessagesByConversation } from '@/app/services/api';
 import { usePathname } from "next/navigation";
+import { useSocket } from '@/app/context/socket/SocketContext';
 
 interface ActiveConversationProps {
     highlightedText: string
@@ -27,7 +27,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
-    const socketRef = useRef<Socket | null>(null);
     const { userState } = useUser();
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
@@ -40,63 +39,63 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
+    const { socketInstance } = useSocket();
 
     useEffect(() => {
-        if (!socketRef.current) {
-            const apiUrl: string = process.env.API_SOCKET ?? "";
-            socketRef.current = io(apiUrl, {
-                auth: { token: userState.token },
-            });
-            socketRef.current.emit('join_new_channel');
+        if (!socketInstance) {
+            return;
+        }
 
-            socketRef.current.on('new_message', (payload) => {
-                console.log("Evento 'new_message' recibido:", payload);
+        const newMessageListener = (payload: any) => {
+            console.log("Evento 'new_message' recibido:", payload);
 
-                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                    if (activeConversationState.id === payload.data.conversation.id) {
-                        setMessages((currentMessages) => [...currentMessages, payload.data.message]);
-                    }
-
-                    if (payload.data.message.status === "client") playSound();
+            if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                if (activeConversationState.id === payload.data.conversation.id) {
+                    setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                 }
-            });
 
-            socketRef.current.on('update_message', (payload) => {
-                console.log("Evento 'update_message' recibido:", payload);
+                if (payload.data.message.status === "client") playSound();
+            }
+        };
 
-                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                    setMessages(prevMessages => {
-                        const messageIndex = prevMessages.findIndex(message => message.id === payload.data.message.id);
+        const updateMessageListener = (payload: any) => {
+            console.log("Evento 'update_message' recibido:", payload);
 
-                        if (messageIndex !== -1) {
-                            const updatedMessages = [...prevMessages];
-                            const message = updatedMessages[messageIndex];
+            if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                setMessages(prevMessages => {
+                    const messageIndex = prevMessages.findIndex(message => message.id === payload.data.message.id);
 
-                            if (
-                                (message.status === "read") ||
-                                (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
-                                (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
-                            ) {
-                                return prevMessages;
-                            }
+                    if (messageIndex !== -1) {
+                        const updatedMessages = [...prevMessages];
+                        const message = updatedMessages[messageIndex];
 
-                            message.status = payload.data.message.status;
-                            return updatedMessages;
+                        if (
+                            (message.status === "read") ||
+                            (message.status === "delivered" && (payload.data.message.status === "failed" || payload.data.message.status === "trying" || payload.data.message.status === "sent")) ||
+                            (message.status === "sent" && (payload.data.message.status === "failed" || payload.data.message.status === "trying"))
+                        ) {
+                            return prevMessages;
                         }
 
-                        return prevMessages;
-                    });
-                }
-            });
-        }
+                        message.status = payload.data.message.status;
+                        return updatedMessages;
+                    }
+
+                    return prevMessages;
+                });
+            }
+        };
+
+        const socket = socketInstance;
+
+        socket.on('new_message', newMessageListener);
+        socket.on('update_message', updateMessageListener);
 
         return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
+            socket.off('new_message', newMessageListener);
+            socket.off('update_message', updateMessageListener);
         }
-    }, [userState.token, messages])
+    }, [userState.token, messages, socketInstance])
 
     useEffect(() => {
         if (activeConversationState.id !== 0 && activeConversationState.id !== -1) {
