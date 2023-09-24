@@ -4,7 +4,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import { IconDocument } from "../Icons/IconDocument";
 import { PreviewActions } from "./PreviewActions";
 import { getFileType } from "../../utils/fileType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputSendMessage } from "../InputSendMessage/InputSendMessage";
 import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
 import { MessageContent } from "../Message/MessageContent/MessageContent";
@@ -28,6 +28,21 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
     const handleResetActiveMessageReply = () => {
         setActiveMessageReply(initialStateActiveMessageReply)
     }
+
+    const handleKeyPress = (event: any) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleAccept();
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, []);
 
     return (
         <>
