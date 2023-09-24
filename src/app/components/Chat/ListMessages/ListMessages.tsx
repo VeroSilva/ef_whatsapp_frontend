@@ -137,8 +137,8 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 replied_message: null,
             };
         });
-
         setUpdatedMessages(newMessages);
+        Scroll(false);
     }, [messages]);
 
     const loadMessages = (clear: boolean, id: number) => {
@@ -170,6 +170,9 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 loadingRefMessage.current = false;
                 setLoadingMessages(false);
                 setLoadingInitialMessages(false)
+                setTimeout(() => {
+                    Scroll(true)
+                }, 50);
             });
     }
 
@@ -182,10 +185,10 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         audioElement.play();
     };
 
-    const scrollToElement = (id: Number) => {
-        const element = document.querySelector(`[data-id="${id}"]`);
-        if (element) {
-            element.scrollIntoView();
+    const Scroll = (force: boolean) => {
+        const { offsetHeight, scrollHeight, scrollTop } = messagesContainerRef.current as HTMLDivElement
+        if (scrollHeight <= scrollTop + offsetHeight + 100 || force) {
+            messagesContainerRef.current?.scrollTo(0, scrollHeight)
         }
     }
 
@@ -196,7 +199,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     return (
         <>
             <div ref={messagesContainerRef} className="flex flex-col overflow-y-auto px-5 pt-5 flex-1 h-full">
-
                 {updatedMessages.map((message, index) =>
                     message.message_type !== "reaction" ? (
                         <MemoizedMessage
@@ -240,4 +242,3 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         </>
     );
 };
-

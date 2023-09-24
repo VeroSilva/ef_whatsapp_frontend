@@ -36,7 +36,7 @@ export const Sidebar = () => {
         }
     }
 
-    if (userState.role === "2") {
+    if (userState.role === "1") {
         addMenuItemIfNotExists("Usuarios", "/pages/users", <IconUsers classes="w-6 h-6" />);
         addMenuItemIfNotExists("Etiquetas", "/pages/tags", <IconTag classes="w-6 h-6" />);
         addMenuItemIfNotExists("Teléfonos", "/pages/phones", <IconPhone classes="w-6 h-6" />);
@@ -60,6 +60,7 @@ export const Sidebar = () => {
 
                 if (idx == -1) {
                     addMenuItemIfNotExists(`${phone.alias} +${phone.phone}`, `/pages/conversation/${phone.company_phone_id}`, <IconTemplates classes="w-6 h-6" />);
+
                     if (userState.role == "1" || userState.role == "2") {
                         addMenuItemIfNotExists(`${phone.alias} Chatbot`, `/pages/templates-flows/${phone.company_phone_id}`, <IconFlow classes="w-5 h-5" />);
                     }
