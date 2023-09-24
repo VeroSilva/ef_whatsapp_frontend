@@ -22,6 +22,8 @@ import useTemplates from "../../hooks/useTemplates"
 import { usePathname } from "next/navigation"
 import { getFlows, updateFlows } from '@/app/services/api';
 import { uniqueIdGenerator } from '@/app/utils/functions';
+import { IconCheckCircle } from '../Icons/IconCheckCircle';
+import { IconInfo } from '../Icons/IconInfo';
 
 const initialNodes = [
     { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
@@ -41,6 +43,12 @@ const TemplatesDragAndDrop = () => {
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
     const { templatesState } = useTemplates();
+    const [loadingSave, setLoadingSave] = useState(false)
+    const [alert, setAlert] = useState({
+        type: "",
+        message: "",
+        show: false
+    });
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
@@ -88,10 +96,18 @@ const TemplatesDragAndDrop = () => {
         (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
     );
+
     const handleSaveFlow = () => {
+        setLoadingSave(true)
         updateFlows(userState.token, phoneId, jsonToSend).then((res) => {
             setJsonToSend([])
-            console.log(res)
+            setLoadingSave(false)
+
+            setAlert({
+                type: "success",
+                message: "Flujo guardado con éxito!",
+                show: true
+            })
         })
     }
 
@@ -167,6 +183,18 @@ const TemplatesDragAndDrop = () => {
         setCount(prevCount => prevCount + 1);
     }, []);
 
+    useEffect(() => {
+        if (alert.show) {
+            setTimeout(() => {
+                setAlert({
+                    type: alert.type,
+                    message: alert.message,
+                    show: false
+                })
+            }, 3000);
+        }
+    }, [alert])
+
     return (
         <div className="dndflow">
             <ReactFlowProvider>
@@ -188,10 +216,16 @@ const TemplatesDragAndDrop = () => {
                     </ReactFlow>
                 </div>
 
-                <button className='main-button absolute' onClick={handleSaveFlow}>Guardar cambios</button>
-
-                <Sidebar />
+                <Sidebar handleSaveFlow={handleSaveFlow} loadingSave={loadingSave} />
             </ReactFlowProvider>
+
+            <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
+                {alert.type === "success" ?
+                    <IconCheckCircle classes="w-6 h-6 mr-2" /> :
+                    <IconInfo classes="w-6 h-6 mr-2" />
+                }
+                <span>{alert.message}</span>
+            </div>
         </div>
     );
 };

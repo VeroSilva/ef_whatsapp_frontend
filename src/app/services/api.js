@@ -161,6 +161,23 @@ export const getTemplates = async (token, company_phone_id) => {
   return response;
 };
 
+export const importTemplates = async (token, company_phone_id) => {
+  const response = await fetch(
+    `${process.env.API_URL}/template/import/${company_phone_id}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};
+
 export const getUsers = async (token) => {
   const response = await fetch(`${process.env.API_URL}/user`, {
     method: "GET",
