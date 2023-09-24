@@ -198,12 +198,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
 
     return (
         <>
-
             <div ref={messagesContainerRef} className="flex flex-col overflow-y-auto px-5 pt-5 flex-1 h-full">
-                <button
-                    onClick={() => {
-                    }}
-                >HOLA</button>
                 {updatedMessages.map((message, index) =>
                     message.message_type !== "reaction" ? (
                         <MemoizedMessage
