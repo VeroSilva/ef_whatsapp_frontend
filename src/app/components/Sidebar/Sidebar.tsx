@@ -17,28 +17,30 @@ const menuItems = [
         title: "Inicio",
         link: "/pages/home",
         icon: <IconHome classes="w-6 h-6" />
-    },
-    {
-        title: "Usuarios",
-        link: "/pages/users",
-        icon: <IconUsers classes="w-6 h-6" />
-    },
-    {
-        title: "Etiquetas",
-        link: "/pages/tags",
-        icon: <IconTag classes="w-6 h-6" />
-    },
-    {
-        title: "Teléfonos",
-        link: "/pages/phones",
-        icon: <IconPhone classes="w-6 h-6" />
-    },
+    }
 ]
 
 export const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const { logoutUser, userState } = useUser();
     const [active, setActive] = useState("");
+
+    function addMenuItemIfNotExists(title: string, link: string, icon: React.JSX.Element) {
+        const idx = menuItems.findIndex((item) => item.title === title);
+        if (idx === -1) {
+            menuItems.push({
+                title,
+                link,
+                icon,
+            });
+        }
+    }
+
+    if (userState.role === "2") {
+        addMenuItemIfNotExists("Usuarios", "/pages/users", <IconUsers classes="w-6 h-6" />);
+        addMenuItemIfNotExists("Etiquetas", "/pages/tags", <IconTag classes="w-6 h-6" />);
+        addMenuItemIfNotExists("Teléfonos", "/pages/phones", <IconPhone classes="w-6 h-6" />);
+    }
 
     useEffect(() => {
         const activeMenu = localStorage.getItem('activeMenu')
@@ -57,18 +59,10 @@ export const Sidebar = () => {
                 });
 
                 if (idx == -1) {
-                    menuItems.push(
-                        {
-                            title: `${phone.alias} +${phone.phone}`,
-                            link: `/pages/conversation/${phone.company_phone_id}`,
-                            icon: <IconTemplates classes="w-6 h-6" />,
-                        },
-                        {
-                            title: `${phone.alias} Chatbot`,
-                            link: `/pages/templates-flows/${phone.company_phone_id}`,
-                            icon: <IconFlow classes="w-5 h-5" />
-                        }
-                    )
+                    addMenuItemIfNotExists(`${phone.alias} +${phone.phone}`, `/pages/conversation/${phone.company_phone_id}`, <IconTemplates classes="w-6 h-6" />);
+                    if (userState.role == "1" || userState.role == "2") {
+                        addMenuItemIfNotExists(`${phone.alias} Chatbot`, `/pages/templates-flows/${phone.company_phone_id}`, <IconFlow classes="w-5 h-5" />);
+                    }
                 }
             })
         }
