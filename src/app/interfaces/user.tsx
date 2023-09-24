@@ -2,6 +2,7 @@ export interface User {
     username: string;
     token: string;
     company_phones?: [CompanyPhones]
+    role?: string
 }
 
 export interface CompanyPhones {

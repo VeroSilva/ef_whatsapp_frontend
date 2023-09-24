@@ -10,6 +10,7 @@ interface UserProviderProps {
 export const INITIAL_STATE: User = {
   username: "",
   token: "",
+  role: "3",
 };
 
 export const LS_USER_ID = "userID";

@@ -32,11 +32,11 @@ export const LoginForm = () => {
             .then((res) => {
                 if (res.status === 200) {
                     const data: any = res.json()
-
                     data.then((d: any) => {
                         loginUser({
                             username: credentials.username,
                             token: d.token,
+                            role: d.role,
                             company_phones: d.company_phones,
                         })
 
