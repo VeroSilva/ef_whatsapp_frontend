@@ -7,6 +7,7 @@ import { ActiveMessageReplyProvider } from '../context/activeMessageReply/Active
 import { TemplatesProvider } from '../context/templates/TemplatesProvider'
 import { TemplatesToSendProvider } from '../context/templatesToSend/TemplatesToSendProvider';
 import { ChatReadProvider } from '../context/chatsRead/ChatsReadProvider';
+import { SocketProvider } from '../context/socket/SocketContext';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -15,17 +16,19 @@ interface ThemeProviderProps {
 export default function ContextProvider({ children }: ThemeProviderProps) {
   return (
     <UserProvider>
-      <ActiveConversationProvider>
-        <ActiveMessageReplyProvider>
-          <TemplatesProvider>
-            <TemplatesToSendProvider>
-              <ChatReadProvider>
-                {children}
-              </ChatReadProvider>
-            </TemplatesToSendProvider>
-          </TemplatesProvider>
-        </ActiveMessageReplyProvider>
-      </ActiveConversationProvider>
+      <SocketProvider>
+        <ActiveConversationProvider>
+          <ActiveMessageReplyProvider>
+            <TemplatesProvider>
+              <TemplatesToSendProvider>
+                <ChatReadProvider>
+                  {children}
+                </ChatReadProvider>
+              </TemplatesToSendProvider>
+            </TemplatesProvider>
+          </ActiveMessageReplyProvider>
+        </ActiveConversationProvider>
+      </SocketProvider>
     </UserProvider>
   );
 }

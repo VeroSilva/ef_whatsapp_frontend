@@ -8,10 +8,10 @@ import useUser from "../../hooks/useUser";
 import useActiveConversation from "../../hooks/useActiveConversation";
 import { ConversationSkeleton } from "../Skeleton/Conversation";
 import { ItemListConversation } from "../ItemListConversation";
-import { io, Socket } from 'socket.io-client';
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
 import { usePathname } from 'next/navigation';
 import useChatsRead from "@/app/hooks/useChatsRead";
+import { useSocket } from "@/app/context/socket/SocketContext";
 
 export const ChatSidebar = () => {
     const [filter, setFilter] = useState<any>({ search: "", unread: false });
@@ -27,11 +27,11 @@ export const ChatSidebar = () => {
     //@ts-ignore
     const { activeConversationState } = useActiveConversation();
     const containerRef = useRef<HTMLDivElement>(null);
-    const socketRef = useRef<Socket | null>(null);
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
     const { chatsReadState, setChatsRead } = useChatsRead()
+    const { socketInstance } = useSocket();
 
     useEffect(() => {
         setPageConversation(0);
@@ -59,75 +59,74 @@ export const ChatSidebar = () => {
     }, [activeConversationState]);
 
     useEffect(() => {
-        if (!socketRef.current) {
-            const apiUrl: string = process.env.API_SOCKET ?? "";
-            socketRef.current = io(apiUrl, {
-                auth: { token: userState.token },
-            });
-            socketRef.current.emit('join_new_channel');
-
-            socketRef.current.on('update_conversation', (payload) => {
-                console.log("Evento 'update_conversation' recibido:", payload);
-
-                if (payload.table === "messages" && payload.action === "insert") {
-                    if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                        setConversations(prevConversations => {
-                            const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation.id);
-
-                            if (chatIndex !== -1) {
-                                const updatedArray = [...prevConversations];
-                                updatedArray[chatIndex] = payload.data.conversation;
-
-                                return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
-                            } else if (!!filter.unread) {
-                                return [...prevConversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
-                            }
-
-                            return prevConversations;
-                        });
-
-                        setChatsRead((prevChatsRead: string[]) => {
-                            const isRead = prevChatsRead.includes(payload.data.conversation.id);
-
-                            if (isRead) {
-                                const chatsFiltered = prevChatsRead.filter(id => id !== payload.data.conversation.id);
-                                return chatsFiltered;
-                            }
-
-                            return prevChatsRead;
-                        });
-                    }
-                } else if (payload.table === "messages" && payload.action === "update") {
-                    if (phoneId.toString() === payload.data.conversation.company_phone_id) {
-                        setConversations((prevConversations) => {
-                            const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
-
-                            if (chatIndex !== -1) {
-                                const updatedArray = [...prevConversations];
-                                updatedArray[chatIndex] = payload.data.conversation;
-                                return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at))
-                            }
-
-                            return prevConversations
-                        });
-                    }
-                }
-            });
-
-            socketRef.current.on('new_conversation', (payload) => {
-                console.log("Evento 'new_conversation' recibido:", payload);
-
-                setConversations((prevConversations) => [payload.data, ...prevConversations]);
-            });
+        if (!socketInstance) {
+            return;
         }
 
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
+        const updateConversationListener = (payload: any) => {
+            console.log("Evento 'update_conversation' recibido:", payload);
+
+            if (payload.table === "messages" && payload.action === "insert") {
+                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                    setConversations(prevConversations => {
+                        const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation.id);
+
+                        if (chatIndex !== -1) {
+                            const updatedArray = [...prevConversations];
+                            updatedArray[chatIndex] = payload.data.conversation;
+
+                            return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                        } else if (!!filter.unread) {
+                            return [...prevConversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                        }
+
+                        return prevConversations;
+                    });
+
+                    setChatsRead((prevChatsRead: string[]) => {
+                        const isRead = prevChatsRead.includes(payload.data.conversation.id);
+
+                        if (isRead) {
+                            const chatsFiltered = prevChatsRead.filter(id => id !== payload.data.conversation.id);
+                            return chatsFiltered;
+                        }
+
+                        return prevChatsRead;
+                    });
+                }
+            } else if (payload.table === "messages" && payload.action === "update") {
+                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                    setConversations((prevConversations) => {
+                        const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
+
+                        if (chatIndex !== -1) {
+                            const updatedArray = [...prevConversations];
+                            updatedArray[chatIndex] = payload.data.conversation;
+                            return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at))
+                        }
+
+                        return prevConversations
+                    });
+                }
             }
+        }
+
+        const newConversationListener = (payload: any) => {
+            console.log("Evento 'new_conversation' recibido:", payload);
+
+            setConversations((prevConversations) => [payload.data, ...prevConversations]);
+        }
+
+        const socket = socketInstance;
+
+        socket.on('update_conversation', updateConversationListener);
+        socket.on('new_conversation', newConversationListener);
+
+        return () => {
+            socket.off('update_conversation', updateConversationListener);
+            socket.off('new_conversation', newConversationListener);
         };
-    }, [conversations, chatsReadState]);
+    }, [conversations, chatsReadState, socketInstance]);
 
     const handleScroll = () => {
         const container = containerRef.current;

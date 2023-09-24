@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, memo } from 'react';
+import { useEffect, useRef } from 'react';
 import { redirect } from 'next/navigation';
 import useUser from "../../../hooks/useUser";
 import useActiveConversation from "../../../hooks/useActiveConversation";
@@ -8,11 +8,15 @@ import { ModalCreateConversartion } from '@/app/components/ModalCreateConversast
 //@ts-ignore
 import { Chat } from '@/app/components/Chat/Chat';
 import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
+import { Socket, io } from 'socket.io-client';
+import { useSocket } from '@/app/context/socket/SocketContext';
 
 const Conversation = (): JSX.Element => {
     const { userState } = useUser();
     //@ts-ignore
     const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
+    const socketRef = useRef<Socket | null>(null);
+    const { setSocketInstance } = useSocket();
 
     useEffect(() => {
         if (!userState || userState.token === "") {
@@ -38,7 +42,22 @@ const Conversation = (): JSX.Element => {
         };
     }, [activeConversationState]);
 
-    const MemoziedModalCreateConversartion = memo(ModalCreateConversartion);
+    useEffect(() => {
+        if (!socketRef.current && userState.token) {
+            const apiUrl: string = process.env.API_SOCKET ?? "";
+            socketRef.current = io(apiUrl, {
+                auth: { token: userState.token },
+            });
+            socketRef.current.emit('join_new_channel');
+            setSocketInstance(socketRef.current);
+        }
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
+        }
+    }, [userState.token])
 
     return (
         <>
