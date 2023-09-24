@@ -117,14 +117,35 @@ export const ChatSidebar = () => {
             setConversations((prevConversations) => [payload.data, ...prevConversations]);
         }
 
+        const conversationTagListener = (payload: any) => {
+            console.log("Evento 'conversation_tags' recibido:", payload);
+
+            if (payload.data.tags) {
+                setConversations(prevConversations => {
+                    const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.id);
+
+                    if (chatIndex !== -1) {
+                        const updatedArray = [...prevConversations];
+                        updatedArray[chatIndex].tags = payload.data.tags;
+
+                        return updatedArray
+                    }
+
+                    return prevConversations;
+                });
+            }
+        }
+
         const socket = socketInstance;
 
         socket.on('update_conversation', updateConversationListener);
         socket.on('new_conversation', newConversationListener);
+        socket.on('conversation_tags', conversationTagListener);
 
         return () => {
             socket.off('update_conversation', updateConversationListener);
             socket.off('new_conversation', newConversationListener);
+            socket.off('conversation_tags', conversationTagListener);
         };
     }, [conversations, chatsReadState, socketInstance]);
 

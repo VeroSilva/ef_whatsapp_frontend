@@ -1,6 +1,6 @@
 // "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MemoizedGenerateInitialsImage } from '../utils/generateUserImage';
 import { IconCheck } from './Icons/IconCheck';
 import { IconClock } from './Icons/IconClock';
@@ -24,43 +24,19 @@ import useActiveConversation from "../hooks/useActiveConversation";
 import useChatsRead from "../hooks/useChatsRead";
 import React from 'react';
 import { SelectedTags } from './Chat/SelectedTags/SelectedTags';
-import { useSocket } from '../context/socket/SocketContext';
 
 export const ItemListConversation = ({ conversation, handleOpenConversation, activeConversation, filter }: { conversation: any, handleOpenConversation: Function, activeConversation: number, filter: string }) => {
     const [isUnread, setIsUnread] = useState(false)
     // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
     const { chatsReadState, setChatsRead } = useChatsRead()
-    const [updatedTags, setUpdatedTags] = useState(conversation.tags)
     const { userState } = useUser()
-    const { socketInstance } = useSocket();
 
     useEffect(() => {
         const isRead = chatsReadState.includes(conversation.id)
 
         setIsUnread(!isRead && (parseInt(conversation.unread_count) > 0))
     }, [conversation, chatsReadState])
-
-    useEffect(() => {
-        if (!socketInstance) {
-            return;
-        }
-
-        const conversationTagListener = (payload: any) => {
-            if (payload.data.tags) {
-                if (conversation.id === payload.data.id)
-                    setUpdatedTags(payload.data.tags)
-            }
-        }
-
-        const socket = socketInstance;
-
-        socket.on('conversation_tags', conversationTagListener);
-
-        return () => {
-            socket.off('conversation_tags', conversationTagListener);
-        }
-    }, [userState.token, conversation.tags, socketInstance])
 
     const handleClick = () => {
         if (activeConversation !== conversation.id) {
@@ -102,7 +78,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             onClick={handleClick}
         >
             <div className='w-full mb-2 flex gap-2 flex-wrap'>
-                <SelectedTags tags={updatedTags} />
+                <SelectedTags tags={conversation.tags} />
             </div>
             <div className="w-14 h-14 flex-none image-fit mr-1">
                 <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />

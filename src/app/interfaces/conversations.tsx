@@ -22,7 +22,8 @@ export interface Conversation {
     message_created_at: string,
     message_type: string,
     status: string,
-    last_message_time: string
+    last_message_time: string,
+    tags: any
 }
 
 export interface MessageDetail {
