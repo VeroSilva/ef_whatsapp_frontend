@@ -5,7 +5,7 @@ import { IconLink } from "../../Icons/IconLink";
 import Image from "next/image"
 import { getVariables } from "@/app/utils/fileType";
 
-export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend, setTemplateToSend }: { template: Template, setSelectedTemplate?: Function, setIsReadyToSend: Function, setTemplateToSend: Function }) => {
+export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }: { template: Template, setIsReadyToSend: Function, setTemplateToSend: Function }) => {
     const [inputsBodyVariables, setInputsBodyVariables] = useState([]);
     const [inputHeaderVariable, setInputHeaderVariable] = useState("");
     const [inputButtonVariable, setInputButtonVariable] = useState("");
@@ -143,7 +143,6 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
         }
     }, [inputHeaderVariable, inputsBodyVariables, inputButtonVariable])
 
-
     useEffect(() => {
         const regex = /\{\{(\d+)\}\}/g;
         let match;
@@ -172,16 +171,6 @@ export const TemplateDetail = ({ template, setSelectedTemplate, setIsReadyToSend
 
     return (
         <>
-            {setSelectedTemplate &&
-                <button
-                    className="text-slate-500"
-                    onClick={() => setSelectedTemplate()}
-                >
-                    <IconChevron classes="w-6 h-6 rotate-180 float-left" />
-                    <span>Atrás</span>
-                </button>
-            }
-
             <h3 className="mb-4 font-bold text-center text-slate-700">{template.name}</h3>
 
             <div className={"template-detail " + (templateIsEditable ? "grid grid-cols-2 grid-flow-row gap-8" : "flex justify-center")}>

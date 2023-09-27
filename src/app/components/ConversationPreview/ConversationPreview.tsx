@@ -8,14 +8,15 @@ import useActiveConversation from "../../hooks/useActiveConversation";
 import { usePathname } from "next/navigation";
 import { MessageDataToSend } from "@/app/interfaces/conversations";
 import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
+import { Template } from "@/app/interfaces/template";
 
 export const ConversationPreview = ({
     selectedFile,
-    classifiedTemplates,
+    template,
     conversationId,
-    setShowPreview,
+    handleClosePreview,
     newConversationPhone
-}: { selectedFile: File | null, classifiedTemplates: any[], conversationId: number, setShowPreview: Function, newConversationPhone?: string }) => {
+}: { selectedFile?: File | null, template?: Template | undefined, conversationId: number, handleClosePreview: Function, newConversationPhone?: string }) => {
     const { sendMessage, isLoading, setIsLoading } = useMessage()
     const { userState } = useUser()
     // @ts-ignore
@@ -52,20 +53,20 @@ export const ConversationPreview = ({
         } catch (error) {
             console.error("Error al enviar el mensaje:", error);
         } finally {
-            setShowPreview(false)
+            handleClosePreview()
         }
     }
 
     return (
-        <div className="w-full p-8 absolute top-0 h-full flex flex-col items-center justify-center z-10 bg-gradient-to-b from-slate-800 to-gray-900">
+        <div className="w-full p-8 absolute left-0 top-0 h-full flex flex-col items-center justify-center z-10 bg-gradient-to-b from-slate-800 to-gray-900">
             {selectedFile ?
                 <Preview
                     file={selectedFile}
                     handleSendMessage={handleSendMessage}
                     isLoading={isLoading}
-                    setShowPreview={setShowPreview}
+                    handleClosePreview={handleClosePreview}
                 /> :
-                <TemplateList templates={classifiedTemplates} handleSendMessage={handleSendMessage} isLoading={isLoading} setShowPreview={setShowPreview} />
+                <TemplateList template={template} handleSendMessage={handleSendMessage} isLoading={isLoading} handleClosePreview={handleClosePreview} />
             }
         </div>
     )

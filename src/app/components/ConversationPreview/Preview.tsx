@@ -11,7 +11,7 @@ import { MessageContent } from "../Message/MessageContent/MessageContent";
 import { IconX } from "../Icons/IconX";
 import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply/ActiveMessageReplyProvider";
 
-export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: { file: File, handleSendMessage: Function, isLoading: boolean, setShowPreview: Function }) => {
+export const Preview = ({ file, handleSendMessage, isLoading, handleClosePreview }: { file: File, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
     const [caption, setCaption] = useState("");
     const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
 
@@ -22,7 +22,7 @@ export const Preview = ({ file, handleSendMessage, isLoading, setShowPreview }: 
     }
 
     const handleCancel = () => {
-        setShowPreview(false)
+        handleClosePreview()
     }
 
     const handleResetActiveMessageReply = () => {

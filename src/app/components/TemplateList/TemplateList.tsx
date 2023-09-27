@@ -1,12 +1,10 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Template } from "@/app/interfaces/template"
 import { useState } from "react"
-import { IconChevron } from "../Icons/IconChevron"
 import { TemplateDetail } from "./TemplateDetail/TemplateDetail"
 import { PreviewActions } from "../ConversationPreview/PreviewActions"
 
-export const TemplateList = ({ templates, handleSendMessage, isLoading, setShowPreview }: { templates: any[], handleSendMessage: Function, isLoading: boolean, setShowPreview: Function }) => {
-    const [selectedTemplate, setSelectedTemplate] = useState<Template>()
+export const TemplateList = ({ template, handleSendMessage, isLoading, handleClosePreview }: { template: Template | undefined, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
     const [isReadyToSend, setIsReadyToSend] = useState(false)
     const [templateToSend, setTemplateToSend] = useState<any>({
         name: "",
@@ -22,33 +20,29 @@ export const TemplateList = ({ templates, handleSendMessage, isLoading, setShowP
     }
 
     const handleCancel = () => {
-        setShowPreview(false)
+        handleClosePreview()
     }
+
+    const handleKeyPress = (event: any) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleAccept();
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [templateToSend]);
 
     return (
         <>
             <div className="bg-slate-100 rounded border border-slate-300 w-full p-8 overflow-auto">
-                {!selectedTemplate && templates.map((template, index) => (
-                    <div key={`template-${index}`}>
-                        <h1 className="text-sky-800 font-bold mb-4">{template.category}</h1>
-
-                        <ul className="mb-4">
-                            {template.data.map((t: any, index: number) => (
-                                <li
-                                    key={index}
-                                    className="p-2 m-2 bg-slate-200 rounded text-slate-500 flex justify-between cursor-pointer"
-                                    onClick={() => setSelectedTemplate(t)}
-                                >
-                                    {t.name}
-                                    <IconChevron classes="w-6 h-6 bg-slate-300 rounded-full" />
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
-
-                {selectedTemplate && (
-                    <TemplateDetail template={selectedTemplate} setSelectedTemplate={setSelectedTemplate} setIsReadyToSend={setIsReadyToSend} setTemplateToSend={setTemplateToSend} />
+                {template && (
+                    <TemplateDetail template={template} setIsReadyToSend={setIsReadyToSend} setTemplateToSend={setTemplateToSend} />
                 )}
             </div>
 

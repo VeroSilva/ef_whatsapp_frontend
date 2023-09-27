@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Spinner } from "flowbite-react"
 import { IconSend } from "../../Icons/IconSend"
 import { IconTrash } from "../../Icons/IconTrash"
 import { AudioRecorder } from "../../AudioRecorder/AudioRecorder"
 import { useMessage } from "@/app/hooks/useMessage"
 import { MediaDropdown } from "../ChatMediaDropdown/ChatMediaDropdown"
-import { createConversation } from "@/app/services/api"
+import { createConversation, getTemplates } from "@/app/services/api"
 import useUser from "@/app/hooks/useUser"
 import { dataMessageToSend } from "@/app/utils/messages"
 import { InputSendMessage } from "../../InputSendMessage/InputSendMessage"
@@ -16,19 +16,21 @@ import { MessageContent } from "../../Message/MessageContent/MessageContent"
 import { IconX } from "../../Icons/IconX"
 import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply/ActiveMessageReplyProvider"
 import { MessageDataToSend } from "@/app/interfaces/conversations"
+import { Template } from "@/app/interfaces/template"
+import { ChatTemplateList } from "../ChatTemplateList/ChatTemplateList"
 
-export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplates, newConversationPhone }: { conversationId: number, setSelectedFile: Function, setTemplates: Function, newConversationPhone?: string }) => {
+export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversationPhone }: { conversationId: number, setSelectedFile: Function, newConversationPhone?: string }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
     const [audio, setAudio] = useState<Blob | null>(null)
-    // @ts-ignore
     const { sendMessage, isLoading } = useMessage()
     const { userState } = useUser()
-    // @ts-ignore
     const { setActiveConversation } = useActiveConversation()
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
     const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
+    const [activeTemplateList, setActiveTemplateList] = useState(false);
+    const [templatesList, setTemplatesList] = useState<Template[]>([]);
 
     const handleSendMessage = async (type: string, data: any, resetData: Function) => {
         if (conversationId === -1) {
@@ -56,6 +58,16 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplate
         setActiveMessageReply(initialStateActiveMessageReply)
     }
 
+    useEffect(() => {
+        if (messageToSend.startsWith('*')) {
+            setActiveTemplateList(true);
+
+            getTemplates(userState.token, phoneId).then((res) => setTemplatesList(res.templates));
+        } else {
+            setActiveTemplateList(false);
+        }
+    }, [messageToSend]);
+
     return (
         <div className="p-5 border-t border-slate-200/60 dark:border-darkmode-400 transition-opacity duration-300">
             {activeMessageReply.conversation_id !== 0 &&
@@ -68,8 +80,12 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, setTemplate
                 </div>
             }
 
+            {activeTemplateList &&
+                <ChatTemplateList templatesList={templatesList} activeTemplateList={activeTemplateList} setActiveTemplateList={setActiveTemplateList} setMessageToSend={setMessageToSend} />
+            }
+
             <div className="flex items-center">
-                <MediaDropdown setSelectedFile={setSelectedFile} setTemplates={setTemplates} />
+                <MediaDropdown setSelectedFile={setSelectedFile} />
 
                 {audio ? (
                     <div className="audio-container w-full flex items-center border border-gray-200 px-2 bg-gray-100 rounded-lg">

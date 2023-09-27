@@ -7,7 +7,6 @@ import { MemoizedGenerateInitialsImage } from "@/app/utils/generateUserImage";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
 import { IconSearch } from "../Icons/IconSearch";
 import React from "react";
-import { Template } from "@/app/interfaces/template";
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
 import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
@@ -23,52 +22,20 @@ export const Chat = () => {
     const [highlightedText, setHighlightedText] = useState("");
     const [showPreview, setShowPreview] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [templates, setTemplates] = useState<Template[]>([]);
-    const [classifiedTemplates, setClassifiedTemplates] = useState<any[]>([]);
     const { activeConversationState, setActiveConversation } = useActiveConversation();
     const { userState } = useUser()
     const [updatedTags, setUpdatedTags] = useState<Tag[]>([])
     const { socketInstance } = useSocket();
 
     useEffect(() => {
-        if (!!templates.length) {
-            setClassifiedTemplates([]);
-
-            templates.forEach((item) => {
-                setClassifiedTemplates((prevTemplate) => {
-                    const isCategoryExist = prevTemplate.some(
-                        (template) => template.category === item.category
-                    );
-
-                    if (isCategoryExist) {
-                        const updatedArray = prevTemplate.map((template) =>
-                            template.category === item.category
-                                ? { ...template, data: [...template.data, item] }
-                                : template
-                        );
-                        return updatedArray;
-                    } else {
-                        const newCategoryData = {
-                            category: item.category,
-                            data: [item],
-                        };
-                        return [...prevTemplate, newCategoryData];
-                    }
-                });
-            });
-        }
-    }, [templates]);
-
-    useEffect(() => {
-        if (selectedFile !== null || !!templates.length) {
+        if (selectedFile !== null) {
             setShowPreview(true);
         }
-    }, [selectedFile, templates]);
+    }, [selectedFile]);
 
     useEffect(() => {
         if (!showPreview) {
             setSelectedFile(null);
-            setTemplates([]);
         }
     }, [showPreview]);
 
@@ -119,6 +86,10 @@ export const Chat = () => {
             handleSearchTextChange();
         }
     };
+
+    const handleClosePreview = () => {
+        setShowPreview(false);
+    }
 
     return (
         <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
@@ -177,10 +148,10 @@ export const Chat = () => {
                                 <ListMessages highlightedText={highlightedText} />
 
                                 {showPreview && (
-                                    <ConversationPreview selectedFile={selectedFile} classifiedTemplates={classifiedTemplates} conversationId={activeConversationState.id} setShowPreview={setShowPreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                    <ConversationPreview selectedFile={selectedFile} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
                                 )}
 
-                                <ChatBottomSection conversationId={activeConversationState.id} setSelectedFile={setSelectedFile} setTemplates={setTemplates} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                <ChatBottomSection conversationId={activeConversationState.id} setSelectedFile={setSelectedFile} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
                             </div>
                         </> :
                         <div className='h-full w-full flex justify-center items-center'>

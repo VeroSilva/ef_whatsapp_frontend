@@ -3,11 +3,10 @@ import { IconDocument } from "../../Icons/IconDocument";
 import { IconImage } from "../../Icons/IconImage";
 import { IconPaperClip } from "../../Icons/IconPaperClip";
 import { IconTemplates } from "../../Icons/IconTemplates";
-import { getTemplates } from "@/app/services/api";
 import useUser from "../../../hooks/useUser";
 import { usePathname } from "next/navigation";
 
-export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFile: Function, setTemplates: Function }) => {
+export const MediaDropdown = ({ setSelectedFile }: { setSelectedFile: Function }) => {
     const imageInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -41,10 +40,6 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
         }
     };
 
-    const handleClickTemplates = () => {
-        getTemplates(userState.token, phoneId).then((res) => setTemplates(res.templates))
-    }
-
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
     }
@@ -63,14 +58,6 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
 
     const handleFileIconLeave = () => {
         setShowDocumentSpan(false);
-    };
-
-    const handleTemplatesIconHover = () => {
-        setShowTemplatesSpan(true);
-    };
-
-    const handleTemplatesIconLeave = () => {
-        setShowTemplatesSpan(false);
     };
 
     useEffect(() => {
@@ -108,25 +95,6 @@ export const MediaDropdown = ({ setSelectedFile, setTemplates }: { setSelectedFi
                 <ul
                     className="absolute bottom-0 mb-14"
                 >
-                    <li className="my-2">
-                        <label htmlFor="file-input" id="file-label-2" className="flex">
-                            <button
-                                className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 shadow p-2 cursor-pointer"
-                                onMouseEnter={handleTemplatesIconHover}
-                                onMouseLeave={handleTemplatesIconLeave}
-                                onClick={handleClickTemplates}
-                            >
-                                <IconTemplates classes="w-8 h-8 text-slate-100" />
-                            </button>
-
-                            {showTemplatesSpan && (
-                                <span className="flex items-center justify-center bg-slate-100 p-2 block rounded shadow float-left w-[150px] ml-3">
-                                    Templates
-                                </span>
-                            )}
-                        </label>
-                    </li>
-
                     <li className="my-2">
                         <label htmlFor="file-input-image" id="file-label" className="flex">
                             <button
