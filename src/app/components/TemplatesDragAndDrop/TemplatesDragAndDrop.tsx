@@ -149,31 +149,34 @@ const TemplatesDragAndDrop = () => {
         if (!(templatesState.length === 1 && templatesState[0].id === 0)) {
             getFlows(userState.token, phoneId).then((res) => {
                 res.map((item) => {
-                    const template = templatesState.find(template => template.id === item.template_data.template.id);
-                    const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
+                    const template = templatesState.find(tmpl => tmpl.id === item.template_data.template.id);
 
-                    setNodes((oldNodes) => [
-                        ...oldNodes,
-                        {
-                            id,
-                            position,
-                            type,
-                            data: {
-                                template,
+                    if (template) {
+                        const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
+
+                        setNodes((oldNodes) => [
+                            ...oldNodes,
+                            {
+                                id,
+                                position,
+                                type,
+                                data: {
+                                    template,
+                                }
                             }
-                        }
-                    ])
+                        ])
 
-                    setEdges((oldEdges) => [
-                        ...oldEdges,
-                        {
-                            id: item.id,
-                            source: sourceEdgeId,
-                            sourceHandle: item.sourceHandle,
-                            target: targetEdgeId,
-                            targetHandle: item.targetHandle
-                        }
-                    ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
+                            }
+                        ])
+                    }
                 })
             })
         }
