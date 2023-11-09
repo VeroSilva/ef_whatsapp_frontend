@@ -81,7 +81,7 @@ export const ChatTemplateList = ({ templatesList, activeTemplateList, setActiveT
             </div>
 
             {showPreview &&
-                <ConversationPreview template={selectedTemplate} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} />
+                <ConversationPreview template={selectedTemplate} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
             }
         </>
     )
