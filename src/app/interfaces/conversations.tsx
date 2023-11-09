@@ -46,6 +46,23 @@ export interface MessageDetail {
     response_to?: string,
     text?: string,
     caption?: string
+    json?: Json
+}
+
+export interface Json {
+    action?: JsonAction,
+    body?: JsonObject,
+    footer?: JsonObject,
+    header?: JsonObject
+}
+
+export interface JsonObject {
+    text?: string
+    type?: string
+}
+
+export interface JsonAction {
+    sections: any
 }
 
 export interface Message {

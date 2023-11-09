@@ -10,6 +10,7 @@ import ReactAudioPlayer from "react-audio-player"
 import { IconDocument } from "../../Icons/IconDocument"
 import { IconLink } from "../../Icons/IconLink"
 import useActiveConversation from "../../../hooks/useActiveConversation";
+import { MessageInteractive } from "./MessageInteractive/MessageInteractive"
 
 export const MessageContent = ({ message, handleOpenModal, setModalImage, highlightedText, isReply }:
     { message: Message | null | undefined, handleOpenModal?: Function, setModalImage?: Function, highlightedText?: string, isReply: boolean }) => {
@@ -193,6 +194,8 @@ export const MessageContent = ({ message, handleOpenModal, setModalImage, highli
                                     isReply ? <TemplateReply template={message.message.template} /> : <TemplateMessage message={message.message.template} />
                                     : message?.message_type === "button" ?
                                         <p>{message?.message.text}</p>
-                                        : <>{message?.message_type}</>
+                                        : message?.message_type === "interactive" ?
+                                            <MessageInteractive message={message.message} />
+                                            : <>{message?.message_type} !!!!</>
     )
 }
