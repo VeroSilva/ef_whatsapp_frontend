@@ -137,7 +137,28 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 replied_message: null,
             };
         });
-        setUpdatedMessages(newMessages);
+
+        setUpdatedMessages(() => {
+            const mensajesConFecha = newMessages.map((mensaje) => {
+                return {
+                    ...mensaje,
+                    created_at: new Date(Number(mensaje.created_at) * 1000),
+                };
+            });
+            const mensajesOrdenados = mensajesConFecha.sort((a, b) => (a.created_at.getTime() - b.created_at.getTime()));
+            const mensajesAgrupados: any = {};
+
+            mensajesOrdenados.forEach((mensaje) => {
+                const fecha = mensaje.created_at.toISOString().split('T')[0];
+                if (!mensajesAgrupados[fecha]) {
+                    mensajesAgrupados[fecha] = [];
+                }
+                mensajesAgrupados[fecha].push(mensaje);
+            });
+
+            return mensajesAgrupados
+        });
+
         Scroll(false);
     }, [messages]);
 
@@ -199,20 +220,27 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     return (
         <>
             <div ref={messagesContainerRef} className="flex flex-col overflow-y-auto px-5 pt-5 flex-1 h-full">
-                {updatedMessages.map((message, index) =>
-                    message.message_type !== "reaction" ? (
-                        <MemoizedMessage
-                            key={message.id}
-                            message={message}
-                            reaction={reactions.filter(
-                                (reaction: Reaction) => reaction.waId === message.message?.id_whatsapp
-                            )}
-                            handleOpenModal={handleOpenModal}
-                            setModalImage={setModalImage}
-                            highlightedText={highlightedText}
-                        />
-                    ) : null
-                )}
+                {Object.keys(updatedMessages).map((fecha) => (
+                    <div key={fecha}>
+                        <div className="w-full flex justify-center">
+                            <span className="bg-slate-300 p-2 block rounded my-4 font-medium">{fecha}</span>
+                        </div>
+
+                        {/* @ts-ignore */}
+                        {updatedMessages[fecha].map((message) => (
+                            <MemoizedMessage
+                                key={`message-${message.id}`}
+                                message={message}
+                                reaction={reactions.filter(
+                                    (reaction: Reaction) => reaction.waId === message.message?.id_whatsapp
+                                )}
+                                handleOpenModal={handleOpenModal}
+                                setModalImage={setModalImage}
+                                highlightedText={highlightedText}
+                            />
+                        ))}
+                    </div>
+                ))}
             </div>
 
             <Modal
