@@ -11,6 +11,7 @@ import { IconDocument } from "../../Icons/IconDocument"
 import { IconLink } from "../../Icons/IconLink"
 import useActiveConversation from "../../../hooks/useActiveConversation";
 import { MessageInteractive } from "./MessageInteractive/MessageInteractive"
+import { MessageOrder } from "./MessageOrder/MessageOrder"
 
 export const MessageContent = ({ message, handleOpenModal, setModalImage, highlightedText, isReply }:
     { message: Message | null | undefined, handleOpenModal?: Function, setModalImage?: Function, highlightedText?: string, isReply: boolean }) => {
@@ -196,6 +197,8 @@ export const MessageContent = ({ message, handleOpenModal, setModalImage, highli
                                         <p>{message?.message.text}</p>
                                         : message?.message_type === "interactive" ?
                                             <MessageInteractive message={message.message} />
-                                            : <>{message?.message_type} !!!!</>
+                                            : message?.message_type === "order" ?
+                                                <MessageOrder message={message.message} />
+                                                : <>{message?.message_type} !!!!</>
     )
 }
