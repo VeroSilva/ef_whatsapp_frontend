@@ -22,11 +22,18 @@ const nextConfig = {
       "kinsta.com",
       "api.efperfumes.com",
       "wa.efperfumes.com",
+      "vzla.efperfumes.com",
     ],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "efperfumes.com",
+        port: "",
+        pathname: "/wp-content/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "vzla.efperfumes.com",
         port: "",
         pathname: "/wp-content/uploads/**",
       },
