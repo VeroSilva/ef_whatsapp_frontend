@@ -5,9 +5,9 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
         reader.onloadend = () => {
             const base64String = reader.result as string;
             const fileName = blob.name || 'file';
-            const base64StringWithFileName = `data:${blob.type};name=${encodeURIComponent(fileName)};base64,${base64String}`;
+            // const base64StringWithFileName = `data:${blob.type};name=${encodeURIComponent(fileName)};base64,${base64String}`;
 
-            resolve(base64StringWithFileName);
+            resolve(base64String);
         };
 
         reader.onerror = reject;
