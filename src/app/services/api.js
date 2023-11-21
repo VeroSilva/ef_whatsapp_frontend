@@ -431,3 +431,20 @@ export const updateFlows = async (token, company_phone_id, data) => {
 
   return response;
 };
+
+export const getCatalog = async (token, company_phone_id) => {
+  const response = await fetch(
+    `${process.env.API_URL}/catalog/${company_phone_id}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};

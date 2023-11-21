@@ -24,11 +24,12 @@ import useTemplatesToSend from '../../hooks/useTemplatesToSend'
 import useUser from "../../hooks/useUser"
 import useTemplates from "../../hooks/useTemplates"
 import { usePathname } from "next/navigation"
-import { getFlows, updateFlows } from '@/app/services/api';
+import { getFlows, updateFlows, getCatalog } from '@/app/services/api';
 import { uniqueIdGenerator } from '@/app/utils/functions';
 import { IconCheckCircle } from '../Icons/IconCheckCircle';
 import { IconInfo } from '../Icons/IconInfo';
 import { dataMessageToSend } from "@/app/utils/messages"
+import useCatalog from "../../hooks/useCatalog"
 
 const initialNodes = [
     { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
@@ -60,6 +61,7 @@ const TemplatesDragAndDrop = () => {
         message: "",
         show: false
     });
+    const { setCatalogState, catalogState } = useCatalog();
     const [messages, setMessages] = useState([])
     const [images, setImages] = useState([])
     const [videos, setVideos] = useState([])
@@ -332,6 +334,10 @@ const TemplatesDragAndDrop = () => {
     }, [edges, templatesToSendState, nodes, messages, images, videos, audios]);
 
     useEffect(() => {
+        getCatalog(userState.token, phoneId).then((res) => {
+            setCatalogState(res.catalog)
+        })
+
         if (!(templatesState.length === 1 && templatesState[0].id === 0)) {
             getFlows(userState.token, phoneId).then((res) => {
                 res.map((item) => {

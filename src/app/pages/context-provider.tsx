@@ -7,6 +7,7 @@ import { ActiveMessageReplyProvider } from '../context/activeMessageReply/Active
 import { TemplatesProvider } from '../context/templates/TemplatesProvider'
 import { TemplatesToSendProvider } from '../context/templatesToSend/TemplatesToSendProvider';
 import { ChatReadProvider } from '../context/chatsRead/ChatsReadProvider';
+import { CatalogProvider } from '../context/catalog/CatalogProvider';
 import { SocketProvider } from '../context/socket/SocketContext';
 
 interface ThemeProviderProps {
@@ -20,11 +21,13 @@ export default function ContextProvider({ children }: ThemeProviderProps) {
         <ActiveConversationProvider>
           <ActiveMessageReplyProvider>
             <TemplatesProvider>
-              <TemplatesToSendProvider>
-                <ChatReadProvider>
-                  {children}
-                </ChatReadProvider>
-              </TemplatesToSendProvider>
+              <CatalogProvider>
+                <TemplatesToSendProvider>
+                  <ChatReadProvider>
+                    {children}
+                  </ChatReadProvider>
+                </TemplatesToSendProvider>
+              </CatalogProvider>
             </TemplatesProvider>
           </ActiveMessageReplyProvider>
         </ActiveConversationProvider>
