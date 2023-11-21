@@ -22,10 +22,11 @@ const Sidebar = ({ handleSaveFlow, loadingSave }: { handleSaveFlow: () => void, 
         show: false
     });
 
-    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string, template: any) => {
+    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string, template?: any) => {
         event.dataTransfer.setData('application/reactflow', nodeType);
-        event.dataTransfer.setData('template', JSON.stringify(template));
         event.dataTransfer.effectAllowed = 'move';
+
+        if (nodeType === "templateNode") event.dataTransfer.setData('template', JSON.stringify(template));
     };
 
     const handleImportTemplates = () => {
@@ -60,12 +61,20 @@ const Sidebar = ({ handleSaveFlow, loadingSave }: { handleSaveFlow: () => void, 
                     {templatesState &&
                         templatesState.map((template, index) => {
                             return (
-                                <div key={index} className="dndnode" onDragStart={(event) => onDragStart(event, 'default', template)} draggable>
+                                <div key={index} className="dndnode" onDragStart={(event) => onDragStart(event, 'templateNode', template)} draggable>
                                     {template.name}
                                 </div>
                             )
                         })
                     }
+
+                    <div className="dndnode" onDragStart={(event) => onDragStart(event, 'textNode')} draggable>Texto</div>
+
+                    <div className="dndnode" onDragStart={(event) => onDragStart(event, 'imageNode')} draggable>Imagen</div>
+
+                    <div className="dndnode" onDragStart={(event) => onDragStart(event, 'videoNode')} draggable>Vídeo</div>
+
+                    <div className="dndnode" onDragStart={(event) => onDragStart(event, 'audioNode')} draggable>Audio</div>
                 </div>
 
                 <div className="actions-container flex flex-col	gap-4">

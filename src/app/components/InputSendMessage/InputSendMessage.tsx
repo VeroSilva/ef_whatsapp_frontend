@@ -25,8 +25,7 @@ export const InputSendMessage = ({ handleSendMessage, setMessageToSend, messageT
                 onChange={(e) => setMessageToSend(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e)}
             ></textarea>
-            <EmojiDropdown setMessageToSend={setMessageToSend} messageToSend={messageToSend} />
+            <EmojiDropdown setMessageToSend={setMessageToSend} messageToSend={messageToSend} containerStyles="absolute top-0 bottom-0 right-5 w-9 h-9 my-[auto] mx-0" emojiStyles="w-9 h-9 text-teal-600" />
         </div>
-
     )
 }

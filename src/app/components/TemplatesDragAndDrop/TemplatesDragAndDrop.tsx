@@ -15,6 +15,10 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
 import TemplateNode from './CustomNodes/TemplateNode.tsx';
+import TextNode from './CustomNodes/TextNode.tsx';
+import ImageNode from './CustomNodes/ImageNode.tsx';
+import VideoNode from './CustomNodes/VideoNode.tsx';
+import AudioNode from './CustomNodes/AudioNode.tsx';
 import './index.scss';
 import useTemplatesToSend from '../../hooks/useTemplatesToSend'
 import useUser from "../../hooks/useUser"
@@ -24,12 +28,19 @@ import { getFlows, updateFlows } from '@/app/services/api';
 import { uniqueIdGenerator } from '@/app/utils/functions';
 import { IconCheckCircle } from '../Icons/IconCheckCircle';
 import { IconInfo } from '../Icons/IconInfo';
+import { dataMessageToSend } from "@/app/utils/messages"
 
 const initialNodes = [
     { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
 ];
 
-const nodeTypes = { templateNode: TemplateNode };
+const nodeTypes = {
+    templateNode: TemplateNode,
+    textNode: TextNode,
+    imageNode: ImageNode,
+    videoNode: VideoNode,
+    audioNode: AudioNode,
+};
 
 const TemplatesDragAndDrop = () => {
     const reactFlowWrapper = useRef(null);
@@ -43,25 +54,83 @@ const TemplatesDragAndDrop = () => {
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
     const { templatesState } = useTemplates();
-    const [loadingSave, setLoadingSave] = useState(false)
+    const [loadingSave, setLoadingSave] = useState(false);
     const [alert, setAlert] = useState({
         type: "",
         message: "",
         show: false
     });
+    const [messages, setMessages] = useState([])
+    const [images, setImages] = useState([])
+    const [videos, setVideos] = useState([])
+    const [audios, setAudios] = useState([])
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     }, []);
+    const handleMessagesChange = (id, text) => {
+        setMessages(prevMessages => {
+            const existingMessageIndex = prevMessages.findIndex(message => message.id === id);
 
+            if (existingMessageIndex !== -1) {
+                return prevMessages.map((message, index) =>
+                    index === existingMessageIndex ? { ...message, text } : message
+                );
+            } else {
+                const messageId = id || generateUniqueId();
+                return [...prevMessages, { id: messageId, text }];
+            }
+        });
+    }
+    const handleImagesChange = (id, image) => {
+        setImages(prevImages => {
+            const existingImageIndex = prevImages.findIndex(img => img.id === id);
+
+            if (existingImageIndex !== -1) {
+                return prevImages.map((img, index) =>
+                    index === existingImageIndex ? { ...img, image } : img
+                );
+            } else {
+                const imageId = id || generateUniqueId();
+                return [...prevImages, { id: imageId, image }];
+            }
+        });
+    }
+    const handleVideosChange = (id, video) => {
+        setVideos(prevVideos => {
+            const existingImageIndex = prevVideos.findIndex(vid => vid.id === id);
+
+            if (existingImageIndex !== -1) {
+                return prevVideos.map((vid, index) =>
+                    index === existingImageIndex ? { ...vid, video } : vid
+                );
+            } else {
+                const videoId = id || generateUniqueId();
+                return [...prevVideos, { id: videoId, video }];
+            }
+        });
+    }
+    const handleAudiosChange = (id, audio) => {
+        setAudios(prevAudios => {
+            const existingAudioIndex = prevAudios.findIndex(vid => vid.id === id);
+
+            if (existingAudioIndex !== -1) {
+                return prevAudios.map((aud, index) =>
+                    index === existingAudioIndex ? { ...aud, audio } : aud
+                );
+            } else {
+                const audioId = id || generateUniqueId();
+                return [...prevAudios, { id: audioId, audio }];
+            }
+        });
+    }
     const onDrop = useCallback(
         (event) => {
             event.preventDefault();
 
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
             const type = event.dataTransfer.getData('application/reactflow');
-            const templateData = JSON.parse(event.dataTransfer.getData('template'));
 
             // check if the dropped element is valid
             if (typeof type === 'undefined' || !type) {
@@ -75,10 +144,39 @@ const TemplatesDragAndDrop = () => {
 
             const newNode = {
                 id: uniqueIdGenerator(),
-                type: 'templateNode',
+                type: type,
                 position,
-                data: { template: templateData },
             };
+
+            if (type === "templateNode") {
+                const templateData = JSON.parse(event.dataTransfer.getData('template'));
+
+                newNode.data = { template: templateData }
+            } else if (type === "textNode") {
+                newNode.data = {
+                    savedMessage: "",
+                    handleMessagesChange,
+                    id: newNode.id
+                }
+            } else if (type === "imageNode") {
+                newNode.data = {
+                    savedImage: "",
+                    handleImagesChange,
+                    id: newNode.id
+                }
+            } else if (type === "videoNode") {
+                newNode.data = {
+                    savedVideo: "",
+                    handleVideosChange,
+                    id: newNode.id
+                }
+            } else if (type === "audioNode") {
+                newNode.data = {
+                    savedAudio: "",
+                    handleAudiosChange,
+                    id: newNode.id
+                }
+            }
 
             setNodes((nds) => nds.concat(newNode));
         },
@@ -96,7 +194,6 @@ const TemplatesDragAndDrop = () => {
         (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
     );
-
     const handleSaveFlow = () => {
         setLoadingSave(true)
         updateFlows(userState.token, phoneId, jsonToSend).then((res) => {
@@ -115,44 +212,150 @@ const TemplatesDragAndDrop = () => {
         if (templatesToSendState.length > 1) {
             const jsonData = [];
 
-            edges.map((edge) => {
+            edges.map(async (edge) => {
                 const { id: edgeID, source, sourceHandle, target, targetHandle } = edge
                 const targetNode = nodes.filter((node) => node.id === target)[0]
                 const sourceNode = nodes.filter((node) => node.id === source)[0]
-                const templateData = templatesToSendState.filter((t) => t.id === targetNode.data.template.id)[0]
 
-                jsonData.push({
-                    id: edgeID,
-                    source: sourceNode.data.template ? sourceNode.data.template.name : "client-message",
-                    sourceHandle: sourceHandle ?? "manually",
-                    target: targetNode.data.template.name,
-                    targetHandle: targetHandle,
-                    template_data: {
-                        type: "template",
-                        template: templateData
-                    },
-                    node: {
-                        position: targetNode.position,
-                        type: 'templateNode',
-                        id: targetNode.id,
-                        targetEdgeId: target,
-                        sourceEdgeId: source
+                if (targetNode.type === "templateNode") {
+                    const templateData = templatesToSendState.filter((t) => t.id === targetNode.data.template.id)[0]
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.data.template.name,
+                        targetHandle: targetHandle,
+                        template_data: {
+                            type: "template",
+                            template: templateData
+                        },
+                        node: {
+                            position: targetNode.position,
+                            type: 'templateNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
                     }
-                })
+
+                    jsonData.push(data)
+                } else if (targetNode.type === "textNode") {
+                    const currentMessage = messages.filter((message) => message.id === targetNode.id)[0]
+                    const dataToSend = currentMessage ? await dataMessageToSend({ type: "text", data: currentMessage.text }) : {}
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.id,
+                        targetHandle: targetHandle,
+                        template_data: dataToSend,
+                        node: {
+                            position: targetNode.position,
+                            type: 'textNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
+                    }
+
+                    jsonData.push(data)
+                } else if (targetNode.type === "imageNode") {
+                    const currentImage = images.filter((img) => img.id === targetNode.id)[0]
+                    const dataToSend = currentImage ? await dataMessageToSend({ type: "image", data: { content: currentImage.image, caption: "" } }) : {}
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.id,
+                        targetHandle: targetHandle,
+                        template_data: dataToSend,
+                        node: {
+                            position: targetNode.position,
+                            type: 'imageNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
+                    }
+
+                    jsonData.push(data)
+                } else if (targetNode.type === "videoNode") {
+                    const currentVideo = videos.filter((video) => video.id === targetNode.id)[0]
+                    const dataToSend = currentVideo ? await dataMessageToSend({ type: "video", data: { content: currentVideo.video, caption: "" } }) : {}
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.id,
+                        targetHandle: targetHandle,
+                        template_data: dataToSend,
+                        node: {
+                            position: targetNode.position,
+                            type: 'videoNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
+                    }
+
+                    jsonData.push(data)
+                } else if (targetNode.type === "audioNode") {
+                    const currentAudio = audios.filter((audio) => audio.id === targetNode.id)[0]
+                    const dataToSend = currentAudio ? await dataMessageToSend({ type: "audio", data: currentAudio.audio }) : {}
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.id,
+                        targetHandle: targetHandle,
+                        template_data: dataToSend,
+                        node: {
+                            position: targetNode.position,
+                            type: 'audioNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
+                    }
+
+                    jsonData.push(data)
+                }
             })
 
             setJsonToSend(jsonData)
         }
-    }, [edges, templatesToSendState, nodes]);
+    }, [edges, templatesToSendState, nodes, messages, images, videos, audios]);
 
     useEffect(() => {
         if (!(templatesState.length === 1 && templatesState[0].id === 0)) {
             getFlows(userState.token, phoneId).then((res) => {
                 res.map((item) => {
-                    const template = templatesState.find(tmpl => tmpl.id === item.template_data.template.id);
+                    const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
 
-                    if (template) {
-                        const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
+                    if (item.template_data.hasOwnProperty('template')) {
+                        const template = templatesState.find(tmpl => tmpl.id === item.template_data.template.id);
+                        if (template) {
+                            setNodes((oldNodes) => [
+                                ...oldNodes,
+                                {
+                                    id,
+                                    position,
+                                    type,
+                                    data: {
+                                        template,
+                                    }
+                                }
+                            ])
+                        }
+                    }
+
+                    if (item.template_data.hasOwnProperty('text')) {
+                        handleMessagesChange(id, item.template_data.text.body)
 
                         setNodes((oldNodes) => [
                             ...oldNodes,
@@ -161,22 +364,78 @@ const TemplatesDragAndDrop = () => {
                                 position,
                                 type,
                                 data: {
-                                    template,
+                                    savedMessage: item.template_data.text.body,
+                                    handleMessagesChange,
+                                    id
                                 }
                             }
                         ])
+                    }
 
-                        setEdges((oldEdges) => [
-                            ...oldEdges,
+                    if (item.template_data.hasOwnProperty('image')) {
+                        handleImagesChange(id, item.template_data.image.data)
+
+                        setNodes((oldNodes) => [
+                            ...oldNodes,
                             {
-                                id: item.id,
-                                source: sourceEdgeId,
-                                sourceHandle: item.sourceHandle,
-                                target: targetEdgeId,
-                                targetHandle: item.targetHandle
+                                id,
+                                position,
+                                type,
+                                data: {
+                                    savedImage: item.template_data.image.data,
+                                    handleImagesChange,
+                                    id
+                                }
                             }
                         ])
                     }
+
+                    if (item.template_data.hasOwnProperty('video')) {
+                        handleVideosChange(id, item.template_data.video.data)
+
+                        setNodes((oldNodes) => [
+                            ...oldNodes,
+                            {
+                                id,
+                                position,
+                                type,
+                                data: {
+                                    savedVideo: item.template_data.video.data,
+                                    handleVideosChange,
+                                    id
+                                }
+                            }
+                        ])
+                    }
+
+                    if (item.template_data.hasOwnProperty('audio')) {
+                        handleAudiosChange(id, item.template_data.audio.data)
+
+                        setNodes((oldNodes) => [
+                            ...oldNodes,
+                            {
+                                id,
+                                position,
+                                type,
+                                data: {
+                                    savedAudio: item.template_data.audio.data,
+                                    handleAudiosChange,
+                                    id
+                                }
+                            }
+                        ])
+                    }
+
+                    setEdges((oldEdges) => [
+                        ...oldEdges,
+                        {
+                            id: item.id,
+                            source: sourceEdgeId,
+                            sourceHandle: item.sourceHandle,
+                            target: targetEdgeId,
+                            targetHandle: item.targetHandle
+                        }
+                    ])
                 })
             })
         }

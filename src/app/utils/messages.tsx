@@ -1,11 +1,24 @@
 import { Context } from "../interfaces/conversations";
-import { blobToBase64, dataURLtoMimeType } from "./blobToBase64";
+import { blobToBase64, dataURLtoMimeType, isBase64 } from "./blobToBase64";
 
 export const dataMessageToSend = async ({ type, data, context }: { type: string, data: any, context?: Context | null }) => {
     let dataTransformed;
 
     if (type !== "text" && type !== "template") {
-        dataTransformed = await blobToBase64(type === "audio" ? data : data.content);
+        if (type === "audio") {
+            if (typeof data === "string" && isBase64(data)) {
+                dataTransformed = data
+            } else {
+                dataTransformed = await blobToBase64(data);
+            }
+        } else {
+            if ((typeof data.content === "string" && isBase64(data.content))) {
+                dataTransformed = data.content
+            } else {
+                dataTransformed = await blobToBase64(data.content);
+            }
+        }
+
     } else {
         dataTransformed = (type === "text" || type === "template") ? data : data.content;
     }

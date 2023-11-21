@@ -34,7 +34,7 @@ export const ChatOptions = () => {
             setSelectedTags((prevOptions: Tag[]): Tag[] => [...prevOptions, tag])
         }
 
-        addTagToConversation(activeConversationState.id, tag.id, userState.token).then((res) => console.log(res))
+        addTagToConversation(activeConversationState.id, tag.id, userState.token)
     }
 
     const removeTag = (id: number) => {

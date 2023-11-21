@@ -47,8 +47,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         }
 
         const newMessageListener = (payload: any) => {
-            console.log("Evento 'new_message' recibido:", payload);
-
             if (phoneId.toString() === payload.data.conversation.company_phone_id) {
                 if (activeConversationState.id === payload.data.conversation.id) {
                     setMessages((currentMessages) => [...currentMessages, payload.data.message]);
@@ -59,8 +57,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         };
 
         const updateMessageListener = (payload: any) => {
-            console.log("Evento 'update_message' recibido:", payload);
-
             if (phoneId.toString() === payload.data.conversation.company_phone_id) {
                 setMessages(prevMessages => {
                     const messageIndex = prevMessages.findIndex(message => message.id === payload.data.message.id);

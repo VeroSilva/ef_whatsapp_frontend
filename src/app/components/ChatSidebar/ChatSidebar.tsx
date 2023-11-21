@@ -64,8 +64,6 @@ export const ChatSidebar = () => {
         }
 
         const updateConversationListener = (payload: any) => {
-            console.log("Evento 'update_conversation' recibido:", payload);
-
             if (payload.table === "messages" && payload.action === "insert") {
                 if (phoneId.toString() === payload.data.conversation.company_phone_id) {
                     setConversations(prevConversations => {
@@ -112,14 +110,10 @@ export const ChatSidebar = () => {
         }
 
         const newConversationListener = (payload: any) => {
-            console.log("Evento 'new_conversation' recibido:", payload);
-
             setConversations((prevConversations) => [payload.data, ...prevConversations]);
         }
 
         const conversationTagListener = (payload: any) => {
-            console.log("Evento 'conversation_tags' recibido:", payload);
-
             if (payload.data.tags) {
                 setConversations(prevConversations => {
                     const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.id);

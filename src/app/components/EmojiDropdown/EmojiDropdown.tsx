@@ -14,7 +14,7 @@ type EmojiTabProps = {
     label: ReactNode;
 };
 
-export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageToSend: Function, messageToSend: string }) => {
+export const EmojiDropdown = ({ setMessageToSend, messageToSend, containerStyles, emojiStyles }: { setMessageToSend: Function, messageToSend: string, containerStyles: string, emojiStyles: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState('smileys');
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -65,12 +65,12 @@ export const EmojiDropdown = ({ setMessageToSend, messageToSend }: { setMessageT
     );
 
     return (
-        <div ref={dropdownRef} className="absolute top-0 bottom-0 right-5 w-9 h-9 my-[auto] mx-0">
+        <div ref={dropdownRef} className={containerStyles}>
             <button
                 className="focus:outline-none me-2"
                 onClick={toggleDropdown}
             >
-                <IconSmile classes='w-9 h-9 text-teal-600' />
+                <IconSmile classes={emojiStyles} />
             </button>
             {isOpen && (
                 <div

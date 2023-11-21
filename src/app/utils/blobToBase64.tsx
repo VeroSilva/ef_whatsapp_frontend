@@ -1,14 +1,52 @@
 export const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
+
         reader.onloadend = () => {
             const base64String = reader.result as string;
-            resolve(base64String);
+            const fileName = blob.name || 'file';
+            const base64StringWithFileName = `data:${blob.type};name=${encodeURIComponent(fileName)};base64,${base64String}`;
+
+            resolve(base64StringWithFileName);
         };
+
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });
 };
+
+export function isBase64(str: string): boolean {
+    const base64Regex = /^data:([a-zA-Z0-9+/]+\/[a-zA-Z0-9-.+]+)(;name=.+)?;base64,(.+)$/;
+    const matchResult = str.match(base64Regex);
+
+    return !!matchResult && matchResult.length >= 3 && matchResult[3].length % 4 === 0;
+}
+
+export function base64ToFile(base64String: string): File | null {
+    const matchResult = base64String.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);name=(.+);base64,(.+)$/);
+
+    if (!matchResult) {
+        console.error('Invalid base64 string format');
+        return null;
+    }
+
+    const [, mimeType, fullFileName, base64Data] = matchResult;
+
+    const fileNameWithoutSuffix = fullFileName.replace(/;base64,.+$/, '');
+    const fileName = decodeURIComponent(fileNameWithoutSuffix);
+    const binaryString = atob(base64Data);
+
+    const uint8Array = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        uint8Array[i] = binaryString.charCodeAt(i);
+    }
+
+    const blob = new Blob([uint8Array], { type: mimeType || 'application/octet-stream' });
+
+    const file = new File([blob], fileName, { type: mimeType || 'application/octet-stream' });
+
+    return file;
+}
 
 export const dataURLtoMimeType = (dataURL: string): string | undefined => {
     const matches = dataURL.match(/^data:(.*?);base64/);
