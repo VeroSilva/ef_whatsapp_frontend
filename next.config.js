@@ -31,6 +31,12 @@ const nextConfig = {
         port: "",
         pathname: "/wp-content/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "vzla.efperfumes.com",
+        port: "",
+        pathname: "/wp-content/uploads/**",
+      },
     ],
   },
   // Configuración de TypeScript
