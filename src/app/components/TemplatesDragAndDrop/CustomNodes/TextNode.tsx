@@ -37,6 +37,7 @@ const TextNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
                         placeholder="Escribe tu mensaje"
                         value={localMessage}
                         onBlur={handleBlur}
+                        onChange={onChange}
                     ></textarea>
                     <EmojiDropdown setMessageToSend={setLocalMessage} messageToSend={localMessage} containerStyles="absolute top-0 bottom-0 right-2 w-6 h-6 my-[auto] mx-0" emojiStyles="w-6 h-6 text-teal-600" />
                 </div>
