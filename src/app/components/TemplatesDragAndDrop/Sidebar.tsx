@@ -75,6 +75,8 @@ const Sidebar = ({ handleSaveFlow, loadingSave }: { handleSaveFlow: () => void, 
                     <div className="dndnode" onDragStart={(event) => onDragStart(event, 'videoNode')} draggable>Vídeo</div>
 
                     <div className="dndnode" onDragStart={(event) => onDragStart(event, 'audioNode')} draggable>Audio</div>
+
+                    <div className="dndnode" onDragStart={(event) => onDragStart(event, 'interactiveNode')} draggable>Interactivo</div>
                 </div>
 
                 <div className="actions-container flex flex-col	gap-4">

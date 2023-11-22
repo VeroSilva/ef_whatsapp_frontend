@@ -4,7 +4,7 @@ import { blobToBase64, dataURLtoMimeType, isBase64 } from "./blobToBase64";
 export const dataMessageToSend = async ({ type, data, context }: { type: string, data: any, context?: Context | null }) => {
     let dataTransformed;
 
-    if (type !== "text" && type !== "template") {
+    if (type !== "text" && type !== "template" && type !== "interactive") {
         if (type === "audio") {
             if (typeof data === "string" && isBase64(data)) {
                 dataTransformed = data
@@ -20,7 +20,7 @@ export const dataMessageToSend = async ({ type, data, context }: { type: string,
         }
 
     } else {
-        dataTransformed = (type === "text" || type === "template") ? data : data.content;
+        dataTransformed = (type === "text" || type === "template" || type === "interactive") ? data : data.content;
     }
 
     const dataToSend = {
@@ -30,7 +30,7 @@ export const dataMessageToSend = async ({ type, data, context }: { type: string,
 
     if (context) dataToSend["context"] = context
 
-    if (type !== "text" && type !== "template") {
+    if (type !== "text" && type !== "template" && type !== "interactive") {
         const mimeType = dataURLtoMimeType(dataTransformed);
 
         if (mimeType) {
@@ -42,7 +42,7 @@ export const dataMessageToSend = async ({ type, data, context }: { type: string,
 
     if (type === "text") {
         dataToSend[type].body = dataTransformed;
-    } else if (type === "template") {
+    } else if (type === "template" || type === "interactive") {
         dataToSend[type] = dataTransformed;
     } else if (type === "document") {
         dataToSend[type].filename = data.content.name;

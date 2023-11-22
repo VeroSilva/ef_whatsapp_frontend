@@ -19,6 +19,7 @@ import TextNode from './CustomNodes/TextNode.tsx';
 import ImageNode from './CustomNodes/ImageNode.tsx';
 import VideoNode from './CustomNodes/VideoNode.tsx';
 import AudioNode from './CustomNodes/AudioNode.tsx';
+import InteractiveNode from './CustomNodes/InteractiveNode.tsx';
 import './index.scss';
 import useTemplatesToSend from '../../hooks/useTemplatesToSend'
 import useUser from "../../hooks/useUser"
@@ -41,6 +42,7 @@ const nodeTypes = {
     imageNode: ImageNode,
     videoNode: VideoNode,
     audioNode: AudioNode,
+    interactiveNode: InteractiveNode,
 };
 
 const TemplatesDragAndDrop = () => {
@@ -66,6 +68,7 @@ const TemplatesDragAndDrop = () => {
     const [images, setImages] = useState([])
     const [videos, setVideos] = useState([])
     const [audios, setAudios] = useState([])
+    const [interactives, setInteractives] = useState([])
 
     const onDragOver = useCallback((event) => {
         event.preventDefault();
@@ -127,6 +130,20 @@ const TemplatesDragAndDrop = () => {
             }
         });
     }
+    const handleInteractivesChange = (id, interactive) => {
+        setInteractives(prevInteractive => {
+            const existingInteractiveIndex = prevInteractive.findIndex(int => int.id === id);
+
+            if (existingInteractiveIndex !== -1) {
+                return prevInteractive.map((int, index) =>
+                    index === existingInteractiveIndex ? { ...int, interactive } : int
+                );
+            } else {
+                const interactiveId = id || generateUniqueId();
+                return [...prevInteractive, { id: interactiveId, interactive }];
+            }
+        });
+    }
     const onDrop = useCallback(
         (event) => {
             event.preventDefault();
@@ -176,6 +193,12 @@ const TemplatesDragAndDrop = () => {
                 newNode.data = {
                     savedAudio: "",
                     handleAudiosChange,
+                    id: newNode.id
+                }
+            } else if (type === "interactiveNode") {
+                newNode.data = {
+                    savedInteractive: {},
+                    handleInteractivesChange,
                     id: newNode.id
                 }
             }
@@ -326,12 +349,33 @@ const TemplatesDragAndDrop = () => {
                     }
 
                     jsonData.push(data)
+                } else if (targetNode.type === "interactiveNode") {
+                    const currentInteractive = interactives.filter((int) => int.id === targetNode.id)[0]
+                    const dataToSend = currentInteractive ? await dataMessageToSend({ type: "interactive", data: currentInteractive.interactive }) : {}
+
+                    const data = {
+                        id: edgeID,
+                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                        sourceHandle: sourceHandle ?? "manually",
+                        target: targetNode.id,
+                        targetHandle: targetHandle,
+                        template_data: dataToSend,
+                        node: {
+                            position: targetNode.position,
+                            type: 'interactiveNode',
+                            id: targetNode.id,
+                            targetEdgeId: target,
+                            sourceEdgeId: source
+                        }
+                    }
+
+                    jsonData.push(data)
                 }
             })
 
             setJsonToSend(jsonData)
         }
-    }, [edges, templatesToSendState, nodes, messages, images, videos, audios]);
+    }, [edges, templatesToSendState, nodes, messages, images, videos, audios, interactives]);
 
     useEffect(() => {
         getCatalog(userState.token, phoneId).then((res) => {
@@ -426,6 +470,24 @@ const TemplatesDragAndDrop = () => {
                                 data: {
                                     savedAudio: item.template_data.audio.data,
                                     handleAudiosChange,
+                                    id
+                                }
+                            }
+                        ])
+                    }
+
+                    if (item.template_data.hasOwnProperty('interactive')) {
+                        handleInteractivesChange(id, item.template_data.interactive)
+
+                        setNodes((oldNodes) => [
+                            ...oldNodes,
+                            {
+                                id,
+                                position,
+                                type,
+                                data: {
+                                    savedInteractive: item.template_data.interactive,
+                                    handleInteractivesChange,
                                     id
                                 }
                             }
