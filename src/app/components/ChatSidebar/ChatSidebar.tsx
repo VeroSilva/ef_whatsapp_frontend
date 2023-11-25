@@ -72,9 +72,8 @@ export const ChatSidebar = () => {
                         if (chatIndex !== -1) {
                             const updatedArray = [...prevConversations];
                             updatedArray[chatIndex] = payload.data.conversation;
-
                             return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
-                        } else if (!!filter.unread) {
+                        } else if (!!filter.unread && payload.data.conversation.unread_count > 0) {
                             return [...prevConversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
                         }
 
