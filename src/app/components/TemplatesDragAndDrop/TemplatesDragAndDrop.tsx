@@ -45,20 +45,31 @@ const TemplatesDragAndDrop = () => {
                 const phoneData = res?.company_phones?.filter((phone: any) => phone.company_phone_id === phoneId)[0]
 
                 phoneData?.flows?.forEach((flow: any, index: number) => {
-                    if (Number(flow.flow_id) !== 0) {
-                        const currentTag = tagsState.filter((tag) => tag.id === Number(flow.flow_id))[0]
+                    const flowId = Number(flow.flow_id);
 
-                        setTabs((prevTabs) => [
-                            ...prevTabs,
-                            {
-                                name: currentTag.name,
-                                id: flow.flow_id,
-                                initialNode: [
-                                    { id: `${flow.flow_id}-${currentTag.name}`, type: 'input', position: { x: 0, y: 0 }, data: { label: currentTag.name } }
-                                ],
-                                show: false
+                    if (flowId !== 0) {
+                        setTabs((prevTabs) => {
+                            if (prevTabs.some(tab => tab.id === flowId)) {
+                                return prevTabs;
                             }
-                        ])
+
+                            const currentTag = tagsState.find((tag) => tag.id === flowId);
+
+                            if (currentTag) {
+                                const newTab = {
+                                    name: currentTag.name,
+                                    id: flowId,
+                                    initialNode: [
+                                        { id: `${flowId}-${currentTag.name}`, type: 'input', position: { x: 0, y: 0 }, data: { label: currentTag.name } }
+                                    ],
+                                    show: false
+                                };
+
+                                return [...prevTabs, newTab];
+                            }
+
+                            return prevTabs;
+                        });
                     }
                 })
             })
