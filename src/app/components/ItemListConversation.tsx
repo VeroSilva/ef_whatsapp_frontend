@@ -85,11 +85,15 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             </div>
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">
-                    <a href="#" className="font-medium">
+                    <a href="#" className="font-medium overflow-hidden overflow-ellipsis whitespace-nowrap">
                         {highlightText(conversation.contact.name, filter)}
                     </a>
                     <div className="text-xs text-right text-slate-500 ml-auto whitespace-nowrap">
-                        <p className={(isUnread ? "text-teal-500 font-semibold" : "")}>{transformDate(conversation.message_created_at)}</p>
+                        <p className={(isUnread ? "text-teal-500 font-semibold" : "")}>
+                            <small>
+                                {transformDate(conversation.message_created_at)}
+                            </small>
+                        </p>
                         {
                             Math.floor((Date.now() - conversation.message_created_at * 1000) / (1000 * 60 * 60)) >= 24 && (
                                 <div className="group relative">

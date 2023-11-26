@@ -13,6 +13,7 @@ import newMessageAudio from '../../../../../sounds/receive.mp3';
 import { getMessagesByConversation } from '@/app/services/api';
 import { usePathname } from "next/navigation";
 import { useSocket } from '@/app/context/socket/SocketContext';
+import { convertDateFormatAndRelative } from '@/app/utils/transformDate';
 
 interface ActiveConversationProps {
     highlightedText: string
@@ -145,7 +146,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
             const mensajesAgrupados: any = {};
 
             mensajesOrdenados.forEach((mensaje) => {
-                const fecha = mensaje.created_at.toISOString().split('T')[0];
+                const fecha = mensaje.created_at.toLocaleString().split(',')[0];
                 if (!mensajesAgrupados[fecha]) {
                     mensajesAgrupados[fecha] = [];
                 }
@@ -219,7 +220,9 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
                 {Object.keys(updatedMessages).map((fecha) => (
                     <div key={fecha}>
                         <div className="w-full flex justify-center">
-                            <span className="bg-slate-300 p-2 block rounded my-4 font-medium">{fecha}</span>
+                            <span className="text-xs bg-slate-200 p-2 block rounded my-4 font-medium">
+                                {convertDateFormatAndRelative(fecha)}
+                            </span>
                         </div>
 
                         {/* @ts-ignore */}
