@@ -1,4 +1,4 @@
-import { convertEpochToDateTime } from "../../utils/transformDate";
+import { transformDate } from "../../utils/transformDate";
 import { IconCheck } from "../Icons/IconCheck";
 import { IconClock } from "../Icons/IconClock";
 import { IconDoubleCheck } from "../Icons/IconDoubleCheck";
@@ -41,9 +41,11 @@ const Message = ({ message, reaction, handleOpenModal, setModalImage, highlighte
 
                     {/* text reaction image audio document sticker video location */}
 
-                    <div className={"float-right relative " + (message.message_type === "sticker" ? "message-sticker-container " + (isFromClient ? "bg-slate-100" : "bg-emerald-100") : "")}>
+                    <div className={"float-right relative top-2" + (message.message_type === "sticker" ? "message-sticker-container " + (isFromClient ? "bg-slate-100" : "bg-emerald-100") : "")}>
                         <span className="mt-2 ms-2 text-xs text-slate-500">
-                            {convertEpochToDateTime(Number(message.created_at))}
+                            <small>
+                                {transformDate(Number(message.created_at))}
+                            </small>
                         </span>
 
                         {message.status !== "client" ? (
