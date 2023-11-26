@@ -10,7 +10,6 @@ interface TextUpdaterNodeProps {
 
 const ImageNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const [localImage, setLocalImage] = useState<string>("")
-    const [imageName, setImageName] = useState<string | undefined>("")
     const { savedImage, handleImagesChange, id } = data
     const imageInputRef = useRef<HTMLInputElement>(null)
 
@@ -25,17 +24,14 @@ const ImageNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
         if (file) {
             const encodedImgae = await blobToBase64(file)
-            setImageName(file.name)
             setLocalImage(encodedImgae)
             handleImagesChange(id, file)
         }
     };
 
     useEffect(() => {
-        const setImage = async (audio: string) => {
-            const decodedImage = await base64ToFile(audio)
-            setImageName(decodedImage?.name)
-            setLocalImage(audio)
+        const setImage = async (image: string) => {
+            setLocalImage(image)
         }
 
         if (savedImage !== "") {
@@ -68,7 +64,7 @@ const ImageNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
                 {localImage &&
                     <div className='bg-slate-200 rounded p-4'>
-                        {imageName}
+                        <span>Imagen seleccionado</span>
                     </div>
                 }
             </div>

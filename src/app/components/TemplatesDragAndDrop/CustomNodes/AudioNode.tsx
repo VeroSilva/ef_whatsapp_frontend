@@ -10,7 +10,6 @@ interface TextUpdaterNodeProps {
 
 const AudioNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const [localAudio, setLocalAudio] = useState<string>("")
-    const [audioName, setAudioName] = useState<string | undefined>("")
     const { savedAudio, handleAudiosChange, id } = data
     const inputAudioRef = useRef<HTMLInputElement>(null)
 
@@ -25,7 +24,6 @@ const AudioNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
         if (file) {
             const encodedAudio = await blobToBase64(file)
-            setAudioName(file.name)
             setLocalAudio(encodedAudio)
             handleAudiosChange(id, file)
         }
@@ -34,7 +32,6 @@ const AudioNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     useEffect(() => {
         const setAudio = async (audio: string) => {
             const decodedAudio = await base64ToFile(audio)
-            setAudioName(decodedAudio?.name)
             setLocalAudio(audio)
         }
 
@@ -68,7 +65,7 @@ const AudioNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
                 {localAudio &&
                     <div className='bg-slate-200 rounded p-4'>
-                        {audioName}
+                        <span>Audio seleccionado</span>
                     </div>
                 }
             </div>

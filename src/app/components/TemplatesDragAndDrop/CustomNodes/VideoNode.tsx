@@ -10,7 +10,6 @@ interface TextUpdaterNodeProps {
 
 const VideoNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const [localVideo, setLocalVideo] = useState<string>("")
-    const [videoName, setVideoName] = useState<string | undefined>("")
     const { savedVideo, handleVideosChange, id } = data
     const videoInputRef = useRef<HTMLInputElement>(null)
 
@@ -25,7 +24,6 @@ const VideoNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
         if (file) {
             const encodedVideo = await blobToBase64(file)
-            setVideoName(file.name)
             setLocalVideo(encodedVideo)
             handleVideosChange(id, file)
         }
@@ -34,7 +32,6 @@ const VideoNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     useEffect(() => {
         const setVideo = async (audio: string) => {
             const decodedVideo = await base64ToFile(audio)
-            setVideoName(decodedVideo?.name)
             setLocalVideo(audio)
         }
 
@@ -68,7 +65,7 @@ const VideoNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
                 {localVideo &&
                     <div className='bg-slate-200 rounded p-4'>
-                        {videoName}
+                        <span>Video seleccionado</span>
                     </div>
                 }
             </div>
