@@ -9,6 +9,7 @@ import { TemplatesToSendProvider } from '../context/templatesToSend/TemplatesToS
 import { ChatReadProvider } from '../context/chatsRead/ChatsReadProvider';
 import { CatalogProvider } from '../context/catalog/CatalogProvider';
 import { SocketProvider } from '../context/socket/SocketContext';
+import { TagsProvider } from '../context/tags/TagsProvider';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -21,13 +22,15 @@ export default function ContextProvider({ children }: ThemeProviderProps) {
         <ActiveConversationProvider>
           <ActiveMessageReplyProvider>
             <TemplatesProvider>
-              <CatalogProvider>
-                <TemplatesToSendProvider>
-                  <ChatReadProvider>
-                    {children}
-                  </ChatReadProvider>
-                </TemplatesToSendProvider>
-              </CatalogProvider>
+              <TagsProvider>
+                <CatalogProvider>
+                  <TemplatesToSendProvider>
+                    <ChatReadProvider>
+                      {children}
+                    </ChatReadProvider>
+                  </TemplatesToSendProvider>
+                </CatalogProvider>
+              </TagsProvider>
             </TemplatesProvider>
           </ActiveMessageReplyProvider>
         </ActiveConversationProvider>

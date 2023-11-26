@@ -11,6 +11,7 @@ export const INITIAL_STATE: User = {
   username: "",
   token: "",
   role: "3",
+  id: 0
 };
 
 export const LS_USER_ID = "userID";

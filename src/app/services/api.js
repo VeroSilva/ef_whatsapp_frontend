@@ -207,6 +207,20 @@ export const createUser = async (data, token) => {
   return response;
 };
 
+export const getUserById = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
 export const editUser = async (data, id, token) => {
   const response = await fetch(`${process.env.API_URL}/user/${id}`, {
     method: "PUT",
@@ -397,9 +411,9 @@ export const deletePhone = async (id, token) => {
   return response;
 };
 
-export const getFlows = async (token, company_phone_id) => {
+export const getFlows = async (token, company_phone_id, flow_id) => {
   const response = await fetch(
-    `${process.env.API_URL}/flow/${company_phone_id}`,
+    `${process.env.API_URL}/flow/${company_phone_id}/${flow_id}`,
     {
       method: "GET",
       headers: {

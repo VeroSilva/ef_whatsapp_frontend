@@ -38,6 +38,7 @@ export const LoginForm = () => {
                             token: d.token,
                             role: d.role,
                             company_phones: d.company_phones,
+                            id: d.id
                         })
 
                         setLoading(false)
