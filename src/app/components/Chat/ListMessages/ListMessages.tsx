@@ -146,7 +146,8 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
             const mensajesAgrupados: any = {};
 
             mensajesOrdenados.forEach((mensaje) => {
-                const fecha = mensaje.created_at.toLocaleString().split(',')[0];
+
+                const fecha = `${mensaje.created_at.getDate()}/${mensaje.created_at.getMonth() + 1}/${mensaje.created_at.getFullYear()}`;
                 if (!mensajesAgrupados[fecha]) {
                     mensajesAgrupados[fecha] = [];
                 }

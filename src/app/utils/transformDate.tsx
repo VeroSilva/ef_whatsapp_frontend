@@ -48,7 +48,7 @@ export function transformDate(timestamp: number): string {
 }
 
 export function convertDateFormatAndRelative(inputDate: string): string {
-  const [month, day, year] = inputDate.split("/");
+  const [day, month, year] = inputDate.split("/");
   const inputDateObj = new Date(+year, +month - 1, +day);
   const currentDate = new Date();
 
