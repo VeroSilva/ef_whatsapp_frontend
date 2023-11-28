@@ -99,35 +99,13 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
     return (
         <>
             <div className='mb-4'>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Body</label>
-
-                <textarea
-                    id="interactive-body"
-                    name="text"
-                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
-                    rows={2}
-                    placeholder="Body del mensaje"
-                    value={interactiveData.body.text}
-                    onChange={(e) => {
-                        setInteractiveData((prevInteractiveData: any) => ({
-                            ...prevInteractiveData,
-                            body: {
-                                ...prevInteractiveData.body,
-                                text: e.target.value
-                            }
-                        }));
-                    }}
-                />
-            </div>
-
-            <div className='mb-4'>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Título de sección</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Título</label>
 
                 <input
                     id="interactive-title"
                     name="text"
                     className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
-                    placeholder="Título de sección"
+                    placeholder="Título"
                     value={interactiveData.action.sections[0].title}
                     onChange={(e) => {
                         setInteractiveData((prevInteractiveData: any) => ({
@@ -140,6 +118,47 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
                                         product_items: prevInteractiveData.action.sections[0].product_items
                                     }
                                 ]
+                            }
+                        }));
+                    }}
+                />
+            </div>
+            <div className='mb-4'>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Subtítulo</label>
+
+                <input
+                    id="interactive-footer"
+                    name="text"
+                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
+                    placeholder="Subtítulo"
+                    value={interactiveData.header.text}
+                    onChange={(e) => {
+                        setInteractiveData((prevInteractiveData: any) => ({
+                            ...prevInteractiveData,
+                            header: {
+                                ...prevInteractiveData.header,
+                                text: e.target.value
+                            }
+                        }));
+                    }}
+                />
+            </div>
+            <div className='mb-4'>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Descripción</label>
+
+                <textarea
+                    id="interactive-body"
+                    name="text"
+                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
+                    rows={2}
+                    placeholder="Descripción del mensaje"
+                    value={interactiveData.body.text}
+                    onChange={(e) => {
+                        setInteractiveData((prevInteractiveData: any) => ({
+                            ...prevInteractiveData,
+                            body: {
+                                ...prevInteractiveData.body,
+                                text: e.target.value
                             }
                         }));
                     }}
@@ -173,40 +192,19 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
             </div>
 
             <div className='mb-4'>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Footer</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Pie de página</label>
 
                 <input
                     id="interactive-footer"
                     name="text"
                     className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
-                    placeholder="Footer del mensaje"
+                    placeholder="Pie de página"
                     value={interactiveData.footer.text}
                     onChange={(e) => {
                         setInteractiveData((prevInteractiveData: any) => ({
                             ...prevInteractiveData,
                             footer: {
                                 ...prevInteractiveData.footer,
-                                text: e.target.value
-                            }
-                        }));
-                    }}
-                />
-            </div>
-
-            <div className='mb-4'>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Header</label>
-
-                <input
-                    id="interactive-footer"
-                    name="text"
-                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
-                    placeholder="Header del mensaje"
-                    value={interactiveData.header.text}
-                    onChange={(e) => {
-                        setInteractiveData((prevInteractiveData: any) => ({
-                            ...prevInteractiveData,
-                            header: {
-                                ...prevInteractiveData.header,
                                 text: e.target.value
                             }
                         }));
