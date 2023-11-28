@@ -9,6 +9,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
     const [phoneData, setPhoneData] = useState({
         phone: "",
         company_id: "1",
+        catalog_id: "",
         wp_phone_id: "",
         waba_id: "",
         bussines_id: "",
@@ -19,12 +20,13 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
 
     useEffect(() => {
         if (data) {
-            const { phone, company_id, wp_phone_id, waba_id, bussines_id, wp_bearer_token, alias } = data;
+            const { phone, company_id, catalog_id, wp_phone_id, waba_id, bussines_id, wp_bearer_token, alias } = data;
 
             setPhoneData({
                 ...phoneData,
                 phone,
                 company_id,
+                catalog_id,
                 wp_phone_id,
                 waba_id,
                 bussines_id,
@@ -126,16 +128,16 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
                 />
             </div>
 
-            {/* <div className="relative">
+            <div className="relative">
                 <input
                     type="text"
                     id="input-group-1"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
-                    placeholder="ID Compañía"
-                    value={phoneData.company_id ?? ""}
-                    onChange={(e) => setPhoneData({ ...phoneData, company_id: e.target.value })}
+                    placeholder="Catálogo ID"
+                    value={phoneData.catalog_id ?? ""}
+                    onChange={(e) => setPhoneData({ ...phoneData, catalog_id: e.target.value })}
                 />
-            </div> */}
+            </div>
 
             <div className="relative">
                 <input
