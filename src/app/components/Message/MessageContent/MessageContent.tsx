@@ -24,17 +24,18 @@ export const MessageContent = ({ message, handleOpenModal, setModalImage, highli
     const handleGetMedia = useCallback(() => {
         setLoadingContent(true);
 
-        getMedia(userState.token, message?.message.url, activeConversationState.id)
-            .then((media) => {
-                setContent(media);
-            })
-            .catch((error) => {
-                console.error("Error fetching media:", error);
-            })
-            .finally(() => {
-                setLoadingContent(false);
-            });
-
+        if (message?.message.url) {
+            getMedia(userState.token, message?.message.url, activeConversationState.id)
+                .then((media) => {
+                    setContent(media);
+                })
+                .catch((error) => {
+                    console.error("Error fetching media:", error);
+                })
+                .finally(() => {
+                    setLoadingContent(false);
+                });
+        }
     }, [])
 
     useEffect(() => {
