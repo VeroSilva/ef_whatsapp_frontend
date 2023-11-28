@@ -130,9 +130,9 @@ const Users = (): JSX.Element => {
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
                                     Teléfono
                                 </th>
-                                {/* <th scope="col" className="px-6 py-3 text-center text-xs">
-                                    Compañía ID
-                                </th> */}
+                                <th scope="col" className="px-6 py-3 text-center text-xs">
+                                    Catálogo ID
+                                </th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
                                     <span className="flex items-center justify-center gap-1"><span><IconFacebook classes="w-4 h-4" /></span> Whatsapp teléfono ID</span>
                                 </th>
@@ -160,7 +160,7 @@ const Users = (): JSX.Element => {
                                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{index + 1}</th>
                                             <td className="px-6 py-4 text-center text-xs">{phone.phone}</td>
                                             <td className="px-6 py-4 text-center text-xs">{phone.alias}</td>
-                                            {/* <td className="px-6 py-4 text-center text-xs">{phone.company_id}</td> */}
+                                            <td className="px-6 py-4 text-center text-xs">{phone.catalog_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.wp_phone_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.waba_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.bussines_id}</td>

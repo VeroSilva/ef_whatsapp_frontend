@@ -100,7 +100,6 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
         <>
             <div className='mb-4'>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Título</label>
-
                 <input
                     id="interactive-title"
                     name="text"
@@ -144,14 +143,15 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
                 />
             </div>
             <div className='mb-4'>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Descripción</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">*Descripción</label>
 
                 <textarea
+                    required
                     id="interactive-body"
                     name="text"
                     className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
                     rows={2}
-                    placeholder="Descripción del mensaje"
+                    placeholder="*Descripción del mensaje"
                     value={interactiveData.body.text}
                     onChange={(e) => {
                         setInteractiveData((prevInteractiveData: any) => ({
@@ -168,7 +168,7 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
             <div className='mb-4'>
                 <div className='flex items-center'>
                     <label className="block text-gray-700 text-sm font-bold" htmlFor="interactive-body">
-                        Productos
+                        *Productos
                     </label>
                     <button
                         className='ml-2 rounded-md bg-gradient-to-r from-teal-400 to-emerald-500 shadow-lg py-1 px-4 cursor-pointer flex text-slate-100 text-xs'
@@ -211,6 +211,7 @@ export const MessageInteractive = ({ handleSetData, savedData }: { handleSetData
                     }}
                 />
             </div>
+            <small>Los campos con * son obligatorios</small>
 
             <Modal
                 title="Elije los productos"

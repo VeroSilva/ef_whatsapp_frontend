@@ -15,10 +15,7 @@ const InteractiveNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
         if (!!Object.keys(interactiveData).length) {
             if (
                 interactiveData.body.text !== "" &&
-                interactiveData.action.sections[0].title !== "" &&
-                !!interactiveData.action.sections[0].product_items.length &&
-                interactiveData.footer.text !== "" &&
-                interactiveData.header.text !== ""
+                !!interactiveData.action.sections[0].product_items.length
             ) return false
             else return true
         }
