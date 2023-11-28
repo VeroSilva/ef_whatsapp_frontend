@@ -14,6 +14,8 @@ export const MediaDropdown = ({ setSelectedFile, setPreviewType, setShowPreview 
     const [showProductsSpan, setShowProductsSpan] = useState<boolean>(false)
 
     const handleImageIconClick = () => {
+        setPreviewType("file")
+
         if (imageInputRef.current) {
             imageInputRef.current.click()
         }
@@ -25,6 +27,8 @@ export const MediaDropdown = ({ setSelectedFile, setPreviewType, setShowPreview 
     };
 
     const handleFileIconClick = () => {
+        setPreviewType("file")
+
         if (fileInputRef.current) {
             fileInputRef.current.click()
         }

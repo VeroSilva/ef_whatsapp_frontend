@@ -164,7 +164,8 @@ export const Chat = () => {
                                 {showPreview ?
                                     previewType === "file" ?
                                         <ConversationPreview type={previewType} selectedFile={selectedFile} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
-                                        : previewType === "interactive" ? <ConversationPreview type={previewType} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                        : previewType === "interactive" ?
+                                            <ConversationPreview type={previewType} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
                                             : null
                                     : null
                                 }
