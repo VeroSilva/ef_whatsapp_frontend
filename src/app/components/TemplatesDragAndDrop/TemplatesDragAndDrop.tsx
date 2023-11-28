@@ -19,7 +19,7 @@ const TemplatesDragAndDrop = () => {
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
-    const { setCatalogState, catalogState } = useCatalog();
+    const { setCatalogState } = useCatalog();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [tag, setTag] = useState<any>([])
     const [tabs, setTabs] = useState<any[]>([

@@ -19,7 +19,7 @@ import { MessageDataToSend } from "@/app/interfaces/conversations"
 import { Template } from "@/app/interfaces/template"
 import { ChatTemplateList } from "../ChatTemplateList/ChatTemplateList"
 
-export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversationPhone }: { conversationId: number, setSelectedFile: Function, newConversationPhone?: string }) => {
+export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversationPhone, setPreviewType, setShowPreview }: { conversationId: number, setSelectedFile: Function, newConversationPhone?: string, setPreviewType: Function, setShowPreview: Function }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
     const [audio, setAudio] = useState<Blob | null>(null)
     const { sendMessage, isLoading } = useMessage()
@@ -85,7 +85,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
             }
 
             <div className="flex items-center">
-                <MediaDropdown setSelectedFile={setSelectedFile} />
+                <MediaDropdown setSelectedFile={setSelectedFile} setPreviewType={setPreviewType} setShowPreview={setShowPreview} />
 
                 {audio ? (
                     <div className="audio-container w-full flex items-center border border-gray-200 px-2 bg-gray-100 rounded-lg">

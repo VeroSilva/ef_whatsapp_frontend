@@ -1,10 +1,10 @@
 import React, { useEffect } from "react"
 import { Template } from "@/app/interfaces/template"
 import { useState } from "react"
-import { TemplateDetail } from "./TemplateDetail/TemplateDetail"
-import { PreviewActions } from "../ConversationPreview/PreviewActions"
+import { TemplateDetail } from "../../../TemplateList/TemplateDetail/TemplateDetail"
+import { PreviewActions } from "../../PreviewActions"
 
-export const TemplateList = ({ template, handleSendMessage, isLoading, handleClosePreview }: { template: Template | undefined, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
+export const PreviewTemplate = ({ template, handleSendMessage, isLoading, handleClosePreview }: { template: Template | undefined, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
     const [isReadyToSend, setIsReadyToSend] = useState(false)
     const [templateToSend, setTemplateToSend] = useState<any>({
         name: "",

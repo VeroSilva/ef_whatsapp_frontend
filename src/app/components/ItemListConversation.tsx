@@ -144,7 +144,9 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                                                             <><IconTemplates classes='w-5 h-5 text-slate-500 inline-block' /> Template</> :
                                                             conversation.message_type === "button" ?
                                                                 <><IconReply classes='w-5 h-5 text-slate-500 inline-block' /> Respuesta template</> :
-                                                                <></>
+                                                                conversation.message_type === "interactive" ?
+                                                                    <span>Productos</span> :
+                                                                    <></>
                             //falta contact 
                         }
                     </div>

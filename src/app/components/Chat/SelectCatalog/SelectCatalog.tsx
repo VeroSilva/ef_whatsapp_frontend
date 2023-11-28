@@ -73,7 +73,7 @@ export const SelectCatalog = ({ handleChange, selectedOptions }: { handleChange:
             catalogState.map((product: any) => {
                 setOptions((prevState: ColourOption[]): ColourOption[] => [
                     ...prevState,
-                    { value: product.id, label: product.title, color: "#2dd4bf" },
+                    { value: product.g_id, label: product.title, color: "#2dd4bf" },
                 ]);
             })
         }

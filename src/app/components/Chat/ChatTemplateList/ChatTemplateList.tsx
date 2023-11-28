@@ -1,7 +1,7 @@
 import useActiveConversation from "@/app/hooks/useActiveConversation";
 import { Template } from "@/app/interfaces/template";
 import { useCallback, useEffect, useState } from "react";
-import { ConversationPreview } from "../../ConversationPreview/ConversationPreview"
+import { ConversationPreview } from "../../ConversationPreview/ConversationPreview/ConversationPreview"
 
 interface ChatTemplateListI {
     templatesList: Template[],
@@ -81,7 +81,7 @@ export const ChatTemplateList = ({ templatesList, activeTemplateList, setActiveT
             </div>
 
             {showPreview &&
-                <ConversationPreview template={selectedTemplate} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                <ConversationPreview type="template" template={selectedTemplate} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
             }
         </>
     )

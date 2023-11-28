@@ -1,17 +1,17 @@
 import Image from "next/image"
 import ReactPlayer from 'react-player'
 import ReactAudioPlayer from 'react-audio-player';
-import { IconDocument } from "../Icons/IconDocument";
-import { PreviewActions } from "./PreviewActions";
-import { getFileType } from "../../utils/fileType";
+import { IconDocument } from "../../../Icons/IconDocument";
+import { PreviewActions } from "../../PreviewActions";
+import { getFileType } from "../../../../utils/fileType";
 import { useEffect, useState } from "react";
-import { InputSendMessage } from "../InputSendMessage/InputSendMessage";
+import { InputSendMessage } from "../../../InputSendMessage/InputSendMessage";
 import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
-import { MessageContent } from "../Message/MessageContent/MessageContent";
-import { IconX } from "../Icons/IconX";
+import { MessageContent } from "../../../Message/MessageContent/MessageContent";
+import { IconX } from "../../../Icons/IconX";
 import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply/ActiveMessageReplyProvider";
 
-export const Preview = ({ file, handleSendMessage, isLoading, handleClosePreview }: { file: File, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
+export const PreviewFile = ({ file, handleSendMessage, isLoading, handleClosePreview }: { file: File | null | undefined, handleSendMessage: Function, isLoading: boolean, handleClosePreview: Function }) => {
     const [caption, setCaption] = useState("");
     const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
 
@@ -46,7 +46,7 @@ export const Preview = ({ file, handleSendMessage, isLoading, handleClosePreview
 
     return (
         <>
-            {file.type.startsWith('image/') ?
+            {file && file.type.startsWith('image/') ?
                 <Image
                     src={URL.createObjectURL(file)}
                     alt="Imagen seleccionada"
@@ -54,13 +54,13 @@ export const Preview = ({ file, handleSendMessage, isLoading, handleClosePreview
                     height={300}
                     className="object-cover rounded-md m-auto"
                 /> :
-                file.type.startsWith('video/') ?
+                file?.type.startsWith('video/') ?
                     <ReactPlayer
                         url={URL.createObjectURL(file)}
                         controls
                         height="90%"
                     /> :
-                    file.type.startsWith('audio/') ?
+                    file?.type.startsWith('audio/') ?
                         <div className="w-full h-full flex items-center justify-center">
                             <ReactAudioPlayer
                                 src={URL.createObjectURL(file)}
@@ -71,7 +71,7 @@ export const Preview = ({ file, handleSendMessage, isLoading, handleClosePreview
                         <div className="w-full h-full flex items-center justify-center">
                             <div className="document-card bg-slate-100 rounded-md shadow flex items-center p-5 w-auto">
                                 <IconDocument classes="w-8 h-8 text-teal-600" />
-                                <span className="text-teal-600">{file.name}</span>
+                                <span className="text-teal-600">{file?.name}</span>
                             </div>
                         </div>
             }

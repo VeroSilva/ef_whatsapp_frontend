@@ -7,13 +7,16 @@ import { MemoizedGenerateInitialsImage } from "@/app/utils/generateUserImage";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
 import { IconSearch } from "../Icons/IconSearch";
 import React from "react";
-import { ConversationPreview } from "../ConversationPreview/ConversationPreview";
+import { ConversationPreview } from "../ConversationPreview/ConversationPreview/ConversationPreview";
 import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
 import { SelectedTags } from "./SelectedTags/SelectedTags";
 import useUser from "@/app/hooks/useUser";
 import { Tag } from "@/app/interfaces/conversations";
 import { useSocket } from "@/app/context/socket/SocketContext";
+import { getCatalog } from "@/app/services/api";
+import useCatalog from '@/app/hooks/useCatalog';
+import { usePathname } from "next/navigation";
 
 export const Chat = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +28,12 @@ export const Chat = () => {
     const { activeConversationState, setActiveConversation } = useActiveConversation();
     const { userState } = useUser()
     const [updatedTags, setUpdatedTags] = useState<Tag[]>([])
+    const [previewType, setPreviewType] = useState<string>("")
     const { socketInstance } = useSocket();
+    const { setCatalogState } = useCatalog();
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     useEffect(() => {
         if (selectedFile !== null) {
@@ -70,6 +78,12 @@ export const Chat = () => {
             socket.off('conversation_tags', conversationTagListener);
         }
     }, [userState.token, activeConversationState.tags, socketInstance])
+
+    useEffect(() => {
+        getCatalog(userState.token, phoneId).then((res) => {
+            setCatalogState(res.catalog)
+        })
+    }, [])
 
     function handleSearchTextChange() {
         if (searchText !== '') {
@@ -147,11 +161,15 @@ export const Chat = () => {
 
                                 <ListMessages highlightedText={highlightedText} />
 
-                                {showPreview && (
-                                    <ConversationPreview selectedFile={selectedFile} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
-                                )}
+                                {showPreview ?
+                                    previewType === "file" ?
+                                        <ConversationPreview type={previewType} selectedFile={selectedFile} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                        : previewType === "interactive" ? <ConversationPreview type={previewType} conversationId={activeConversationState.id} handleClosePreview={handleClosePreview} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                            : null
+                                    : null
+                                }
 
-                                <ChatBottomSection conversationId={activeConversationState.id} setSelectedFile={setSelectedFile} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} />
+                                <ChatBottomSection conversationId={activeConversationState.id} setSelectedFile={setSelectedFile} newConversationPhone={activeConversationState.id === -1 ? activeConversationState.contact.phone : undefined} setPreviewType={setPreviewType} setShowPreview={setShowPreview} />
                             </div>
                         </> :
                         <div className='h-full w-full flex justify-center items-center'>

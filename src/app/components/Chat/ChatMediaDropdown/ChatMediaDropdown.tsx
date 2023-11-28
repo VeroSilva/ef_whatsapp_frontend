@@ -1,28 +1,27 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { IconDocument } from "../../Icons/IconDocument";
+import { IconShoppingCart } from "../../Icons/IconShoppingCart";
 import { IconImage } from "../../Icons/IconImage";
 import { IconPaperClip } from "../../Icons/IconPaperClip";
-import { IconTemplates } from "../../Icons/IconTemplates";
-import useUser from "../../../hooks/useUser";
-import { usePathname } from "next/navigation";
 
-export const MediaDropdown = ({ setSelectedFile }: { setSelectedFile: Function }) => {
+export const MediaDropdown = ({ setSelectedFile, setPreviewType, setShowPreview }: { setSelectedFile: Function, setPreviewType: Function, setShowPreview: Function }) => {
     const imageInputRef = useRef<HTMLInputElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showImageSpan, setShowImageSpan] = useState<boolean>(false)
     const [showDocumentSpan, setShowDocumentSpan] = useState<boolean>(false)
-    const [showTemplatesSpan, setShowTemplatesSpan] = useState<boolean>(false)
-    const { userState } = useUser()
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const [showProductsSpan, setShowProductsSpan] = useState<boolean>(false)
 
     const handleImageIconClick = () => {
         if (imageInputRef.current) {
             imageInputRef.current.click()
         }
+    };
+
+    const handleCartIconClick = () => {
+        setPreviewType("interactive")
+        setShowPreview(true)
     };
 
     const handleFileIconClick = () => {
@@ -60,6 +59,14 @@ export const MediaDropdown = ({ setSelectedFile }: { setSelectedFile: Function }
         setShowDocumentSpan(false);
     };
 
+    const handleCartIconHover = () => {
+        setShowProductsSpan(true);
+    };
+
+    const handleCartIconLeave = () => {
+        setShowProductsSpan(false);
+    };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -95,6 +102,34 @@ export const MediaDropdown = ({ setSelectedFile }: { setSelectedFile: Function }
                 <ul
                     className="absolute bottom-0 mb-14"
                 >
+                    <li className="my-2">
+                        <label htmlFor="file-input" id="file-label-2" className="flex">
+                            <button
+                                className="rounded-full bg-gradient-to-r from-teal-500 to-emerald-400 shadow p-2 cursor-pointer"
+                                onClick={handleCartIconClick}
+                                onMouseEnter={handleCartIconHover}
+                                onMouseLeave={handleCartIconLeave}
+                            >
+                                <IconShoppingCart classes="w-8 h-8 text-slate-100" />
+                            </button>
+
+                            {showProductsSpan && (
+                                <span className="flex items-center justify-center bg-slate-100 p-2 block rounded shadow float-left w-[150px] ml-3">
+                                    Productos
+                                </span>
+                            )}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="file-input"
+                            accept="image/jpeg, image/png, application/pdf, application/vnd.ms-powerpoint, application/vnd.ms-powerpoint, application/msword, application/msword, application/vnd.ms-excel, application/vnd.ms-excel, video/mp4, video/3gp, image/webp, audio/aac, audio/mp3, audio/mpeg, audio/amr, audio/ogg"
+                            style={{ display: "none" }}
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                        />
+                    </li>
+
                     <li className="my-2">
                         <label htmlFor="file-input-image" id="file-label" className="flex">
                             <button

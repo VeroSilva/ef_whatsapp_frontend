@@ -1,22 +1,24 @@
-import { TemplateList } from "../TemplateList/TemplateList"
-import { Preview } from "./Preview"
-import { useMessage } from "../../hooks/useMessage";
+import { PreviewTemplate } from "./Previews/PreviewTemplate"
+import { PreviewFile } from "./Previews/PreviewFile"
+import { useMessage } from "../../../hooks/useMessage";
 import { dataMessageToSend } from "@/app/utils/messages";
 import { createConversation } from "@/app/services/api";
 import useUser from "@/app/hooks/useUser";
-import useActiveConversation from "../../hooks/useActiveConversation";
+import useActiveConversation from "../../../hooks/useActiveConversation";
 import { usePathname } from "next/navigation";
 import { MessageDataToSend } from "@/app/interfaces/conversations";
 import useActiveMessageReply from "@/app/hooks/useActiveMessageReply";
 import { Template } from "@/app/interfaces/template";
+import { PreviewInteractive } from "./Previews/PreviewInteractive";
 
 export const ConversationPreview = ({
     selectedFile,
     template,
     conversationId,
     handleClosePreview,
-    newConversationPhone
-}: { selectedFile?: File | null, template?: Template | undefined, conversationId: number, handleClosePreview: Function, newConversationPhone?: string }) => {
+    newConversationPhone,
+    type
+}: { selectedFile?: File | null, template?: Template | undefined, conversationId: number, handleClosePreview: Function, newConversationPhone?: string, type: string }) => {
     const { sendMessage, isLoading, setIsLoading } = useMessage()
     const { userState } = useUser()
     // @ts-ignore
@@ -59,14 +61,18 @@ export const ConversationPreview = ({
 
     return (
         <div className="w-full p-8 absolute left-0 top-0 h-full flex flex-col items-center justify-center z-10 bg-gradient-to-b from-slate-800 to-gray-900">
-            {selectedFile ?
-                <Preview
+            {type === "file" ?
+                <PreviewFile
                     file={selectedFile}
                     handleSendMessage={handleSendMessage}
                     isLoading={isLoading}
                     handleClosePreview={handleClosePreview}
-                /> :
-                <TemplateList template={template} handleSendMessage={handleSendMessage} isLoading={isLoading} handleClosePreview={handleClosePreview} />
+                />
+                : type === "template" ?
+                    <PreviewTemplate template={template} handleSendMessage={handleSendMessage} isLoading={isLoading} handleClosePreview={handleClosePreview} />
+                    : type === "interactive" ?
+                        <PreviewInteractive handleSendMessage={handleSendMessage} isLoading={isLoading} handleClosePreview={handleClosePreview} />
+                        : null
             }
         </div>
     )
