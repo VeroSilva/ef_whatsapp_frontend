@@ -25,10 +25,7 @@ export const PreviewInteractive = ({ handleSendMessage, isLoading, handleClosePr
     const isDisabled = () => {
         if (
             data.body.text !== "" &&
-            data.action.sections[0].title !== "" &&
-            !!data.action.sections[0].product_items.length &&
-            data.footer.text !== "" &&
-            data.header.text !== ""
+            !!data.action.sections[0].product_items.length
         ) return false
         else return true
     }
