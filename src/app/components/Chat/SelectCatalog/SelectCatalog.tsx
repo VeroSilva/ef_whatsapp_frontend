@@ -12,7 +12,7 @@ interface ColourOption {
     isDisabled?: boolean
 }
 
-export const SelectCatalog = ({ handleChange, selectedOptions }: { handleChange: any, selectedOptions?: any }) => {
+export const SelectCatalog = ({ handleChange, selectedOptions, isMulti }: { handleChange: any, selectedOptions?: any, isMulti: boolean }) => {
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { catalogState } = useCatalog();
 
@@ -69,7 +69,7 @@ export const SelectCatalog = ({ handleChange, selectedOptions }: { handleChange:
     };
 
     useEffect(() => {
-        if (!!catalogState.length) {
+        if (catalogState && !!catalogState.length) {
             catalogState.map((product: any) => {
                 setOptions((prevState: ColourOption[]): ColourOption[] => [
                     ...prevState,
@@ -83,7 +83,8 @@ export const SelectCatalog = ({ handleChange, selectedOptions }: { handleChange:
         <Select
             closeMenuOnSelect={false}
             defaultValue={selectedOptions ?? []}
-            isMulti
+            //@ts-ignore
+            isMulti={isMulti}
             options={options}
             styles={colourStyles}
             onChange={handleChange}
