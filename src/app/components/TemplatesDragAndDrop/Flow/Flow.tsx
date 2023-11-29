@@ -233,140 +233,142 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                 const targetNode = nodes.filter((node: any) => node.id === target)[0]
                 const sourceNode = nodes.filter((node: any) => node.id === source)[0]
 
-                if (targetNode.type === "templateNode") {
-                    const templateData = templatesToSendState.filter((t) => t.id === targetNode.data.template.id)[0]
+                if (targetNode) {
+                    if (targetNode.type === "templateNode") {
+                        const templateData = templatesToSendState.filter((t) => t.id === targetNode.data.template.id)[0]
 
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.data.template.name,
-                        targetHandle: targetHandle,
-                        template_data: {
-                            type: "template",
-                            template: templateData
-                        },
-                        node: {
-                            position: targetNode.position,
-                            type: 'templateNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.data.template.name,
+                            targetHandle: targetHandle,
+                            template_data: {
+                                type: "template",
+                                template: templateData
+                            },
+                            node: {
+                                position: targetNode.position,
+                                type: 'templateNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
+                    } else if (targetNode.type === "textNode") {
+                        const currentMessage = messages.filter((message) => message.id === targetNode.id)[0]
+                        const dataToSend = currentMessage ? await dataMessageToSend({ type: "text", data: currentMessage.text }) : {}
+
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.id,
+                            targetHandle: targetHandle,
+                            template_data: dataToSend,
+                            node: {
+                                position: targetNode.position,
+                                type: 'textNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
+                    } else if (targetNode.type === "imageNode") {
+                        const currentImage = images.filter((img) => img.id === targetNode.id)[0]
+                        const dataToSend = currentImage ? await dataMessageToSend({ type: "image", data: { content: currentImage.image, caption: "" } }) : {}
+
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.id,
+                            targetHandle: targetHandle,
+                            template_data: dataToSend,
+                            node: {
+                                position: targetNode.position,
+                                type: 'imageNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
+                    } else if (targetNode.type === "videoNode") {
+                        const currentVideo = videos.filter((video) => video.id === targetNode.id)[0]
+                        const dataToSend = currentVideo ? await dataMessageToSend({ type: "video", data: { content: currentVideo.video, caption: "" } }) : {}
+
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.id,
+                            targetHandle: targetHandle,
+                            template_data: dataToSend,
+                            node: {
+                                position: targetNode.position,
+                                type: 'videoNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
+                    } else if (targetNode.type === "audioNode") {
+                        const currentAudio = audios.filter((audio) => audio.id === targetNode.id)[0]
+                        const dataToSend = currentAudio ? await dataMessageToSend({ type: "audio", data: currentAudio.audio }) : {}
+
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.id,
+                            targetHandle: targetHandle,
+                            template_data: dataToSend,
+                            node: {
+                                position: targetNode.position,
+                                type: 'audioNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
+                    } else if (targetNode.type === "interactiveNode") {
+                        const currentInteractive: any = interactives.filter((int: any) => int.id === targetNode.id)[0]
+                        const dataToSend = currentInteractive ? await dataMessageToSend({ type: "interactive", data: currentInteractive.interactive }) : {}
+
+                        const data = {
+                            id: edgeID,
+                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            sourceHandle: sourceHandle ?? "manually",
+                            target: targetNode.id,
+                            targetHandle: targetHandle,
+                            template_data: dataToSend,
+                            node: {
+                                position: targetNode.position,
+                                type: 'interactiveNode',
+                                id: targetNode.id,
+                                targetEdgeId: target,
+                                sourceEdgeId: source
+                            },
+                            flow_id: activeFlow
+                        }
+
+                        jsonData.push(data)
                     }
-
-                    jsonData.push(data)
-                } else if (targetNode.type === "textNode") {
-                    const currentMessage = messages.filter((message) => message.id === targetNode.id)[0]
-                    const dataToSend = currentMessage ? await dataMessageToSend({ type: "text", data: currentMessage.text }) : {}
-
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.id,
-                        targetHandle: targetHandle,
-                        template_data: dataToSend,
-                        node: {
-                            position: targetNode.position,
-                            type: 'textNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
-                    }
-
-                    jsonData.push(data)
-                } else if (targetNode.type === "imageNode") {
-                    const currentImage = images.filter((img) => img.id === targetNode.id)[0]
-                    const dataToSend = currentImage ? await dataMessageToSend({ type: "image", data: { content: currentImage.image, caption: "" } }) : {}
-
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.id,
-                        targetHandle: targetHandle,
-                        template_data: dataToSend,
-                        node: {
-                            position: targetNode.position,
-                            type: 'imageNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
-                    }
-
-                    jsonData.push(data)
-                } else if (targetNode.type === "videoNode") {
-                    const currentVideo = videos.filter((video) => video.id === targetNode.id)[0]
-                    const dataToSend = currentVideo ? await dataMessageToSend({ type: "video", data: { content: currentVideo.video, caption: "" } }) : {}
-
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.id,
-                        targetHandle: targetHandle,
-                        template_data: dataToSend,
-                        node: {
-                            position: targetNode.position,
-                            type: 'videoNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
-                    }
-
-                    jsonData.push(data)
-                } else if (targetNode.type === "audioNode") {
-                    const currentAudio = audios.filter((audio) => audio.id === targetNode.id)[0]
-                    const dataToSend = currentAudio ? await dataMessageToSend({ type: "audio", data: currentAudio.audio }) : {}
-
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.id,
-                        targetHandle: targetHandle,
-                        template_data: dataToSend,
-                        node: {
-                            position: targetNode.position,
-                            type: 'audioNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
-                    }
-
-                    jsonData.push(data)
-                } else if (targetNode.type === "interactiveNode") {
-                    const currentInteractive: any = interactives.filter((int: any) => int.id === targetNode.id)[0]
-                    const dataToSend = currentInteractive ? await dataMessageToSend({ type: "interactive", data: currentInteractive.interactive }) : {}
-
-                    const data = {
-                        id: edgeID,
-                        source: sourceNode.data.template ? sourceNode.data.template.name : source,
-                        sourceHandle: sourceHandle ?? "manually",
-                        target: targetNode.id,
-                        targetHandle: targetHandle,
-                        template_data: dataToSend,
-                        node: {
-                            position: targetNode.position,
-                            type: 'interactiveNode',
-                            id: targetNode.id,
-                            targetEdgeId: target,
-                            sourceEdgeId: source
-                        },
-                        flow_id: activeFlow
-                    }
-
-                    jsonData.push(data)
                 }
             })
 
@@ -395,6 +397,16 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                 }
                             ])
                         }
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
+                            }
+                        ])
                     }
 
                     if (item.template_data.hasOwnProperty('text')) {
@@ -411,6 +423,16 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     handleMessagesChange,
                                     id
                                 }
+                            }
+                        ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
                             }
                         ])
                     }
@@ -431,6 +453,16 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                 }
                             }
                         ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
+                            }
+                        ])
                     }
 
                     if (item.template_data.hasOwnProperty('video')) {
@@ -447,6 +479,16 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     handleVideosChange,
                                     id
                                 }
+                            }
+                        ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
                             }
                         ])
                     }
@@ -467,6 +509,16 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                 }
                             }
                         ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
+                            }
+                        ])
                     }
 
                     if (item.template_data.hasOwnProperty('interactive')) {
@@ -485,18 +537,17 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                 }
                             }
                         ])
+                        setEdges((oldEdges) => [
+                            ...oldEdges,
+                            {
+                                id: item.id,
+                                source: sourceEdgeId,
+                                sourceHandle: item.sourceHandle,
+                                target: targetEdgeId,
+                                targetHandle: item.targetHandle
+                            }
+                        ])
                     }
-
-                    setEdges((oldEdges) => [
-                        ...oldEdges,
-                        {
-                            id: item.id,
-                            source: sourceEdgeId,
-                            sourceHandle: item.sourceHandle,
-                            target: targetEdgeId,
-                            targetHandle: item.targetHandle
-                        }
-                    ])
                 })
             })
         }
