@@ -26,7 +26,8 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
             ...prevInteractiveData,
             action: {
                 ...prevInteractiveData.action,
-                product_retailer_id: option.value
+                product_retailer_id: option.value,
+                product_name: option.label
             }
         }));
     };

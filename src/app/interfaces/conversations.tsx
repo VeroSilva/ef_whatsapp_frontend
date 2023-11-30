@@ -53,7 +53,8 @@ export interface Json {
     action?: JsonAction,
     body?: JsonObject,
     footer?: JsonObject,
-    header?: JsonObject
+    header?: JsonObject,
+    type?: string,
 }
 
 export interface JsonObject {
@@ -62,7 +63,8 @@ export interface JsonObject {
 }
 
 export interface JsonAction {
-    sections: any
+    sections: any,
+    product_name?: string
 }
 
 export interface Message {

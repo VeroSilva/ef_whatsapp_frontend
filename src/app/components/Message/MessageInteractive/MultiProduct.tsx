@@ -37,7 +37,7 @@ export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Func
     const handleMultiSelectChange = (options: any) => {
         setProducts(options);
 
-        const productsRetailers = options.map((option: any) => ({ product_retailer_id: option.value }));
+        const productsRetailers = options.map((option: any) => ({ product_retailer_id: option.value, product_name: option.label }));
 
         setInteractiveMultiData((prevInteractiveData: any) => ({
             ...prevInteractiveData,
