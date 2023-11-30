@@ -86,9 +86,9 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
                     <SelectCatalog handleChange={handleSingleSelectChange} selectedOptions={product} isMulti={false} />
 
                     <button
-                        className='ml-2 mt-4 rounded-md bg-gradient-to-r from-teal-400 to-emerald-500 shadow-lg py-1 px-4 cursor-pointer flex text-slate-100 text-lg'
+                        className='ml-2 mt-4 rounded-md bg-slate-600 shadow-lg py-1 px-4 cursor-pointer flex text-slate-100 text-lg'
                         onClick={handleOpenModal}
-                    >Aceptar</button>
+                    >Cerrar</button>
                 </div>
             </Modal>
         </>

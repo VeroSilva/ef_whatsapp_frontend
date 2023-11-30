@@ -150,7 +150,7 @@ const TemplatesDragAndDrop = () => {
                     <div>
                         <p className='mb-4'>Esta etiqueta iniciará el flujo creado.</p>
 
-                        <SelectTags handleChange={handleSelectChange} selectedOptions={tag} />
+                        <SelectTags handleChange={handleSelectChange} selectedOptions={tag} flows={tabs} />
                     </div>
                     <button
                         className='main-button flex items-center justify-center self-center w-1/2'

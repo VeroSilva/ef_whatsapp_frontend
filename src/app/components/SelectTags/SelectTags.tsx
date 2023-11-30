@@ -12,7 +12,7 @@ interface ColourOption {
     isDisabled?: boolean
 }
 
-export const SelectTags = ({ handleChange, selectedOptions }: { handleChange: any, selectedOptions?: any }) => {
+export const SelectTags = ({ handleChange, selectedOptions, flows }: { handleChange: any, selectedOptions?: any, flows?: any }) => {
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { tagsState } = useTags();
 
@@ -71,7 +71,13 @@ export const SelectTags = ({ handleChange, selectedOptions }: { handleChange: an
 
     useEffect(() => {
         if (tagsState.length > 1) {
-            tagsState.map((tag: any) => {
+            let availableTags = tagsState;
+
+            if (flows) {
+                availableTags = tagsState.filter((tag) => !flows.some((flow: any) => flow.id === tag.id))
+            }
+
+            availableTags.map((tag: any) => {
                 setOptions((prevState: ColourOption[]): ColourOption[] => [
                     ...prevState,
                     { value: tag.id, label: tag.name, color: tag.color },

@@ -81,13 +81,15 @@ export const SelectCatalog = ({ handleChange, selectedOptions, isMulti }: { hand
 
     return (
         <Select
-            closeMenuOnSelect={false}
+            closeMenuOnSelect={isMulti ? false : true}
+            max={5}
             defaultValue={selectedOptions ?? []}
             //@ts-ignore
             isMulti={isMulti}
             options={options}
             styles={colourStyles}
             onChange={handleChange}
+            isOptionDisabled={(option) => isMulti ? selectedOptions.length === 5 : false}
         />
     )
 }

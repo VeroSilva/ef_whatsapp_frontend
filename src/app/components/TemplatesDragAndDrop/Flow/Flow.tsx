@@ -383,7 +383,50 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
 
                     if (item.template_data.hasOwnProperty('template')) {
-                        const template = templatesState.find(tmpl => tmpl.id === item.template_data.template.id);
+                        let template = templatesState.find(tmpl => tmpl.id === item.template_data.template.id);
+
+                        item.template_data.template.components.forEach((component: any) => {
+                            switch (component.type) {
+                                case "header":
+                                    template?.components.forEach((cp: any) => {
+                                        if (cp.type === "HEADER") {
+                                            if (cp.format === "IMAGE") cp.example.header_handle[0] = component.parameters[0].image.link
+                                            if (cp.format === "TEXT") cp.example.header_text[0] = component.parameters[0].text
+                                        }
+                                    })
+                                    break;
+
+                                case "body":
+                                    template?.components.forEach((cp: any) => {
+                                        if (cp.type === "BODY") {
+                                            component.parameters.forEach((param: any, index: number) => {
+                                                if (param.type === "text") {
+                                                    cp.example.body_text[0][index] = param.text
+                                                }
+                                            });
+                                        }
+                                    })
+                                    break;
+
+                                //to do...
+                                // case "button":
+                                //     template?.components.forEach((cp: any) => {
+                                //         if (cp.type === "BUTTONS") {
+                                //             component.parameters.forEach((param: any, index: number) => {
+                                //                 console.log(cp, param)
+                                //             });
+                                //         }
+                                //     })
+                                //     break;
+                                //to do...
+
+                                default:
+                                    break;
+                            }
+                        });
+
+                        // console.log(template, item.template_data.template)
+
                         if (template) {
                             setNodes((oldNodes: any) => [
                                 ...oldNodes,
@@ -392,7 +435,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     position,
                                     type,
                                     data: {
-                                        template,
+                                        template: template,
                                     }
                                 }
                             ])
