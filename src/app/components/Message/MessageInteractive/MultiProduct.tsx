@@ -90,13 +90,16 @@ export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Func
                         placeholder="Título"
                         value={interactiveMultiData.action.sections[0].title}
                         onChange={(e) => {
+                            const inputValue = e.target.value;
+                            const truncatedValue = inputValue.substring(0, 24);
+
                             setInteractiveMultiData((prevInteractiveData: any) => ({
                                 ...prevInteractiveData,
                                 action: {
                                     ...prevInteractiveData.action,
                                     sections: [
                                         {
-                                            title: e.target.value,
+                                            title: truncatedValue,
                                             product_items: prevInteractiveData.action.sections[0].product_items
                                         }
                                     ]
