@@ -19,10 +19,41 @@ export const getConversations = async (
   token,
   company_phone_id
 ) => {
-  const response = await fetch(
-    `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=${company_phone_id}`,
+  let url = `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=${company_phone_id}`;
+
+  if (filter.startDate && filter.endDate) {
+    const startHour = filter.startDate + " 00:00:00";
+    const endHour = filter.endDate + " 23:59:59";
+
+    url += `&initDate=${startHour}&endDate=${endHour}`;
+  }
+
+  if (filter.tags) url += `&tags=${filter.tags}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const setMassiveTagsToConversations = (
+  tag,
+  company_phone_id,
+  token,
+  data
+) => {
+  const response = fetch(
+    `${process.env.API_URL}/conversation/tag/${tag}/massive/${company_phone_id}`,
     {
-      method: "GET",
+      method: "PUT",
+      body: JSON.stringify(data),
       headers: {
         Accept: "*/*",
         Authorization: token,
@@ -30,7 +61,10 @@ export const getConversations = async (
         "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
       },
     }
-  ).then((res) => res.json());
+  ).then((res) => {
+    if (res.status === 204) return { status: true };
+    else throw new Error("Error 500");
+  });
 
   return response;
 };

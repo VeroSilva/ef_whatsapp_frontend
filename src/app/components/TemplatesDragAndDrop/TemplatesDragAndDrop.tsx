@@ -10,7 +10,7 @@ import useUser from '@/app/hooks/useUser';
 import { usePathname } from 'next/navigation';
 import useCatalog from '@/app/hooks/useCatalog';
 import { Modal } from "@/app/components/Modal/Modal";
-import { SelectTags } from '../SelectTags/SelectTags';
+import { SelectTags } from '../Selects/SelectTags/SelectTags';
 import useTags from '@/app/hooks/useTags';
 
 const TemplatesDragAndDrop = () => {

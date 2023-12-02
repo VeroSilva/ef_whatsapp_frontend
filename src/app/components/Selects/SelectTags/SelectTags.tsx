@@ -12,7 +12,7 @@ interface ColourOption {
     isDisabled?: boolean
 }
 
-export const SelectTags = ({ handleChange, selectedOptions, flows }: { handleChange: any, selectedOptions?: any, flows?: any }) => {
+export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { handleChange: any, selectedOptions?: any, flows?: any, isMulti?: boolean }) => {
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { tagsState } = useTags();
 
@@ -93,6 +93,8 @@ export const SelectTags = ({ handleChange, selectedOptions, flows }: { handleCha
             options={options}
             styles={colourStyles}
             onChange={handleChange}
+            // @ts-ignore
+            isMulti={isMulti}
         />
     )
 }
