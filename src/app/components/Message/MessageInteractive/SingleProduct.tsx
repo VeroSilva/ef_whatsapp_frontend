@@ -12,7 +12,13 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
         action: {
             product_retailer_id: "",
             catalog_id: "249532717895232"
-        }
+        },
+        body: {
+            text: ""
+        },
+        footer: {
+            text: ""
+        },
     })
 
     const handleOpenModal = () => {
@@ -76,6 +82,52 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
                     <span className='mt-2 block'>No ha seleccionado productos</span>
                 }
             </div>
+
+            <div className='mb-4'>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Descripción</label>
+
+                <textarea
+                    required
+                    id="interactive-body"
+                    name="text"
+                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
+                    rows={2}
+                    placeholder="Descripción del mensaje"
+                    value={interactiveSingleData.body.text}
+                    onChange={(e) => {
+                        setInteractiveSingleData((prevInteractiveData: any) => ({
+                            ...prevInteractiveData,
+                            body: {
+                                ...prevInteractiveData.body,
+                                text: e.target.value
+                            }
+                        }));
+                    }}
+                />
+            </div>
+
+            <div className='mb-4'>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interactive-body">Pie de página</label>
+
+                <input
+                    id="interactive-footer"
+                    name="text"
+                    className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
+                    placeholder="Pie de página"
+                    value={interactiveSingleData.footer.text}
+                    onChange={(e) => {
+                        setInteractiveSingleData((prevInteractiveData: any) => ({
+                            ...prevInteractiveData,
+                            footer: {
+                                ...prevInteractiveData.footer,
+                                text: e.target.value
+                            }
+                        }));
+                    }}
+                />
+            </div>
+
+            <small>Los campos con * son obligatorios</small>
 
             <Modal
                 title="Elije los productos"
