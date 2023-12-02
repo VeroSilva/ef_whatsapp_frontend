@@ -282,7 +282,7 @@ const Tags = (): JSX.Element => {
                 show={showAssignmentModal}
                 width="800px"
             >
-                <div className='h-[450px]'>
+                <div>
                     <MassiveAssigment handleShowModal={handleOpenAssigmentModal} setAlert={setAlert} />
                 </div>
             </Modal>

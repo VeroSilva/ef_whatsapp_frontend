@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import { base64ToFile, blobToBase64 } from '@/app/utils/blobToBase64';
+import { base64ToFile, blobToBase64 } from '@/app/utils/fileProcessing';
 import { IconVideoCamera } from '../../Icons/IconVideoCamera';
 
 interface TextUpdaterNodeProps {

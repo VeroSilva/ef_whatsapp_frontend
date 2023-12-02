@@ -71,7 +71,6 @@ export const SelectPhones = ({ handleChange }: { handleChange: any }) => {
 
     useEffect(() => {
         if (userState.company_phones && !!userState.company_phones.length) {
-            console.log(userState)
             userState.company_phones.map((phone: any) => {
                 setOptions((prevState: ColourOption[]): ColourOption[] => [
                     ...prevState,

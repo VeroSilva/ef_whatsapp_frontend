@@ -63,3 +63,11 @@ export const getFilenameFromBase64 = (base64: string): string | undefined => {
     }
     return undefined;
 };
+
+export const getCsvData = async (file: File) => {
+    const text = await file.text();
+    const lines = text.split('\n');
+    const data = lines.map((line: string) => line.trim()).filter(Boolean);
+
+    return data
+};

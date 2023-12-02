@@ -1,5 +1,5 @@
 import { Context } from "../interfaces/conversations";
-import { blobToBase64, dataURLtoMimeType, isBase64 } from "./blobToBase64";
+import { blobToBase64, dataURLtoMimeType, isBase64 } from "./fileProcessing";
 
 export const dataMessageToSend = async ({ type, data, context }: { type: string, data: any, context?: Context | null }) => {
     let dataTransformed;
