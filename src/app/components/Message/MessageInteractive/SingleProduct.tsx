@@ -14,10 +14,10 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
             catalog_id: "249532717895232"
         },
         body: {
-            text: ""
+            text: "Conoce aquí nuestros perfumes altamente concentrados y de gran duración👆🏼👀"
         },
         footer: {
-            text: ""
+            text: "Escoge tu perfume aquí👋🏻"
         },
     })
 
