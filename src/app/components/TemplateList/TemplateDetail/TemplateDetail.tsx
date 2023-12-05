@@ -61,7 +61,7 @@ export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }
                 }
                 else if (component.type === "BUTTONS") {
                     const itemWithExample = component.buttons.find((button: any) => "example" in button);
-                    handleInputButtonsChange(itemWithExample.example)
+                    handleInputButtonsChange(itemWithExample.example[0])
                 }
             }
         })

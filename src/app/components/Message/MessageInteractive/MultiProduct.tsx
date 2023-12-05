@@ -9,7 +9,7 @@ export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Func
     const [products, setProducts] = useState<any>([])
     const [interactiveMultiData, setInteractiveMultiData] = useState({
         body: {
-            text: ""
+            text: "Conoce aquí nuestros perfumes altamente concentrados y de gran duración👆🏼👀"
         },
         type: "product_list",
         action: {
@@ -22,7 +22,7 @@ export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Func
             catalog_id: "249532717895232"
         },
         footer: {
-            text: ""
+            text: "Escoge tu perfume aquí👋🏻"
         },
         header: {
             text: "",
