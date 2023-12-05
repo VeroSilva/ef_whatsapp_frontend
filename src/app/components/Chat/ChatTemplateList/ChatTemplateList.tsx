@@ -68,7 +68,7 @@ export const ChatTemplateList = ({ templatesList, activeTemplateList, setActiveT
                 tabIndex={0}
                 onKeyDown={(e) => handleKeyPress(e)}
             >
-                {templatesList.map((template, index) => (
+                {templatesList.sort((a, b) => a.name.localeCompare(b.name)).map((template, index) => (
                     <div
                         key={`template-${index}`}
                         className={`rounded p-3 cursor-pointer ${isHovered === index || selectedIndex === index ? 'bg-teal-100 text-teal-600 font-semibold transition duration-500 drop-shadow-md' : ''
