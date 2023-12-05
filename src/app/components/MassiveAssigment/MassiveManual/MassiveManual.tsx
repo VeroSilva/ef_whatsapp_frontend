@@ -261,7 +261,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
             }
 
             {steps[1].current &&
-                <div className="-mt-32">
+                <div>
                     <div className="w-ful px-3 mb-6 md:mb-0">
                         <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
                             Selecciona tag a asignar
@@ -274,7 +274,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
             }
 
             {steps[2].current &&
-                <div>
+                <div className="mt-6">
                     <h2>
                         ¿Está seguro que desea asignar a
                         {" "} <span className="font-semibold bg-green-200 text-green-500 p-2 rounded-full">{conversations.mount} {conversations.mount === 1 ? "conversación" : "conversaciones"}</span> {" "}
