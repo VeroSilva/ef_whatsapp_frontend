@@ -11,6 +11,7 @@ import { CompanyPhones } from "@/app/interfaces/user";
 import { IconHome } from "../Icons/IconHome";
 import { IconPhone } from "../Icons/IconPhone";
 import { IconFlow } from "../Icons/IconFlow";
+import { IconForward } from "../Icons/IconForward";
 
 const menuItems = [
     {
@@ -40,6 +41,7 @@ export const Sidebar = () => {
         addMenuItemIfNotExists("Usuarios", "/pages/users", <IconUsers classes="w-6 h-6" />);
         addMenuItemIfNotExists("Etiquetas", "/pages/tags", <IconTag classes="w-6 h-6" />);
         addMenuItemIfNotExists("Teléfonos", "/pages/phones", <IconPhone classes="w-6 h-6" />);
+        addMenuItemIfNotExists("Respuestas rápidas", "/pages/quick-answers", <IconForward classes="w-6 h-6" />);
     }
 
     useEffect(() => {
