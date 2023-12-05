@@ -93,7 +93,7 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
                     className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
                     rows={2}
                     placeholder="Descripción del mensaje"
-                    value={interactiveSingleData.body.text}
+                    value={interactiveSingleData.body ? interactiveSingleData.body.text : " "}
                     onChange={(e) => {
                         setInteractiveSingleData((prevInteractiveData: any) => ({
                             ...prevInteractiveData,
@@ -114,7 +114,7 @@ export const SingleProduct = ({ handleSetData, savedData }: { handleSetData: Fun
                     name="text"
                     className="nodrag bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg input-sky block w-full p-2.5"
                     placeholder="Pie de página"
-                    value={interactiveSingleData.footer.text}
+                    value={interactiveSingleData.footer ? interactiveSingleData.footer.text : ""}
                     onChange={(e) => {
                         setInteractiveSingleData((prevInteractiveData: any) => ({
                             ...prevInteractiveData,
