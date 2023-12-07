@@ -352,7 +352,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
 
                         const data = {
                             id: edgeID,
-                            source: sourceNode.data.template ? sourceNode.data.template.name : source,
+                            source: sourceNode?.data?.template ? sourceNode.data.template.name : source,
                             sourceHandle: sourceHandle ?? "manually",
                             target: targetNode.id,
                             targetHandle: targetHandle,
