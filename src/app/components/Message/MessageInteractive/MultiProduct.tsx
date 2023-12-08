@@ -3,7 +3,7 @@ import { Modal } from "@/app/components/Modal/Modal";
 import { SelectCatalog } from "../../Chat/SelectCatalog/SelectCatalog";
 import useCatalog from "@/app/hooks/useCatalog";
 
-export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Function, savedData: any }) => {
+export const MultiProduct = ({ handleSetData, savedData }: { handleSetData: Function, savedData?: any }) => {
     const { catalogState } = useCatalog();
     const [showModal, setShowModal] = useState<boolean>(false)
     const [products, setProducts] = useState<any>([])

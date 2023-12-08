@@ -1,11 +1,11 @@
 "use client"
 
-import { ChangeEvent, useEffect, useState, KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "@/app/components/Sidebar/Sidebar";
 import { SkeletonTable } from "@/app/components/Skeleton/Table";
-import { usePaginateTable } from "../../hooks/usePaginateTable"
-import { deleteUser, getQuickAnswers, getUsers } from "@/app/services/api";
-import useUser from "../../hooks/useUser"
+import { usePaginateTable } from "../../../hooks/usePaginateTable"
+import { deleteQuickAnswers, getCatalog, getQuickAnswers } from "@/app/services/api";
+import useUser from "../../../hooks/useUser"
 import { IconEdit } from "@/app/components/Icons/IconEdit";
 import { IconTrash } from "@/app/components/Icons/IconTrash";
 import { Modal } from "@/app/components/Modal/Modal";
@@ -13,51 +13,44 @@ import { IconLoading } from "@/app/components/Icons/IconLoading";
 import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
 import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
-import { FormUser } from "@/app/components/FormUser/FormUser";
-import { FormEditPassword } from "@/app/components/FormUser/FormEditPassword/FormEditPassword";
-import { IconPassword } from "@/app/components/Icons/IconPassword";
-import { redirect } from "next/navigation";
-import { MessageInteractive } from "@/app/components/Message/MessageInteractive/MessageInteractive";
+import { redirect, usePathname } from "next/navigation";
 import { FormQuickReply } from "@/app/components/FormQuickReply/FormQuickReply";
+import useCatalog from '@/app/hooks/useCatalog';
+import { IconCheck } from "@/app/components/Icons/IconCheck";
+import { IconX } from "@/app/components/Icons/IconX";
 
 const QuickAnswers = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
-    const [loadingDeleteUser, setLoadingDeleteUser] = useState(false);
+    const [loadingDeleteRelation, setLoadingDeleteRelation] = useState(false);
     const [relation, setRelation] = useState([]);
-    const [userData, setUserData] = useState<any>({});
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
+    const [quickAnswersData, setQuickAnswersData] = useState({} as any);
     const { slice, range } = usePaginateTable({ data: relation, page, rowsPerPage });
     const { userState } = useUser();
+    const { setCatalogState } = useCatalog();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+    const pathname = usePathname();
+    const parts = pathname.split('/');
+    const phoneId = Number(parts[parts.length - 1]);
 
     const [alert, setAlert] = useState({
         type: "",
         message: "",
         show: false
     });
-    const roles = [
-        { id: "1", name: "Administrador", classes: "bg-blue-500" },
-        { id: "2", name: "Call Center", classes: "bg-indigo-500" },
-        { id: "3", name: "Vendedor", classes: "bg-violet-500" },
-    ]
+
+    useEffect(() => {
+        handleLoadQuickAnswers();
+    }, [])
 
     useEffect(() => {
         if (!userState || userState.token === "") {
             redirect('/pages/login')
         }
-    }, [userState]);
-
-    useEffect(() => {
-        // handleLoadUsers()
-
-        getQuickAnswers(userState.token, 1).then((res => {
-
-            setRelation(res)
-        }))
-    }, []);
+    }, [userState])
 
     useEffect(() => {
         if (alert.show) {
@@ -71,32 +64,39 @@ const QuickAnswers = (): JSX.Element => {
         }
     }, [alert])
 
-    // const handleLoadUsers = () => {
-    //     setLoading(true);
-    //     getUsers(userState.token).then((res => {
-    //         setUsers(res);
-    //         setLoading(false);
-    //     }))
-    // }
+    useEffect(() => {
+        getCatalog(userState.token, phoneId).then((res) => {
+            setCatalogState(res.catalog)
+        })
+    }, [])
 
-    const handleDeleteUser = () => {
-        setLoadingDeleteUser(true);
+    const handleLoadQuickAnswers = () => {
+        setLoading(true)
 
-        deleteUser(userData.id, userState.token).then((res => {
-            setLoadingDeleteUser(false);
+        getQuickAnswers(userState.token, phoneId).then((res => {
+            setLoading(false)
+            setRelation(res)
+        }))
+    }
+
+    const handleDeleteRelation = () => {
+        setLoadingDeleteRelation(true);
+
+        deleteQuickAnswers(quickAnswersData.id, phoneId, userState.token).then((res => {
+            setLoadingDeleteRelation(false);
             handleOpenDeleteModal(false);
 
             if (!res) {
                 setAlert({
                     type: "error",
-                    message: res.message,
+                    message: "Algo salió mal, vuelve a intentarlo",
                     show: true
                 })
             } else {
-                // handleLoadUsers()
+                handleLoadQuickAnswers()
                 setAlert({
                     type: "success",
-                    message: "Usuario eliminado con éxito!",
+                    message: "Relación eliminada con éxito!",
                     show: true
                 })
             }
@@ -139,13 +139,16 @@ const QuickAnswers = (): JSX.Element => {
                                     Coincidencias
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
+                                    Activo
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-center">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <SkeletonTable col={3} />
+                                <SkeletonTable col={4} />
                             ) : (
                                 slice.map((relation, index) => {
                                     return (
@@ -165,11 +168,26 @@ const QuickAnswers = (): JSX.Element => {
                                             <td className="px-6 py-4 text-center">
                                                 <div className="flex flex-wrap gap-2">
                                                     {
-                                                        relation.messageData.interactive.action.sections[0].product_items.map((item: any, index: number) => (
-                                                            <span key={`item-product-${index}`} className="bg-slate-200 p-2 rounded-md">
-                                                                {item.product_name}
-                                                            </span>
-                                                        ))
+                                                        relation.messageData.interactive.type === "product_list" ?
+                                                            relation.messageData.interactive.action.sections[0].product_items.map((item: any, index: number) => (
+                                                                <span key={`item-product-${index}`} className="bg-slate-200 p-2 rounded-md">
+                                                                    {item.product_name}
+                                                                </span>
+                                                            )) :
+                                                            relation.messageData.interactive.type === "product" ?
+                                                                <span className="bg-slate-200 p-2 rounded-md">
+                                                                    {relation.messageData.interactive.action.product_name}
+                                                                </span> :
+                                                                null
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <div className="flex justify-center">
+                                                    {
+                                                        relation.status ?
+                                                            <IconCheck classes="w-5 h-5 rounded-full bg-emerald-500 text-slate-100" />
+                                                            : <IconX classes="w-5 h-5 rounded-full bg-rose-500 text-slate-100" />
                                                     }
                                                 </div>
                                             </td>
@@ -180,7 +198,7 @@ const QuickAnswers = (): JSX.Element => {
                                                         href="#"
                                                         onClick={() => {
                                                             handleOpenEditModal(true);
-                                                            // setUserData(user);
+                                                            setQuickAnswersData(relation);
                                                         }}
                                                     >
                                                         <IconEdit classes="w-5 h-5" />
@@ -192,7 +210,7 @@ const QuickAnswers = (): JSX.Element => {
                                                         href="#"
                                                         onClick={() => {
                                                             setShowDeleteModal(true);
-                                                            // setUserData(user);
+                                                            setQuickAnswersData(relation);
                                                         }}
                                                     >
                                                         <IconTrash classes="w-5 h-5 text-rose-600" />
@@ -235,38 +253,31 @@ const QuickAnswers = (): JSX.Element => {
                 show={showModal}
                 width="800px"
             >
-                <FormQuickReply />
+                <FormQuickReply handleLoadQuickAnswers={handleLoadQuickAnswers} setAlert={setAlert} handleOpenModal={handleOpenModal} />
             </Modal>
             {/* END: Create User Modal */}
 
             {/* BEGIN: Edit User Modal */}
             <Modal
-                title="Editar usuario"
+                title="Editar relación"
                 onClose={() => handleOpenEditModal(false)}
                 show={showEditModal}
-                width="500px"
+                width="800px"
             >
-                {/* <FormUser
-                    type="edit"
-                    roles={roles}
-                    setAlert={setAlert}
-                    handleLoadUsers={handleLoadUsers}
-                    handleOpenModal={handleOpenEditModal}
-                    data={userData}
-                /> */}
+                <FormQuickReply handleLoadQuickAnswers={handleLoadQuickAnswers} setAlert={setAlert} quickAnswersData={quickAnswersData} handleOpenModal={handleOpenEditModal} />
             </Modal>
             {/* END: Edit User Modal */}
 
             {/* END: Delete User Modal */}
             <Modal
-                // title="Eliminar usuario usuario"
+                title="Eliminar relación"
                 onClose={() => handleOpenDeleteModal(false)}
                 show={showDeleteModal}
                 width="500px"
             >
                 <div className="text-xl mt-5">Estás seguro?</div>
                 <div className="text-slate-500 mt-2">
-                    Quieres eliminar el usuario de: <strong>{userData.username}</strong>?{" "}
+                    Quieres eliminar esta relación?{" "}
                     <br />
                     Esta acción es irreversible.
                 </div>
@@ -280,9 +291,9 @@ const QuickAnswers = (): JSX.Element => {
                     </button>
                     <button
                         className="bg-red-800 text-white rounded-md text-sm px-4 py-2 mb-8 transition ease-in-out delay-50 flex"
-                        onClick={handleDeleteUser}
+                        onClick={handleDeleteRelation}
                     >
-                        {loadingDeleteUser && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
+                        {loadingDeleteRelation && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
                         Sí, eliminar
                     </button>
                 </div>

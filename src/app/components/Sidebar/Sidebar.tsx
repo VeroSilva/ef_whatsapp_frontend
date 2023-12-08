@@ -186,8 +186,8 @@ export const Sidebar = () => {
                         .filter((m) => m.subMenu)
                         .map((menu, index) => (
                             <Accordion.Panel itemID={`panel-${index}`} isOpen={menu.active} key={`item-acc-key-${index}`}>
-                                <Accordion.Title className={`p-2 focus:ring-0 bg-slate-100 rounded-md ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}>
-                                    <span className={`flex items-center flex-row gap-3 ${menu.active ? "text-slate-100 hover:text-gray-600" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>
+                                <Accordion.Title className={`p-2 focus:ring-0 bg-slate-100 rounded-md border-none ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}>
+                                    <span className={`flex items-center flex-row gap-3 ${menu.active ? "text-slate-100" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>
                                         {menu.icon} {menu.title}
                                     </span>
                                 </Accordion.Title>

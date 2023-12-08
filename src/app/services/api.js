@@ -514,46 +514,55 @@ export const getQuickAnswers = async (token, company_phone_id) => {
   return response;
 };
 
-export const createQuickAnswers = async (data, token) => {
-  const response = await fetch(`${process.env.API_URL}/user`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      Accept: "*/*",
-      Authorization: token,
-      "Content-Type": "application/json",
-      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-    },
-  }).then((res) => res.json());
+export const createQuickAnswer = async (data, company_phone_id, token) => {
+  const response = await fetch(
+    `${process.env.API_URL}/quick-answer/${company_phone_id}`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
 
   return response;
 };
 
-export const editQuickAnswers = async (data, id, token) => {
-  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-    headers: {
-      Accept: "*/*",
-      Authorization: token,
-      "Content-Type": "application/json",
-      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-    },
-  }).then((res) => res.json());
+export const editQuickAnswers = async (data, id, company_phone_id, token) => {
+  const response = await fetch(
+    `${process.env.API_URL}/quick-answer/${id}/${company_phone_id}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
 
   return response;
 };
 
-export const deleteQuickAnswers = async (id, token) => {
-  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
-    method: "DELETE",
-    headers: {
-      Accept: "*/*",
-      Authorization: token,
-      "Content-Type": "application/json",
-      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-    },
-  }).then((res) => res.json());
+export const deleteQuickAnswers = async (id, company_phone_id, token) => {
+  const response = await fetch(
+    `${process.env.API_URL}/quick-answer/${id}/${company_phone_id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
 
   return response;
 };
