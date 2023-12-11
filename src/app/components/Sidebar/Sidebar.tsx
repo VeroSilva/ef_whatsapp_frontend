@@ -13,6 +13,7 @@ import { IconPhone } from "../Icons/IconPhone";
 import { IconFlow } from "../Icons/IconFlow";
 import { IconForward } from "../Icons/IconForward";
 import { Accordion } from 'flowbite-react';
+import "./styles.scss"
 
 export const Sidebar = () => {
     const [open, setOpen] = useState(true);
@@ -185,29 +186,44 @@ export const Sidebar = () => {
                     {menuItems
                         .filter((m) => m.subMenu)
                         .map((menu, index) => (
-                            <Accordion.Panel itemID={`panel-${index}`} isOpen={menu.active} key={`item-acc-key-${index}`}>
-                                <Accordion.Title className={`p-2 focus:ring-0 bg-slate-100 rounded-md border-none ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}>
-                                    <span className={`flex items-center flex-row gap-3 ${menu.active ? "text-slate-100" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>
-                                        {menu.icon} {menu.title}
+                            <Accordion.Panel
+                                itemID={`panel-${index}`}
+                                isOpen={menu.active}
+                                key={`item-acc-key-${index}`}
+                            >
+                                <Accordion.Title
+                                    className={`accordion-button p-0 focus:ring-0 bg-slate-100 rounded-md border-none ${!open ? "hide-arrow" : ""} ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}
+                                >
+                                    <span
+                                        className={`p-2 flex items-center flex-row gap-3 ${menu.active ? "text-slate-100" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200`}
+                                        onClick={() => {
+                                            if (!open) setOpen(!open)
+                                        }}
+                                    >
+                                        <span className="w-6 h-6">{menu.icon}</span>
+                                        <span className={`${!open && "scale-0"}`}>{menu.title}</span>
                                     </span>
                                 </Accordion.Title>
-                                <Accordion.Content className="p-2 bg-slate-200">
-                                    {menu.subMenu?.map((sub, idx) => (
-                                        <Link
-                                            key={`sub-acc-key-${idx}`}
-                                            href={sub.link}
-                                            className={
-                                                `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${sub.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
-                                            }
-                                            onClick={() => handleActiveMenu(menu.title, sub.title)}
-                                        >
-                                            <span className={`text-base text-sm flex-1 origin-left duration-200`}>{sub.title}</span>
-                                        </Link>
-                                    ))}
-                                </Accordion.Content>
+                                {open ? (
+                                    <Accordion.Content className="p-2 bg-slate-200">
+                                        {menu.subMenu?.map((sub, idx) => (
+                                            <Link
+                                                key={`sub-acc-key-${idx}`}
+                                                href={sub.link}
+                                                className={
+                                                    `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${sub.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
+                                                }
+                                                onClick={() => handleActiveMenu(menu.title, sub.title)}
+                                            >
+                                                <span className={`text-base text-sm flex-1 origin-left duration-200`}>{sub.title}</span>
+                                            </Link>
+                                        ))}
+                                    </Accordion.Content>
+                                ) : (
+                                    <></>
+                                )}
                             </Accordion.Panel>
-                        ))
-                    }
+                        ))}
                 </Accordion>
             </ul>
 

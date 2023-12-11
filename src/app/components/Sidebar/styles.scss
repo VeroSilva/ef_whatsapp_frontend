@@ -1,0 +1,7 @@
+.accordion-button {
+    &.hide-arrow{
+        &>svg {
+            display: none;
+        }
+    }
+}
