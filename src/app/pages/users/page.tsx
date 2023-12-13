@@ -291,7 +291,7 @@ const Users = (): JSX.Element => {
                 <div className="flex justify-center space-x-4 mt-4">
                     <button
                         className="second-button mb-8"
-                        onClick={() => handleOpenModal(false)}
+                        onClick={() => handleOpenDeleteModal(false)}
                     >
                         Cancelar
                     </button>

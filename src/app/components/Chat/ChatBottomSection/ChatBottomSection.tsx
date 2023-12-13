@@ -113,7 +113,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
                 )}
 
                 {!audio ?
-                    messageToSend === "" && !isLoading ?
+                    messageToSend.trim() === "" && !isLoading ?
                         <AudioRecorder audio={audio} setAudio={setAudio} /> :
                         <button
                             className="w-12 h-12 bg-slate-100 hover:bg-teal-600 text-white rounded-full flex items-center justify-center group ease-in duration-100"

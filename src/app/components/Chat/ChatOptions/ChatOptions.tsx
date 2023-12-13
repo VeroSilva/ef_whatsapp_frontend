@@ -6,9 +6,13 @@ import { Tag } from "@/app/interfaces/conversations";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
 //@ts-ignore
 import chroma from 'chroma-js';
-import { addTagToConversation, getTags, removeTagToConversation } from "@/app/services/api";
+import { addTagToConversation, deleteConversation, getTags, removeTagToConversation } from "@/app/services/api";
 import useUser from "@/app/hooks/useUser"
 import { IconX } from "../../Icons/IconX";
+import { IconDoubleCheck } from "../../Icons/IconDoubleCheck";
+import { IconTrash } from "../../Icons/IconTrash";
+import { markAsUnread } from '@/app/services/api';
+import { IconLoading } from "../../Icons/IconLoading";
 
 export const ChatOptions = () => {
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
@@ -17,14 +21,16 @@ export const ChatOptions = () => {
     const [tags, setTags] = useState<Tag[]>([])
     const dropdownRef = useRef<HTMLDivElement>(null);
     //@ts-ignore
-    const { activeConversationState } = useActiveConversation();
+    const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const { userState } = useUser();
+    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+    const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
 
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
     }
 
-    const handleOpenModal = () => {
+    const handleOpenTagsModal = () => {
         setShowModal(!showModal)
     }
 
@@ -43,6 +49,27 @@ export const ChatOptions = () => {
 
         removeTagToConversation(activeConversationState.id, id, userState.token)
     }
+
+    const handleMarkAsUnread = () => {
+        resetActiveConversation();
+        markAsUnread(userState.token, activeConversationState.id);
+    }
+
+    const handleDeleteConversation = () => {
+        setLoadingDeleteConversation(true)
+
+        deleteConversation(activeConversationState.id, userState.token)
+            .then((res) => {
+                console.log(res)
+                resetActiveConversation()
+                setLoadingDeleteConversation(false)
+                setShowDeleteModal(false)
+            });
+    }
+
+    const handleOpenDeleteModal = (show: boolean) => {
+        setShowDeleteModal(show);
+    };
 
     useEffect(() => {
         getTags(userState.token).then((res => {
@@ -92,11 +119,31 @@ export const ChatOptions = () => {
                 >
                     <li
                         className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
-                        onClick={handleOpenModal}
+                        onClick={handleOpenTagsModal}
                     >
-                        <label htmlFor="file-input" id="file-label-2" className="text-sm flex justify-end items-center gap-2 cursor-pointer">
+                        <label htmlFor="file-input" id="file-label-2" className="text-sm flex justify-center items-center gap-2 cursor-pointer">
                             Administrar etiquetas
-                            <IconTag classes="w-6 h-6 text-teal-800" />
+                            <IconTag classes="w-5 h-5 text-slate-500" />
+                        </label>
+                    </li>
+
+                    <li
+                        className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
+                        onClick={handleMarkAsUnread}
+                    >
+                        <label htmlFor="file-input" id="file-label-2" className="text-sm flex justify-center items-center gap-2 cursor-pointer">
+                            Marcar como no leída
+                            <IconDoubleCheck classes="w-5 h-5 text-slate-500" />
+                        </label>
+                    </li>
+
+                    <li
+                        className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
+                        onClick={() => handleOpenDeleteModal(true)}
+                    >
+                        <label htmlFor="file-input" id="file-label-2" className="text-sm flex justify-center items-center gap-2 cursor-pointer">
+                            Eliminar conversación
+                            <IconTrash classes="w-5 h-5 text-slate-500" />
                         </label>
                     </li>
                 </ul>
@@ -104,7 +151,7 @@ export const ChatOptions = () => {
 
             <Modal
                 title="Gestiona las etiquetas de este chat"
-                onClose={handleOpenModal}
+                onClose={handleOpenTagsModal}
                 show={showModal}
                 width="500px"
             >
@@ -157,6 +204,38 @@ export const ChatOptions = () => {
                     </div>
                 }
             </Modal>
+
+            {/* END: Delete Conversation Modal */}
+            <Modal
+                // title="Eliminar usuario usuario"
+                onClose={() => handleOpenDeleteModal(false)}
+                show={showDeleteModal}
+                width="500px"
+            >
+                <div className="text-xl mt-5">Estás seguro?</div>
+                <div className="text-slate-500 mt-2">
+                    Quieres eliminar la conversación de: <strong>{activeConversationState.contact.name} - {activeConversationState.contact.phone}</strong>?{" "}
+                    <br />
+                    Esta acción es irreversible.
+                </div>
+
+                <div className="flex justify-center space-x-4 mt-4">
+                    <button
+                        className="second-button mb-8"
+                        onClick={() => handleOpenDeleteModal(false)}
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        className="bg-red-800 text-white rounded-md text-sm px-4 py-2 mb-8 transition ease-in-out delay-50 flex"
+                        onClick={handleDeleteConversation}
+                    >
+                        {loadingDeleteConversation && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
+                        Sí, eliminar
+                    </button>
+                </div>
+            </Modal >
+            {/* END: Delete Conversation Modal */}
         </div>
     )
 }

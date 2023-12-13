@@ -105,6 +105,24 @@ export const createConversation = async (data, token) => {
   return response;
 };
 
+export const deleteConversation = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/conversation/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  })
+    .then((res) => res.json())
+    .catch((error) => {
+      throw new Error("Error: " + error.message);
+    });
+
+  return response;
+};
+
 export const sendMessage = async (id, data, token) => {
   try {
     const response = await fetch(
@@ -151,6 +169,21 @@ export const getMedia = async (token, url, conversation_id) => {
 
 export const markAsRead = async (token, idConversation) => {
   const response = await fetch(`${process.env.API_URL}/message/markAsRead`, {
+    method: "POST",
+    body: JSON.stringify({ conversation_id: idConversation }),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.text());
+
+  return response;
+};
+
+export const markAsUnread = async (token, idConversation) => {
+  const response = await fetch(`${process.env.API_URL}/message/markAsUnread`, {
     method: "POST",
     body: JSON.stringify({ conversation_id: idConversation }),
     headers: {
