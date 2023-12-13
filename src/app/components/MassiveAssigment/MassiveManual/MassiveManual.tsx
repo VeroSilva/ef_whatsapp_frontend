@@ -15,6 +15,7 @@ import { IconChevron } from "../../Icons/IconChevron";
 export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: Function, setAlert: Function }) => {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(null);
+    const [errorDate, setErrorDate] = useState("");
     const [nextStepDisabled, setNextStepDisabled] = useState(true);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [loadingAssign, setLoadingAssing] = useState(false);
@@ -126,11 +127,16 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
     const onChange = (dates: any) => {
         const [start, end] = dates;
 
+        if (start && end && dayjs(end).diff(dayjs(start), 'days') > 31) {
+            setErrorDate('El rango seleccionado no puede ser mayor a 31 días');
+            return;
+        }
+
         const startFormatted = dayjs(start).format("YYYY-MM-DD")
         const endFormatted = end ? dayjs(end).format("YYYY-MM-DD") : dayjs(start).format("YYYY-MM-DD")
 
         setFilters((prevFilters) => ({ ...prevFilters, startDate: startFormatted, endDate: endFormatted }))
-
+        setErrorDate('');
         setEndDate(end)
         setStartDate(start)
     };
@@ -194,14 +200,14 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                     <div className="flex flex-wrap -mx-3 mb-6 items-center w-full">
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
-                                <strong>*</strong> Teléfono origen
+                                * Teléfono origen
                             </label>
                             <SelectPhones handleChange={handleSelectPhoneChange} />
                         </div>
 
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
-                                <strong>*</strong> Escoge rango de fechas
+                                * Escoge rango de fechas
                             </label>
                             <DatePicker
                                 selected={startDate}
@@ -212,6 +218,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full p-2.5"
                                 dateFormat="dd/MM/yyyy"
                             />
+                            <span className="text-xs text-rose-500">{errorDate}</span>
                         </div>
                     </div>
 
