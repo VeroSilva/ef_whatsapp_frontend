@@ -13,6 +13,7 @@ import { IconDoubleCheck } from "../../Icons/IconDoubleCheck";
 import { IconTrash } from "../../Icons/IconTrash";
 import { markAsUnread } from '@/app/services/api';
 import { IconLoading } from "../../Icons/IconLoading";
+import useChatsRead from "@/app/hooks/useChatsRead";
 
 export const ChatOptions = () => {
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
@@ -22,6 +23,7 @@ export const ChatOptions = () => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     //@ts-ignore
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
+    const { setChatsRead } = useChatsRead()
     const { userState } = useUser();
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
@@ -53,6 +55,17 @@ export const ChatOptions = () => {
     const handleMarkAsUnread = () => {
         resetActiveConversation();
         markAsUnread(userState.token, activeConversationState.id);
+
+        setChatsRead((prevChatsRead: number[]) => {
+            const isChatRead = prevChatsRead.includes(activeConversationState.id);
+
+            if (isChatRead) {
+                const filteredChatsRead = prevChatsRead.filter((chat) => chat !== activeConversationState.id);
+                return filteredChatsRead;
+            }
+
+            return prevChatsRead;
+        });
     }
 
     const handleDeleteConversation = () => {

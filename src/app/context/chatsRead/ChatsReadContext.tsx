@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 export type ChatsReadContextProps = {
-    chatsReadState: string[],
+    chatsReadState: number[],
     setChatsRead: Function
 };
 
