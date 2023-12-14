@@ -112,6 +112,13 @@ export const ChatSidebar = () => {
             setConversations((prevConversations) => [payload.data, ...prevConversations]);
         }
 
+        const deleteConversationListener = (payload: any) => {
+            setConversations((prevConversations) => {
+                const filterConversations = [...prevConversations].filter((conversation) => conversation.id !== payload.data.id)
+                return filterConversations
+            });
+        }
+
         const conversationTagListener = (payload: any) => {
             if (payload.data.tags) {
                 setConversations(prevConversations => {
@@ -133,11 +140,13 @@ export const ChatSidebar = () => {
 
         socket.on('update_conversation', updateConversationListener);
         socket.on('new_conversation', newConversationListener);
+        socket.on('delete_conversation', deleteConversationListener);
         socket.on('conversation_tags', conversationTagListener);
 
         return () => {
             socket.off('update_conversation', updateConversationListener);
             socket.off('new_conversation', newConversationListener);
+            socket.off('delete_conversation', deleteConversationListener);
             socket.off('conversation_tags', conversationTagListener);
         };
     }, [conversations, chatsReadState, socketInstance]);

@@ -73,7 +73,6 @@ export const ChatOptions = () => {
 
         deleteConversation(activeConversationState.id, userState.token)
             .then((res) => {
-                console.log(res)
                 resetActiveConversation()
                 setLoadingDeleteConversation(false)
                 setShowDeleteModal(false)
