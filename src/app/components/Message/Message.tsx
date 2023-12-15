@@ -8,6 +8,7 @@ import { Reaction } from "../../interfaces/reactions";
 import React from "react";
 import { MemoizedMessageOptions } from "./MessageOptions/MessageOptions";
 import { MessageContent } from "./MessageContent/MessageContent";
+import { MessageCampaign } from "./MessageCampaign/MessageCampaign";
 
 const Message = ({ message, reaction, handleOpenModal, setModalImage, highlightedText }: { message: IMessage, reaction: Reaction[], handleOpenModal: Function, setModalImage: Function, highlightedText: string }) => {
     const isRead = message.read;
@@ -36,6 +37,10 @@ const Message = ({ message, reaction, handleOpenModal, setModalImage, highlighte
                             }>
                                 <MessageContent message={message.replied_message} isReply={true} />
                             </div>
+                        }
+
+                        {(message.referral && message.referral.id) &&
+                            <MessageCampaign referral={message.referral} />
                         }
 
                         <MessageContent message={message} handleOpenModal={handleOpenModal} setModalImage={setModalImage} highlightedText={highlightedText} isReply={false} />

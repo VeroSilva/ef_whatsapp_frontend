@@ -67,6 +67,18 @@ export interface JsonAction {
     product_name?: string
 }
 
+export interface Referral {
+    body?: string,
+    ctwa_clid?: string,
+    headline?: string,
+    id?: string,
+    image_url?: string,
+    media_type?: string,
+    source_id?: string,
+    source_type?: string,
+    source_url?: string
+}
+
 export interface Message {
     conversation_id: number,
     created_at: string,
@@ -76,6 +88,7 @@ export interface Message {
     read: boolean,
     status: string,
     replied_message?: Message | null,
+    referral: Referral
 }
 
 export interface Context {

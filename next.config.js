@@ -23,6 +23,8 @@ const nextConfig = {
       "api.efperfumes.com",
       "wa.efperfumes.com",
       "vzla.efperfumes.com",
+      "scontent-*.xx.fbcdn.net",
+      "scontent.xx.fbcdn.net",
     ],
     remotePatterns: [
       {
@@ -36,6 +38,14 @@ const nextConfig = {
         hostname: "vzla.efperfumes.com",
         port: "",
         pathname: "/wp-content/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "scontent-*.xx.fbcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "scontent.xx.fbcdn.net",
       },
     ],
   },
