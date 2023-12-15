@@ -1,5 +1,6 @@
 import { Referral } from "@/app/interfaces/conversations";
 import Image from "next/image";
+import { IconLink } from "../../Icons/IconLink";
 
 export const MessageCampaign = ({ referral }: { referral: Referral }) => {
     return (
@@ -30,7 +31,7 @@ export const MessageCampaign = ({ referral }: { referral: Referral }) => {
                 }
 
                 {referral.source_url &&
-                    <p className="text-teal-600 text-sm">{referral.source_url}</p>
+                    <p className="text-teal-600 text-sm flex gap-1 items-center"><IconLink classes="w-4 h-4" /> Ver campaña</p>
                 }
             </div>
         </a>
