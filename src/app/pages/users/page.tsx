@@ -38,8 +38,8 @@ const Users = (): JSX.Element => {
     });
     const roles = [
         { id: "1", name: "Administrador", classes: "bg-blue-500" },
-        { id: "2", name: "Call Center", classes: "bg-indigo-500" },
-        { id: "3", name: "Vendedor", classes: "bg-violet-500" },
+        { id: "2", name: "Tecnico", classes: "bg-indigo-500" },
+        { id: "3", name: "Telemarketing", classes: "bg-violet-500" },
     ]
 
     useEffect(() => {

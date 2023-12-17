@@ -149,7 +149,7 @@ export const ChatOptions = () => {
                         </label>
                     </li>
 
-                    <li
+                    {userState.role == "1" && <li
                         className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
                         onClick={() => handleOpenDeleteModal(true)}
                     >
@@ -157,7 +157,8 @@ export const ChatOptions = () => {
                             Eliminar conversación
                             <IconTrash classes="w-5 h-5 text-slate-500" />
                         </label>
-                    </li>
+                    </li>}
+
                 </ul>
             }
 
