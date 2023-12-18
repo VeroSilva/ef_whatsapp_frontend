@@ -135,7 +135,7 @@ const Home = (): JSX.Element => {
                 }
                 {(userState.role == "1" || userState.role == "2") &&
                     <>
-                        <div className="col-span-12 m-2 text-center">
+                        <div className="col-span-6 m-2 mx-5">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                                 Escoge un Rango de fechas
                             </label>
@@ -149,6 +149,11 @@ const Home = (): JSX.Element => {
                                 dateFormat="dd/MM/yyyy"
                                 selectsRange
                             />
+                        </div>
+                        <div className="col-span-6 m-2 mx-5">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
+                                Descargar detalles en Excel
+                            </label>
                             <button
                                 className={`main-button rounded-full flex items-center justify-center mt-2 ${loading ? "opacity-75" : ""}`}
                                 onClick={handleDownload}
