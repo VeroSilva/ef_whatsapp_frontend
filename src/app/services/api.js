@@ -616,3 +616,41 @@ export const getDashboardReport = async (token, initDate, endDate) => {
 
   return response;
 };
+
+export const downloadDashboardReport = async (token, initDate, endDate) => {
+  try {
+    const response = await fetch(
+      `${process.env.API_URL}/report/download?initDate=${initDate} 00:00:00&endDate=${endDate} 23:59:59`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+          Authorization: token,
+          "Content-Type": "application/json",
+          "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "reporte.xlsx";
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(link.href);
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: "Error al descargar el informe." };
+  }
+};

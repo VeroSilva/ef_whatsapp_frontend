@@ -3,7 +3,7 @@ import { Sidebar } from "@/app/components/Sidebar/Sidebar";
 import useUser from "@/app/hooks/useUser";
 import { redirect } from 'next/navigation'
 import { useEffect, useState } from "react";
-import { getDashboardReport } from "@/app/services/api";
+import { getDashboardReport, downloadDashboardReport } from "@/app/services/api";
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
 import { es } from 'date-fns/esm/locale'
@@ -15,6 +15,9 @@ import { ConversationSkeleton } from "../../components/Skeleton/Conversation";
 import { IconUnread } from "../../components/Icons/IconUnread"
 import { IconMessage } from "../../components/Icons/IconMessage"
 import { IconSearch } from "../../components/Icons/IconSearch"
+import { IconDocument } from "../../components/Icons/IconDocument"
+import { IconLoading } from "../../components/Icons/IconLoading";
+
 import dayjs from "dayjs";
 
 const Home = (): JSX.Element => {
@@ -28,6 +31,8 @@ const Home = (): JSX.Element => {
     const ultimoDiaMes = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     const [startDate, setStartDate] = useState(inicioMes);
     const [endDate, setEndDate] = useState(ultimoDiaMes);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         if (!userState || userState.token === "") {
             redirect('/pages/login')
@@ -35,7 +40,9 @@ const Home = (): JSX.Element => {
     }, [userState]);
 
     const handleLoadDashboardReport = (startFormatted: String, endFormatted: String) => {
+        setLoading(true)
         getDashboardReport(userState.token, startFormatted, endFormatted).then((res => {
+            setLoading(false)
             if ('botMessages' in res && res.botMessages) {
                 setReportsData(res.botMessages)
             }
@@ -50,6 +57,16 @@ const Home = (): JSX.Element => {
             }
         }))
     }
+
+    const handleDownload = () => {
+        setLoading(true)
+        const startFormatted = dayjs(inicioMes).format("YYYY-MM-DD")
+        const endFormatted = dayjs(ultimoDiaMes).format("YYYY-MM-DD")
+        downloadDashboardReport(userState.token, startFormatted, endFormatted).then((res => {
+            setLoading(false)
+        }))
+    }
+
     useEffect(() => {
         const startFormatted = dayjs(inicioMes).format("YYYY-MM-DD")
         const endFormatted = dayjs(ultimoDiaMes).format("YYYY-MM-DD")
@@ -123,6 +140,7 @@ const Home = (): JSX.Element => {
                                 Escoge un Rango de fechas
                             </label>
                             <DatePicker
+                                disabled={loading}
                                 locale={es}
                                 selected={startDate}
                                 startDate={startDate}
@@ -131,6 +149,14 @@ const Home = (): JSX.Element => {
                                 dateFormat="dd/MM/yyyy"
                                 selectsRange
                             />
+                            <button
+                                className={`main-button rounded-full flex items-center justify-center mt-2 ${loading ? "opacity-75" : ""}`}
+                                onClick={handleDownload}
+                                disabled={loading}
+                            >
+                                {loading ? <IconLoading classes="w-6 h-6 text-slate-100 me-2" /> : <IconDocument classes="w-6 h-6" />}
+                                Descargar Excel
+                            </button>
                         </div>
                         <div className="col-span-6 m-2">
                             <BotMessagesChart data={botMessagesData} />
