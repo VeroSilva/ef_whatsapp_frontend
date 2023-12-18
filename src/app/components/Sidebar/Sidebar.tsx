@@ -46,21 +46,21 @@ export const Sidebar = () => {
             title: "Usuarios",
             link: "/pages/users",
             icon: <IconUsers classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
             title: "Etiquetas",
             link: "/pages/tags",
             icon: <IconTag classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
             title: "Teléfonos",
             link: "/pages/phones",
             icon: <IconPhone classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
@@ -68,7 +68,7 @@ export const Sidebar = () => {
             icon: <IconForward classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/quick-answers"),
             open: false,
-            show: userState.role === "1",
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
@@ -84,7 +84,7 @@ export const Sidebar = () => {
             icon: <IconFlow classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/templates-flows"),
             open: false,
-            show: userState.role === "1",
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
     ])

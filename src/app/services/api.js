@@ -599,3 +599,20 @@ export const deleteQuickAnswers = async (id, company_phone_id, token) => {
 
   return response;
 };
+
+export const getDashboardReport = async (token, initDate, endDate) => {
+  const response = await fetch(
+    `${process.env.API_URL}/report?initDate=${initDate} 00:00:00&endDate=${endDate} 23:59:59`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  ).then((res) => res.json());
+
+  return response;
+};
