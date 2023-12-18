@@ -68,15 +68,15 @@ export const Sidebar = () => {
             icon: <IconForward classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/quick-answers"),
             open: false,
-            show: true,
+            show: userState.role === "1",
             active: false
         },
         {
             title: "Chats",
             icon: <IconTemplates classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/conversation"),
-            open: false,
-            show: true,
+            open: true,
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
@@ -84,7 +84,7 @@ export const Sidebar = () => {
             icon: <IconFlow classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/templates-flows"),
             open: false,
-            show: true,
+            show: userState.role === "1",
             active: false
         },
     ])
@@ -185,7 +185,8 @@ export const Sidebar = () => {
                 <Accordion className="border-none" collapseAll>
                     {menuItems
                         .filter((m) => m.subMenu)
-                        .map((menu, index) => (
+                        .map((menu, index) => menu.show ? (
+
                             <Accordion.Panel
                                 itemID={`panel-${index}`}
                                 isOpen={menu.active}
@@ -223,7 +224,8 @@ export const Sidebar = () => {
                                     <></>
                                 )}
                             </Accordion.Panel>
-                        ))}
+                        ) : <></>)
+                    }
                 </Accordion>
             </ul>
 

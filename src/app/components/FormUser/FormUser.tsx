@@ -5,27 +5,58 @@ import { IconEye } from "@/app/components/Icons/IconEye";
 import { createUser, editUser } from "@/app/services/api";
 import useUser from "../../hooks/useUser"
 import { IconLoading } from "../Icons/IconLoading";
+import { IconX } from "../Icons/IconX";
+import { CompanyPhones } from "@/app/interfaces/user";
+//@ts-ignore
+import chroma from 'chroma-js';
 
 export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenModal, data }: { type: string, roles: any[], setAlert: Function, handleLoadUsers: Function, handleOpenModal: Function, data?: any }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorCredentials, setErrorCredentials] = useState(false);
     const [loadingCreate, setLoadingCreate] = useState(false);
+    const [selectedNumbers, setSelectedNumbers] = useState<CompanyPhones[]>([])
     const [credentials, setCredentials] = useState({
         username: "",
         password: "",
         role: "",
+        company_phones_ids: "",
     });
     const { userState } = useUser();
 
+    const addPhone = (phone: CompanyPhones) => {
+        const itemExists = selectedNumbers.some((item: CompanyPhones) => item.company_phone_id === phone.company_phone_id);
+        if (!itemExists) {
+            setSelectedNumbers((prevOptions: CompanyPhones[]): CompanyPhones[] => [...prevOptions, phone])
+        }
+    }
+
+    const removePhone = (id: number) => {
+        const updatedOptions = selectedNumbers.filter((item: CompanyPhones) => item.company_phone_id !== id);
+        setSelectedNumbers(updatedOptions);
+    }
+
+    useEffect(() => {
+        setCredentials({
+            ...credentials,
+            company_phones_ids: selectedNumbers.map((phone: CompanyPhones) => phone.company_phone_id).join(',')
+        });
+    }, [selectedNumbers])
+
+
     useEffect(() => {
         if (data) {
-            const { username, password, role } = data;
+            const { username, password, role, company_phones_ids } = data;
+
+            if (userState.company_phones && !!userState.company_phones.length) {
+                setSelectedNumbers(userState.company_phones.filter((phone: CompanyPhones) => company_phones_ids && company_phones_ids.split(',').includes(String(phone.company_phone_id))))
+            }
 
             setCredentials({
                 ...credentials,
                 username,
                 password,
-                role
+                role,
+                company_phones_ids: selectedNumbers.map((phone: CompanyPhones) => phone.company_phone_id).join(',')
             });
         }
     }, [data]);
@@ -61,7 +92,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     }
                 });
             } else {
-                editUser({ username: credentials.username, role: credentials.role }, data.id, userState.token).then((res) => {
+                editUser({ username: credentials.username, role: credentials.role, company_phones_ids: credentials.company_phones_ids }, data.id, userState.token).then((res) => {
                     setLoadingCreate(false)
                     handleOpenModal(false)
 
@@ -149,6 +180,56 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     ))}
                 </select>
             </div>
+
+            {credentials.role === "3" &&
+                <div className="relative mb-6">
+                    <h6 className="text-sm font-bold mb-2">Seleccione para asignar</h6>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {userState.company_phones && !!userState.company_phones.length && userState.company_phones.map((phone) => {
+                            const color = chroma("#002e6d");
+                            const background = color.alpha(0.2).css()
+                            return (
+                                <span
+                                    key={`phone-${phone.company_phone_id}`}
+                                    style={{ backgroundColor: background, border: `1px solid #002e6d` }}
+                                    className={`rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 cursor-pointer flex items-center`}
+                                    onClick={() => addPhone(phone)}
+                                >
+                                    {phone.alias}
+                                </span>
+                            )
+
+                        })}
+                    </div>
+
+                    {selectedNumbers.length > 0 &&
+                        <>
+                            <h6 className="text-sm font-bold mb-2">Listado de asignados</h6>
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {selectedNumbers.map((phone) => {
+                                    const color = chroma("#a2042d");
+                                    const background = color.alpha(0.2).css()
+                                    return (
+                                        <span
+                                            key={`phone-added-${phone.company_phone_id}`}
+                                            style={{ backgroundColor: background, border: `1px solid #a2042d` }}
+                                            className="rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 flex items-center"
+                                        >
+                                            {phone.alias}
+                                            <button
+                                                className="rounded-full"
+                                                onClick={() => removePhone(phone.company_phone_id)}
+                                            >
+                                                <IconX classes="w-6 h-6 ms-1 text-gray-800" />
+                                            </button>
+                                        </span>
+                                    )
+                                })}
+                            </div>
+                        </>
+                    }
+                </div>
+            }
 
             {errorCredentials && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
