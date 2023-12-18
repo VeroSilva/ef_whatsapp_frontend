@@ -12,9 +12,10 @@ import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
 import { SelectedTags } from "./SelectedTags/SelectedTags";
 import useUser from "@/app/hooks/useUser";
+import useTag from "@/app/hooks/useTags";
 import { Tag } from "@/app/interfaces/conversations";
 import { useSocket } from "@/app/context/socket/SocketContext";
-import { getCatalog } from "@/app/services/api";
+import { getCatalog, getTags } from "@/app/services/api";
 import useCatalog from '@/app/hooks/useCatalog';
 import { usePathname } from "next/navigation";
 
@@ -34,6 +35,7 @@ export const Chat = () => {
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
+    const { setTagsState } = useTag();
 
     useEffect(() => {
         if (selectedFile !== null) {
@@ -83,6 +85,10 @@ export const Chat = () => {
         getCatalog(userState.token, phoneId).then((res) => {
             setCatalogState(res.catalog)
         })
+
+        getTags(userState.token).then((res => {
+            setTagsState(res)
+        }))
     }, [])
 
     function handleSearchTextChange() {

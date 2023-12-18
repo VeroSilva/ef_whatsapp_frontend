@@ -6,15 +6,17 @@ import { Conversation as IConversation } from '@/app/interfaces/conversations';
 import { getConversations } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
 import useActiveConversation from "../../hooks/useActiveConversation";
+import useChatFilters from "../../hooks/useChatFilters";
 import { ConversationSkeleton } from "../Skeleton/Conversation";
 import { ItemListConversation } from "../ItemListConversation";
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
 import { usePathname } from 'next/navigation';
 import useChatsRead from "@/app/hooks/useChatsRead";
 import { useSocket } from "@/app/context/socket/SocketContext";
+import { ChatFilters } from "../Chat/ChatFilters/ChatFilters";
+import { IconWarning } from "../Icons/IconWarning";
 
 export const ChatSidebar = () => {
-    const [filter, setFilter] = useState<any>({ search: "", unread: false });
     const [showModal, setShowModal] = useState<boolean>(false);
     const [pageConversation, setPageConversation] = useState(0);
     const [totalPagesConversation, setTotalPagesConversation] = useState(0);
@@ -30,15 +32,13 @@ export const ChatSidebar = () => {
     const pathname = usePathname();
     const parts = pathname.split('/');
     const phoneId = Number(parts[parts.length - 1]);
-    const { chatsReadState, setChatsRead } = useChatsRead()
+    const { chatsReadState, setChatsRead } = useChatsRead();
     const { socketInstance } = useSocket();
+    const { chatFiltersState, setChatFiltersState } = useChatFilters();
 
     useEffect(() => {
-        setPageConversation(0);
-        setConversations([]);
-        setLoadingInitialConversations(true)
-        loadConversations(true);
-    }, [filter.unread]);
+        handleClearPaginateConversation();
+    }, [chatFiltersState.unread, chatFiltersState.overdue])
 
     useEffect(() => {
         if (!loadingConversations && containerRef.current) {
@@ -73,7 +73,7 @@ export const ChatSidebar = () => {
                             const updatedArray = [...prevConversations];
                             updatedArray[chatIndex] = payload.data.conversation;
                             return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
-                        } else if (!!filter.unread && payload.data.conversation.unread_count > 0) {
+                        } else if (!!chatFiltersState.unread && payload.data.conversation.unread_count > 0) {
                             return [...prevConversations, payload.data.conversation].sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
                         }
 
@@ -162,13 +162,18 @@ export const ChatSidebar = () => {
         }
     };
 
-    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFilter((prevFilter: any) => ({ ...prevFilter, search: event.target.value }));
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChatFiltersState({ ...chatFiltersState, search: event.target.value })
     };
 
     const handleFilterUnread = () => {
-        setFilter((prevFilter: any) => ({ ...prevFilter, unread: !filter.unread }));
+        setChatFiltersState({ ...chatFiltersState, unread: !chatFiltersState.unread })
     };
+
+    const handleFilterOverdue = () => {
+        setChatFiltersState({ ...chatFiltersState, overdue: !chatFiltersState.overdue })
+    };
+
     const handleOpenModal = (show: boolean) => {
         setShowModal(show);
     };
@@ -177,7 +182,7 @@ export const ChatSidebar = () => {
         setPageConversation(0);
         setConversations([]);
         loadConversations(true);
-        setLoadingInitialConversations(true)
+        setLoadingInitialConversations(true);
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -192,9 +197,18 @@ export const ChatSidebar = () => {
         }
         loadingRefConversation.current = true;
         const offset = clear ? 0 * limitConversation : pageConversation * limitConversation;
+        const tagsIds = chatFiltersState.tags.map((option: any) => option.value).join()
+        const filtersToSend = { ...chatFiltersState, tags: tagsIds }
+
         setLoadingConversations(true);
 
-        getConversations(offset, limitConversation, filter, userState.token, phoneId)
+        getConversations(
+            offset,
+            limitConversation,
+            filtersToSend,
+            userState.token,
+            phoneId
+        )
             .then((res) => {
                 setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
                 setPageConversation(res.currentPage);
@@ -211,23 +225,35 @@ export const ChatSidebar = () => {
     }
 
     const handleOpenConversation = (id: number) => {
-        if (filter.unread) {
+        if (chatFiltersState.unread) {
             setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
         }
     };
-
     return (
         <>
             <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto min-h-full bg-slate-50 border border-gray-200" ref={containerRef}>
                 <div className="box intro-y bg-slate-50 ">
                     <div className="bg-slate-50 sticky top-0 z-40">
                         <div className="flex items-center justify-between px-5 pt-5">
-                            <div className="group relative">
-                                <button onClick={() => handleFilterUnread()} >
-                                    <IconUnread classes={`w-6 h-6 ${filter.unread ? 'text-red-600 ' : 'text-slate-500 '} ml-auto`} />
-                                </button>
-                                <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leidos</span>
+                            <div className="flex items-center gap-2">
+                                <div className="group relative">
+                                    <ChatFilters handleLoadConversations={handleClearPaginateConversation} />
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Más filtros</span>
+                                </div>
+                                <div className="group relative">
+                                    <button onClick={() => handleFilterUnread()} >
+                                        <IconUnread classes={`w-6 h-6 ${chatFiltersState.unread ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
+                                    </button>
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leidos</span>
+                                </div>
+                                <div className="group relative">
+                                    <button onClick={() => handleFilterOverdue()} >
+                                        <IconWarning classes={`w-5 h-5 ${chatFiltersState.overdue ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
+                                    </button>
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes que necesitan recontacto</span>
+                                </div>
                             </div>
+
                             <div className="group relative">
                                 <button onClick={() => handleOpenModal(true)}>
                                     <IconMessage classes="w-6 h-6 text-slate-500 ml-auto" />
@@ -246,8 +272,8 @@ export const ChatSidebar = () => {
                                     className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 input-sky"
                                     placeholder="Buscar contacto o celular"
                                     required
-                                    value={filter.search}
-                                    onChange={handleFilterChange}
+                                    value={chatFiltersState.search}
+                                    onChange={handleSearchChange}
                                     onKeyDown={handleKeyDown}
                                 />
                             </div>
@@ -263,7 +289,7 @@ export const ChatSidebar = () => {
                                     key={index}
                                     handleOpenConversation={handleOpenConversation}
                                     activeConversation={activeConversationState.id}
-                                    filter={filter.search}
+                                    filter={chatFiltersState.search}
                                 />
 
                             )))

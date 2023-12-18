@@ -33,7 +33,8 @@ export const initialStateActiveMessageReply: Message = {
   },
   message_type: "",
   read: false,
-  status: ""
+  status: "",
+  referral: {}
 };
 
 export const ACTIVE_CONVERSATION = "activeMessage";

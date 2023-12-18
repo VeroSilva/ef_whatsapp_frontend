@@ -19,7 +19,19 @@ export const getConversations = async (
   token,
   company_phone_id
 ) => {
-  let url = `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&search=${filter.search}&unread=${filter.unread}&company_phone_id=${company_phone_id}`;
+  let url = `${process.env.API_URL}/conversation?offset=${offset}&limit=${limit}&company_phone_id=${company_phone_id}`;
+
+  if (filter.search) {
+    url += `&search=${filter.search}`;
+  }
+
+  if (filter.unread) {
+    url += `&unread=${filter.unread}`;
+  }
+
+  if (filter.overdue) {
+    url += `&overdue=${filter.overdue}`;
+  }
 
   if (filter.startDate && filter.endDate) {
     const startHour = filter.startDate + " 00:00:00";

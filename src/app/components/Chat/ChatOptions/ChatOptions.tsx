@@ -14,12 +14,12 @@ import { IconTrash } from "../../Icons/IconTrash";
 import { markAsUnread } from '@/app/services/api';
 import { IconLoading } from "../../Icons/IconLoading";
 import useChatsRead from "@/app/hooks/useChatsRead";
+import useTag from "@/app/hooks/useTags";
 
 export const ChatOptions = () => {
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-    const [tags, setTags] = useState<Tag[]>([])
     const dropdownRef = useRef<HTMLDivElement>(null);
     //@ts-ignore
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
@@ -27,6 +27,7 @@ export const ChatOptions = () => {
     const { userState } = useUser();
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
+    const { tagsState } = useTag();
 
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
@@ -82,12 +83,6 @@ export const ChatOptions = () => {
     const handleOpenDeleteModal = (show: boolean) => {
         setShowDeleteModal(show);
     };
-
-    useEffect(() => {
-        getTags(userState.token).then((res => {
-            setTags(res)
-        }))
-    }, [])
 
     useEffect(() => {
         setSelectedTags(activeConversationState.tags)
@@ -196,9 +191,9 @@ export const ChatOptions = () => {
 
                 <h3 className="my-3 text-start font-semibold text-gray-800">Selecciona etiquetas:</h3>
 
-                {tags.length > 0 &&
+                {tagsState.length > 0 &&
                     <div className="flex flex-wrap gap-2">
-                        {tags.map((tag) => {
+                        {tagsState.map((tag) => {
                             const color = chroma(tag.color);
                             const background = color.alpha(0.2).css()
 

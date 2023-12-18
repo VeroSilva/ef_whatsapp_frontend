@@ -10,6 +10,7 @@ import { ChatReadProvider } from '../context/chatsRead/ChatsReadProvider';
 import { CatalogProvider } from '../context/catalog/CatalogProvider';
 import { SocketProvider } from '../context/socket/SocketContext';
 import { TagsProvider } from '../context/tags/TagsProvider';
+import { ChatFiltersProvider } from '../context/chatFilters/ChatFiltersProvider';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -26,7 +27,9 @@ export default function ContextProvider({ children }: ThemeProviderProps) {
                 <CatalogProvider>
                   <TemplatesToSendProvider>
                     <ChatReadProvider>
-                      {children}
+                      <ChatFiltersProvider>
+                        {children}
+                      </ChatFiltersProvider>
                     </ChatReadProvider>
                   </TemplatesToSendProvider>
                 </CatalogProvider>
