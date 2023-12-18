@@ -76,7 +76,7 @@ export const Sidebar = () => {
             icon: <IconTemplates classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/conversation"),
             open: true,
-            show: true,
+            show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
