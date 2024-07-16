@@ -83,7 +83,7 @@ export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }
             })
 
             if (headerData && headerData.example) {
-                const parameterData = headerData.format.toLowerCase() === "image" ? { link: inputHeaderVariable } : inputHeaderVariable
+                const parameterData = headerData.format.toLowerCase() === "image" || headerData.format.toLowerCase() === "video" ? { link: inputHeaderVariable } : inputHeaderVariable
 
                 setTemplateToSend((prevState: any) => ({
                     ...prevState,
@@ -180,7 +180,7 @@ export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }
                             <>
                                 <h3 className="font-semibold text-center mb-3 text-slate-700">HEADER</h3>
 
-                                {headerData.format === "IMAGE" ?
+                                {headerData.format === "IMAGE" || headerData.format === "VIDEO" ?
                                     <input
                                         type="text"
                                         id="file-input-image"

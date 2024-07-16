@@ -31,7 +31,6 @@ export const ChatFiltersProvider: React.FC<ChatFiltersProviderProps> = ({ childr
     if (typeof window !== "undefined") {
       const filtersData = window.localStorage.getItem(CHAT_FILTERS_DATA);
       if (filtersData) {
-        console.log(filtersData)
         const filter = JSON.parse(filtersData) as ChatFiltersType;
         if (filter) return filter;
       }

@@ -390,6 +390,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     template?.components.forEach((cp: any) => {
                                         if (cp.type === "HEADER") {
                                             if (cp.format === "IMAGE") cp.example.header_handle[0] = component.parameters[0].image.link
+                                            if (cp.format === "VIDEO") cp.example.header_handle[0] = component.parameters[0].video.link
                                             if (cp.format === "TEXT") cp.example.header_text[0] = component.parameters[0].text
                                         }
                                     })
@@ -423,8 +424,6 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     break;
                             }
                         });
-
-                        // console.log(template, item.template_data.template)
 
                         if (template) {
                             setNodes((oldNodes: any) => [
