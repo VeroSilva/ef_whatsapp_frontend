@@ -111,17 +111,19 @@ const TemplatesDragAndDrop = () => {
 
     return (
         <>
-            <div className="dndflow">
-                <div className="flex gap-4 items-center absolute top-10 z-10">
-                    {tabs.map((tab, index) => (
-                        <button
-                            key={`btn-tab-${index}`}
-                            className={`p-2 rounded ${tab.show ? "bg-sky-800 text-slate-100" : "bg-slate-300"}`}
-                            onClick={() => handleActiveTab(tab.id)}
-                        >
-                            {tab.name}
-                        </button>
-                    ))}
+            <div className="dndflow relative">
+                <div className="w-full flex gap-4 items-center absolute z-10 bg-slate-100 rounded-lg p-2">
+                    <div className="w-full flex gap-4 items-center overflow-auto tags-container">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={`btn-tab-${index}`}
+                                className={`p-2 rounded text-nowrap	${tab.show ? "bg-sky-800 text-slate-100" : "bg-slate-300"}`}
+                                onClick={() => handleActiveTab(tab.id)}
+                            >
+                                {tab.name}
+                            </button>
+                        ))}
+                    </div>
 
                     <button
                         className='rounded-full bg-sky-800 p-1'

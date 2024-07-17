@@ -12,6 +12,7 @@ $border-color_2: #ff0072;
         padding: 15px 10px;
         font-size: 12px;
         background: #fcfcfc;
+        margin-top: 75px;
 
         .description {
             margin-bottom: 10px;
@@ -75,6 +76,17 @@ $border-color_2: #ff0072;
                 font-size: 10px;
             }
         }
+    }
+
+    .text-nowrap {
+        text-wrap: nowrap;
+    }
+
+    .tags-container
+    {
+        border-right: 1px solid #cdcdcd;
+        scrollbar-width: thin;
+        scrollbar-color: #075985 #F5F5F5;
     }
 }
 
