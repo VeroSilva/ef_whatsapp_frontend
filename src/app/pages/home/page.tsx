@@ -27,10 +27,10 @@ const Home = (): JSX.Element => {
     const [receivedMessages, setReceivedMessages] = useState<any[]>([]);
     const [totalConversations, setTotalConversations] = useState<any[]>([]);
     const currentDate = new Date();
-    const inicioMes = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const ultimoDiaMes = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-    const [startDate, setStartDate] = useState(inicioMes);
-    const [endDate, setEndDate] = useState(ultimoDiaMes);
+    const initMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const [startDate, setStartDate] = useState(initMonth);
+    const [endDate, setEndDate] = useState(endMonth);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -60,16 +60,16 @@ const Home = (): JSX.Element => {
 
     const handleDownload = () => {
         setLoading(true)
-        const startFormatted = dayjs(inicioMes).format("YYYY-MM-DD")
-        const endFormatted = dayjs(ultimoDiaMes).format("YYYY-MM-DD")
+        const startFormatted = dayjs(startDate).format("YYYY-MM-DD")
+        const endFormatted = dayjs(endDate).format("YYYY-MM-DD")
         downloadDashboardReport(userState.token, startFormatted, endFormatted).then((res => {
             setLoading(false)
         }))
     }
 
     useEffect(() => {
-        const startFormatted = dayjs(inicioMes).format("YYYY-MM-DD")
-        const endFormatted = dayjs(ultimoDiaMes).format("YYYY-MM-DD")
+        const startFormatted = dayjs(startDate).format("YYYY-MM-DD")
+        const endFormatted = dayjs(endDate).format("YYYY-MM-DD")
         handleLoadDashboardReport(startFormatted, endFormatted);
     }, [])
 
@@ -80,9 +80,11 @@ const Home = (): JSX.Element => {
         setStartDate(start)
         const endFormatted = end ? dayjs(end).format("YYYY-MM-DD") : dayjs(start).format("YYYY-MM-DD")
         setEndDate(end)
+
         if (null == end) {
             return;
         }
+
         handleLoadDashboardReport(startFormatted, endFormatted);
     };
 
