@@ -12,6 +12,7 @@ import { IconHome } from "../Icons/IconHome";
 import { IconPhone } from "../Icons/IconPhone";
 import { IconFlow } from "../Icons/IconFlow";
 import { IconForward } from "../Icons/IconForward";
+import { IconMegaphone } from "../Icons/IconMegaphone";
 import { Accordion } from 'flowbite-react';
 import "./styles.scss"
 
@@ -46,6 +47,13 @@ export const Sidebar = () => {
             title: "Usuarios",
             link: "/pages/users",
             icon: <IconUsers classes="w-6 h-6" />,
+            show: userState.role === "1",
+            active: false
+        },
+        {
+            title: "Campañas",
+            link: "/pages/campaigns",
+            icon: <IconMegaphone classes="w-6 h-6" />,
             show: userState.role === "1",
             active: false
         },
