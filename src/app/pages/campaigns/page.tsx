@@ -147,7 +147,7 @@ const Campaigns = (): JSX.Element => {
                                             <td className="px-6 py-4 text-center">{campaign.id_campaign}</td>
                                             <td className="px-6 py-4 text-center flex gap-2 justify-center">{
                                                 campaign.users.map((user: CampaignUser) => (
-                                                    <span className="rounded-lg text-xs text-blue-900 px-2 py-1 bg-slate-100">{user.username}</span>
+                                                    <span className="rounded-lg text-xs text-blue-900 px-2 py-1 bg-slate-100" key={`user-${user.id}`}>{user.username}</span>
                                                 ))
                                             }</td>
                                             <td className="px-6 py-4">

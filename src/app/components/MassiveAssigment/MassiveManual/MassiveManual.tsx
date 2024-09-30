@@ -97,7 +97,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
 
             const conversationsData = {
                 conversations: conversations.ids.split(","),
-                schedule_date: dayjs(scheduleDate).format("YYYY-MM-DD HH:mm:ss")
+                dispatch_date: dayjs(scheduleDate).format("YYYY-MM-DD HH:mm:ss")
             }
 
             setMassiveTagsToConversations(
