@@ -65,7 +65,12 @@ export const ChatSidebar = () => {
 
         const updateConversationListener = (payload: any) => {
             if (payload.table === "messages" && payload.action === "insert") {
-                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                if (
+                    phoneId.toString() === payload.data.conversation.company_phone_id &&
+                    (!payload.data.conversation.user_assigned_id || 
+                        (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id)
+                    )
+                ) {
                     setConversations(prevConversations => {
                         const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation.id);
 

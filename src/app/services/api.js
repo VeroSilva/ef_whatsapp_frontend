@@ -662,3 +662,61 @@ export const downloadDashboardReport = async (token, initDate, endDate) => {
     return { success: false, error: "Error al descargar el informe." };
   }
 };
+
+export const getCampaigns = async (token) => {
+  const response = await fetch(`${process.env.API_URL}/campaign`, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const createCampaign = async (data, token) => {
+  const response = await fetch(`${process.env.API_URL}/campaign`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const editCampaign = async (data, id, token) => {
+  const response = await fetch(`${process.env.API_URL}/campaign/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};
+
+export const deleteCampaign = async (id, token) => {
+  const response = await fetch(`${process.env.API_URL}/campaign/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};

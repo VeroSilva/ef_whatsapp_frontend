@@ -20,6 +20,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [loadingAssign, setLoadingAssing] = useState(false);
     const [tagToAssign, setTagToAssign] = useState<Option>({} as Option);
+    const [scheduleDate, setScheduleDate] = useState(new Date());
     const { userState } = useUser();
     const [filters, setFilters] = useState({
         startDate: "",
@@ -95,7 +96,8 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
             setLoadingAssing(true)
 
             const conversationsData = {
-                conversations: conversations.ids.split(",")
+                conversations: conversations.ids.split(","),
+                schedule_date: dayjs(scheduleDate).format("YYYY-MM-DD HH:mm:ss")
             }
 
             setMassiveTagsToConversations(
@@ -123,6 +125,10 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                 })
         }
     };
+
+    const onScheduleChange = (date: any) => {
+        setScheduleDate(date)
+    }
 
     const onChange = (dates: any) => {
         const [start, end] = dates;
@@ -268,12 +274,27 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
             }
 
             {steps[1].current &&
-                <div>
-                    <div className="w-ful px-3 mb-6 md:mb-0">
-                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
-                            Selecciona tag a asignar
-                        </label>
-                        <SelectTags handleChange={handleSelectTagsChange} />
+                <div className="w-full">
+                    <div className="flex flex-wrap -mx-3 mb-6 items-center w-full">
+                        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+                                Selecciona tag a asignar
+                            </label>
+                            <SelectTags handleChange={handleSelectTagsChange} />
+                        </div>
+
+                        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+                                Programa el día
+                            </label>
+                            <DatePicker
+                                selected={scheduleDate}
+                                onChange={onScheduleChange}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full p-2.5"
+                                dateFormat="dd/MM/yyyy HH:mm:ss"
+                                showTimeSelect
+                            />
+                        </div>
                     </div>
 
                     <span className="block bg-green-200 p-2 rounded-full mt-4">Conversaciones seleccionadas: <span className="font-semibold text-green-400">{conversations.mount}</span></span>
