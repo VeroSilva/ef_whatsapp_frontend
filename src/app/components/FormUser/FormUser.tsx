@@ -9,8 +9,18 @@ import { IconX } from "../Icons/IconX";
 import { CompanyPhones } from "@/app/interfaces/user";
 //@ts-ignore
 import chroma from 'chroma-js';
+import { FormSelectSchedules } from "./FormSelectSchedules/FormSelectSchedules";
+import { IconSort } from "../Icons/IconSort";
+import { Accordion } from "../Accordion/Accordion";
+
+type Schedule = {
+    days: string[];
+    startTime: string | null;
+    endTime: string | null;
+};
 
 export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenModal, data }: { type: string, roles: any[], setAlert: Function, handleLoadUsers: Function, handleOpenModal: Function, data?: any }) => {
+    const { userState } = useUser();
     const [showPassword, setShowPassword] = useState(false);
     const [errorCredentials, setErrorCredentials] = useState(false);
     const [loadingCreate, setLoadingCreate] = useState(false);
@@ -20,8 +30,9 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         password: "",
         role: "",
         company_phones_ids: "",
+        weight: ""
     });
-    const { userState } = useUser();
+    const [scheduleGroup, setScheduleGroup] = useState<Schedule[]>([]);
 
     const addPhone = (phone: CompanyPhones) => {
         const itemExists = selectedNumbers.some((item: CompanyPhones) => item.company_phone_id === phone.company_phone_id);
@@ -45,7 +56,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
 
     useEffect(() => {
         if (data) {
-            const { username, password, role, company_phones_ids } = data;
+            const { username, password, role, company_phones_ids, weight } = data;
 
             if (userState.company_phones && !!userState.company_phones.length) {
                 setSelectedNumbers(userState.company_phones.filter((phone: CompanyPhones) => company_phones_ids && company_phones_ids.split(',').includes(String(phone.company_phone_id))))
@@ -56,13 +67,21 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                 username,
                 password,
                 role,
-                company_phones_ids: selectedNumbers.map((phone: CompanyPhones) => phone.company_phone_id).join(',')
+                company_phones_ids: selectedNumbers.map((phone: CompanyPhones) => phone.company_phone_id).join(','),
+                weight
             });
+
+            setScheduleGroup(data.work_schedule);
         }
     }, [data]);
 
     const dataIsValid = () => {
-        if (credentials.username === "" || credentials.password === "" || credentials.role === "") return false;
+        if (
+            credentials.username === "" ||
+            credentials.password === "" ||
+            credentials.role === "" ||
+            credentials.weight === ""
+        ) return false;
         else return true;
     };
 
@@ -71,8 +90,13 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         else {
             setLoadingCreate(true)
 
+            const dataUser = {
+                ...credentials,
+                work_schedule: scheduleGroup
+            }
+
             if (type === "create") {
-                createUser(credentials, userState.token).then((res) => {
+                createUser(dataUser, userState.token).then((res) => {
                     setLoadingCreate(false)
                     handleOpenModal(false)
 
@@ -92,7 +116,8 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     }
                 });
             } else {
-                editUser({ username: credentials.username, role: credentials.role, company_phones_ids: credentials.company_phones_ids }, data.id, userState.token).then((res) => {
+                const { username, role, company_phones_ids, weight} = credentials
+                editUser({ username, role, company_phones_ids, weight, work_schedule: scheduleGroup }, data.id, userState.token).then((res) => {
                     setLoadingCreate(false)
                     handleOpenModal(false)
 
@@ -119,7 +144,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         <button
             onClick={handleCreateUser}
             className={
-                "main-button transition ease-in-out delay-50 flex mb-8 " +
+                "main-button transition ease-in-out delay-50 flex " +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}
@@ -168,7 +193,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                 </div>
             )}
 
-            <div className="relative mb-6">
+            <div className="relative">
                 <select
                     id="rols"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -182,53 +207,77 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
             </div>
 
             {credentials.role === "3" &&
-                <div className="relative mb-6">
-                    <h6 className="text-sm font-bold mb-2">Seleccione para asignar</h6>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {userState.company_phones && !!userState.company_phones.length && userState.company_phones.map((phone) => {
-                            const color = chroma("#002e6d");
-                            const background = color.alpha(0.2).css()
-                            return (
-                                <span
-                                    key={`phone-${phone.company_phone_id}`}
-                                    style={{ backgroundColor: background, border: `1px solid #002e6d` }}
-                                    className={`rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 cursor-pointer flex items-center`}
-                                    onClick={() => addPhone(phone)}
-                                >
-                                    {phone.alias}
-                                </span>
-                            )
+                <>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <IconSort classes="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        </div>
+                        <input
+                            type="number"
+                            id="input-group-1"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                            placeholder="Relevancia"
+                            value={credentials.weight ?? ""}
+                            onChange={(e) => setCredentials({ ...credentials, weight: e.target.value })}
+                        />
+                    </div>
+                    
+                    <div className="relative">
+                        <h6 className="block uppercase tracking-wide text-gray-700 text-xs text-start font-bold mb-2">Seleccione para asignar</h6>
+                        <div className="flex flex-wrap gap-2">
+                            {userState.company_phones && !!userState.company_phones.length && userState.company_phones.map((phone) => {
+                                const color = chroma("#002e6d");
+                                const background = color.alpha(0.2).css()
+                                return (
+                                    <span
+                                        key={`phone-${phone.company_phone_id}`}
+                                        style={{ backgroundColor: background, border: `1px solid #002e6d` }}
+                                        className={`rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 cursor-pointer flex items-center`}
+                                        onClick={() => addPhone(phone)}
+                                    >
+                                        {phone.alias}
+                                    </span>
+                                )
 
-                        })}
+                            })}
+                        </div>
+
+                        {selectedNumbers.length > 0 &&
+                            <>
+                                <h6 className="block uppercase tracking-wide text-gray-700 text-xs text-start font-bold mt-6 mb-2">Listado de asignados</h6>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedNumbers.map((phone) => {
+                                        const color = chroma("#a2042d");
+                                        const background = color.alpha(0.2).css()
+                                        return (
+                                            <span
+                                                key={`phone-added-${phone.company_phone_id}`}
+                                                style={{ backgroundColor: background, border: `1px solid #a2042d` }}
+                                                className="rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 flex items-center"
+                                            >
+                                                {phone.alias}
+                                                <button
+                                                    className="rounded-full"
+                                                    onClick={() => removePhone(phone.company_phone_id)}
+                                                >
+                                                    <IconX classes="w-6 h-6 ms-1 text-gray-800" />
+                                                </button>
+                                            </span>
+                                        )
+                                    })}
+                                </div>
+                            </>
+                        }
                     </div>
 
-                    {selectedNumbers.length > 0 &&
-                        <>
-                            <h6 className="text-sm font-bold mb-2">Listado de asignados</h6>
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                {selectedNumbers.map((phone) => {
-                                    const color = chroma("#a2042d");
-                                    const background = color.alpha(0.2).css()
-                                    return (
-                                        <span
-                                            key={`phone-added-${phone.company_phone_id}`}
-                                            style={{ backgroundColor: background, border: `1px solid #a2042d` }}
-                                            className="rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 flex items-center"
-                                        >
-                                            {phone.alias}
-                                            <button
-                                                className="rounded-full"
-                                                onClick={() => removePhone(phone.company_phone_id)}
-                                            >
-                                                <IconX classes="w-6 h-6 ms-1 text-gray-800" />
-                                            </button>
-                                        </span>
-                                    )
-                                })}
-                            </div>
-                        </>
-                    }
-                </div>
+                    <Accordion
+                        title="Agregar horario"
+                        titleClassname="block uppercase tracking-wide text-gray-700 text-xs text-left font-bold"
+                        defaultIsOpen={type === "edit"}
+                    >
+                        <FormSelectSchedules scheduleGroup={scheduleGroup} setScheduleGroup={setScheduleGroup} />
+                    </Accordion>
+                </>
             }
 
             {errorCredentials && (
@@ -243,7 +292,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button mb-8"
+                    className="second-button"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar
