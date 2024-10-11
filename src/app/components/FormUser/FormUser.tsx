@@ -71,7 +71,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                 weight
             });
 
-            setScheduleGroup(data.work_schedule);
+            setScheduleGroup(data.work_schedule ?? []);
         }
     }, [data]);
 
@@ -273,7 +273,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     <Accordion
                         title="Agregar horario"
                         titleClassname="block uppercase tracking-wide text-gray-700 text-xs text-left font-bold"
-                        defaultIsOpen={type === "edit"}
+                        defaultIsOpen={type === "edit" && !!scheduleGroup.length}
                     >
                         <FormSelectSchedules scheduleGroup={scheduleGroup} setScheduleGroup={setScheduleGroup} />
                     </Accordion>
