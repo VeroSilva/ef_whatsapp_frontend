@@ -24,6 +24,7 @@ export interface Conversation {
     status: string,
     last_message_time: string,
     tags: any
+    company_phone_id: number
 }
 
 export interface MessageDetail {
