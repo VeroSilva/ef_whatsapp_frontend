@@ -116,9 +116,9 @@ export const ChatSidebar = () => {
         const newConversationListener = (payload: any) => {
             setConversations((prevConversations) => {
                 if (
-                    phoneId.toString() === payload.data.conversation.company_phone_id &&
-                    (!payload.data.conversation.user_assigned_id ||
-                        (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id)
+                    phoneId.toString() === payload.data.company_phone_id &&
+                    (!payload.data.user_assigned_id ||
+                        (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id)
                     )
                 ) {
                     const filteredConversations = prevConversations.filter(
@@ -132,11 +132,15 @@ export const ChatSidebar = () => {
             });
         }
 
-
         const deleteConversationListener = (payload: any) => {
             setConversations((prevConversations) => {
-                const filterConversations = [...prevConversations].filter((conversation) => conversation.id !== payload.data.id)
-                return filterConversations
+                const filteredConversations = prevConversations.filter((conversation: any) => {
+                    return conversation.data.id !== payload.data.id &&
+                        phoneId.toString() === conversation.data.company_phone_id &&
+                        (!conversation.data.user_assigned_id || conversation.data.user_assigned_id === userState.id);
+                });
+
+                return filteredConversations;
             });
         }
 
