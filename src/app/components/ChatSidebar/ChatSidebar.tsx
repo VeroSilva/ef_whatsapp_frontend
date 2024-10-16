@@ -114,6 +114,7 @@ export const ChatSidebar = () => {
         }
 
         const newConversationListener = (payload: any) => {
+            console.log(payload.data)
             setConversations((prevConversations) => {
                 if (
                     phoneId.toString() === payload.data.company_phone_id &&
@@ -122,8 +123,8 @@ export const ChatSidebar = () => {
                     )
                 ) {
                     const filteredConversations = prevConversations.filter(
-                        (conversation: any) => conversation.data.company_phone_id === phoneId.toString() &&
-                            (!conversation.data.user_assigned_id || conversation.data.user_assigned_id === userState.id)
+                        (conversation: any) => conversation.company_phone_id === phoneId.toString() &&
+                            (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id)
                     );
 
                     return [payload.data, ...filteredConversations];
@@ -136,8 +137,8 @@ export const ChatSidebar = () => {
             setConversations((prevConversations) => {
                 const filteredConversations = prevConversations.filter((conversation: any) => {
                     return conversation.data.id !== payload.data.id &&
-                        phoneId.toString() === conversation.data.company_phone_id &&
-                        (!conversation.data.user_assigned_id || conversation.data.user_assigned_id === userState.id);
+                        phoneId.toString() === conversation.company_phone_id &&
+                        (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
                 });
 
                 return filteredConversations;
