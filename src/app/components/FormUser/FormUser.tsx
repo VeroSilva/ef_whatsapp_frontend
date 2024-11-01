@@ -80,7 +80,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
             credentials.username === "" ||
             credentials.password === "" ||
             credentials.role === "" ||
-            credentials.weight === ""
+            (credentials.role === "3" && credentials.weight === "") //solo para telemarketing
         ) return false;
         else return true;
     };
@@ -90,9 +90,27 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         else {
             setLoadingCreate(true)
 
-            const dataUser = {
-                ...credentials,
-                work_schedule: scheduleGroup
+            let dataUser = {}
+
+            if (credentials.role !== "3") {
+                const {
+                    company_phones_ids,
+                    password,
+                    role,
+                    username
+                } = credentials;
+
+                dataUser = {
+                    company_phones_ids,
+                    password,
+                    role,
+                    username
+                }
+            } else {
+                dataUser = {
+                    ...credentials,
+                    work_schedule: scheduleGroup
+                }
             }
 
             if (type === "create") {
