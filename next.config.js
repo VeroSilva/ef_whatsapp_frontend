@@ -22,6 +22,7 @@ const nextConfig = {
       "kinsta.com",
       "api.efperfumes.com",
       "wa.efperfumes.com",
+      "lacasadelperfumeperu.com",
       "vzla.efperfumes.com",
       "scontent-*.xx.fbcdn.net",
       "scontent.xx.fbcdn.net",

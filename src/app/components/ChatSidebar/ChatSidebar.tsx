@@ -67,7 +67,7 @@ export const ChatSidebar = () => {
             if (payload.table === "messages" && payload.action === "insert") {
                 if (
                     phoneId.toString() === payload.data.conversation.company_phone_id &&
-                    (!payload.data.conversation.user_assigned_id || 
+                    (!payload.data.conversation.user_assigned_id ||
                         (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id)
                     )
                 ) {
@@ -114,15 +114,40 @@ export const ChatSidebar = () => {
         }
 
         const newConversationListener = (payload: any) => {
-            setConversations((prevConversations) => [payload.data, ...prevConversations]);
+            setConversations((prevConversations) => {
+                if (
+                    phoneId.toString() === payload.data.company_phone_id &&
+                    (!payload.data.user_assigned_id ||
+                        (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id)
+                    )
+                ) {
+                    const filteredConversations = prevConversations.filter(
+                        (conversation: any) => {
+                            return conversation?.company_phone_id !== null &&
+                                conversation.company_phone_id === phoneId.toString() &&
+                                (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
+                        }
+                    );
+
+                    return [payload.data, ...filteredConversations];
+                }
+                return prevConversations;
+            });
         }
 
         const deleteConversationListener = (payload: any) => {
             setConversations((prevConversations) => {
-                const filterConversations = [...prevConversations].filter((conversation) => conversation.id !== payload.data.id)
-                return filterConversations
+                const filteredConversations = prevConversations.filter((conversation: any) => {
+                    return conversation?.data?.id !== payload.data.id &&
+                        conversation?.company_phone_id !== null &&
+                        phoneId.toString() === conversation.company_phone_id &&
+                        (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
+                });
+
+                return filteredConversations;
             });
         }
+
 
         const conversationTagListener = (payload: any) => {
             if (payload.data.tags) {
