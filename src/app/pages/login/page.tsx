@@ -21,13 +21,13 @@ const Login = () => {
         <div className="w-full min-h-screen p-5 md:p-20 flex items-center justify-center">
             <div className="w-96 intro-y">
                 <div className="flex items-center flex-col text-blue-950 text-lg font-medium text-center">
-                    <Image
+                    {/* <Image
                         src={"/images/logo/LogoEF_PERFUMES_Horizontal.png"}
                         width={250}
                         height={100}
                         className="h-[50px] duration-200"
                         alt="Logo EF Perfumes"
-                    />
+                    /> */}
                     Inicia sesión
                 </div>
                 <div className="relative">

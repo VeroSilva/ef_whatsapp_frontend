@@ -159,13 +159,13 @@ export const Sidebar = () => {
                 <IconChevron classes={`w-6 h-6 duration-200 ${open && "rotate-180"}`} />
             </button>
 
-            <Image
+            {/* <Image
                 src={open ? "/images/logo/LogoEF_PERFUMES_Horizontal.png" : "/images/logo/LogoEF_PERFUMES_Vertical.png"}
                 width={200}
                 height={100}
                 className="h-[50px] w-auto"
                 alt="Logo EF Perfumes"
-            />
+            /> */}
 
             <ul className="mt-8 border-b border-gray-300">
                 {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
