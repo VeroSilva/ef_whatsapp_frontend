@@ -15,10 +15,78 @@ import { IconMegaphone } from "../Icons/IconMegaphone";
 import { Accordion } from 'flowbite-react';
 import "./styles.scss"
 import { IconTemplates } from "../Icons/IconTemplates";
+import Select, { StylesConfig } from 'react-select';
+//@ts-ignore
+import chroma from 'chroma-js';
+import { getPhones } from "@/app/services/api";
+import useActivePhone from "../../hooks/useActivePhone";
+
+interface ColourOption {
+    value: number;
+    label: string;
+    color: string;
+    isFixed?: boolean;
+    isDisabled?: boolean
+}
 
 export const Sidebar = () => {
-    const [open, setOpen] = useState(true);
     const { logoutUser, userState } = useUser();
+    const [open, setOpen] = useState(true);
+    const [phoneOptions, setPhoneOptions] = useState<ColourOption[]>([]);
+    const [defaultPhone, setDefaultPhone] = useState<ColourOption[]>([]);
+    const { setActivePhone } = useActivePhone();
+
+    const colourStyles: StylesConfig<ColourOption, true> = {
+        control: (styles) => ({ ...styles, backgroundColor: 'white' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            const color = chroma(data.color);
+            return {
+                ...styles,
+                backgroundColor: isDisabled
+                    ? undefined
+                    : isSelected
+                        ? data.color
+                        : isFocused
+                            ? color.alpha(0.1).css()
+                            : undefined,
+                color: isDisabled
+                    ? '#ccc'
+                    : isSelected
+                        ? chroma.contrast(color, 'white') > 2
+                            ? 'white'
+                            : 'black'
+                        : data.color,
+                cursor: isDisabled ? 'not-allowed' : 'default',
+                ':active': {
+                    ...styles[':active'],
+                    backgroundColor: !isDisabled
+                        ? isSelected
+                            ? data.color
+                            : color.alpha(0.3).css()
+                        : undefined,
+                },
+            };
+        },
+        multiValue: (styles, { data }) => {
+            const color = chroma(data.color);
+            return {
+                ...styles,
+                backgroundColor: color.alpha(0.1).css(),
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+            ':hover': {
+                backgroundColor: data.color,
+                color: 'white',
+            },
+        }),
+    };
 
     const getSubMenu = (link: string): any[] => {
         const submenu: any[] = [];
@@ -132,9 +200,15 @@ export const Sidebar = () => {
         if (subMenuTitle) localStorage.setItem('activeSubMenu', subMenuTitle);
     }
 
+    const handleSelectChange = (option: any) => {
+        setActivePhone(option.value)
+        setDefaultPhone(option)
+    }
+
     useEffect(() => {
         const activeMenu = localStorage.getItem('activeMenu')
         const activeSubMenu = localStorage.getItem('activeSubMenu')
+
         if (activeMenu) {
             setMenuItems((prevMenuItems) =>
                 prevMenuItems.map((menuItem) => {
@@ -158,7 +232,18 @@ export const Sidebar = () => {
                 })
             );
         }
-    }, []);
+
+        if (userState.company_phones) {
+            getPhones(userState.token).then(((res: any) => {
+                const options = res.map((item: any) => ({ value: item.id, label: `${item.alias} +${item.phone}`, color: "#075985" }));
+                const firstPhone = userState?.company_phones ? userState?.company_phones[0]?.company_phone_id : 1;
+                const defaultUserPhone = options.filter((option: any) => option.value === firstPhone);
+
+                setPhoneOptions(options);
+                setDefaultPhone(defaultUserPhone);
+            }))
+        }
+    }, [userState.company_phones]);
 
     return (
         <div className={`bg-slate-100 z-50 shadow-sm p-5 pt-8 relative duration-200 h-full rounded-tl-md rounded-bl-md ${open ? "w-72" : "w-20"}`}>
@@ -174,80 +259,92 @@ export const Sidebar = () => {
                 alt="Logo EF Perfumes"
             /> */}
 
-            <ul className="mt-8 border-b border-gray-300">
-                {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
-                    if (menu.show) {
-                        return (
-                            <li key={`menu-item-${index}`}>
-                                {
-                                    menu.link &&
-                                    <Link
-                                        href={menu.link}
-                                        className={
-                                            `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
-                                        }
-                                        onClick={() => handleActiveMenu(menu.title)}
-                                    >
-                                        <span>{menu.icon}</span>
-                                        <span className={`text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>{menu.title}</span>
-                                    </Link>
-                                }
-                            </li>
-                        )
-                    }
-                })}
+            <Select
+                closeMenuOnSelect
+                value={defaultPhone}
+                options={phoneOptions}
+                styles={colourStyles}
+                onChange={handleSelectChange}
+            />
 
-                <Accordion className="border-none" collapseAll>
-                    {menuItems
-                        .filter((m) => m.subMenu)
-                        .map((menu, index) => menu.show ? (
+            <hr className="border my-4" />
 
-                            <Accordion.Panel
-                                itemID={`panel-${index}`}
-                                isOpen={menu.active}
-                                key={`item-acc-key-${index}`}
-                            >
-                                <Accordion.Title
-                                    className={`accordion-button p-0 focus:ring-0 bg-slate-100 rounded-md border-none ${!open ? "hide-arrow" : ""} ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}
+            <div>
+                <ul className="border-b border-gray-300">
+                    {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
+                        if (menu.show) {
+                            return (
+                                <li key={`menu-item-${index}`}>
+                                    {
+                                        menu.link &&
+                                        <Link
+                                            href={menu.link}
+                                            className={
+                                                `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
+                                            }
+                                            onClick={() => handleActiveMenu(menu.title)}
+                                        >
+                                            <span>{menu.icon}</span>
+                                            <span className={`text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>{menu.title}</span>
+                                        </Link>
+                                    }
+                                </li>
+                            )
+                        }
+                    })}
+
+                    <Accordion className="border-none" collapseAll>
+                        {menuItems
+                            .filter((m) => m.subMenu)
+                            .map((menu, index) => menu.show ? (
+
+                                <Accordion.Panel
+                                    itemID={`panel-${index}`}
+                                    isOpen={menu.active}
+                                    key={`item-acc-key-${index}`}
                                 >
-                                    <span
-                                        className={`p-2 flex items-center flex-row gap-3 ${menu.active ? "text-slate-100" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200`}
-                                        onClick={() => {
-                                            if (!open) setOpen(!open)
-                                        }}
+                                    <Accordion.Title
+                                        className={`accordion-button p-0 focus:ring-0 bg-slate-100 rounded-md border-none ${!open ? "hide-arrow" : ""} ${menu.active ? "text-slate-100 bg-sky-800 hover:bg-sky-800" : "hover:bg-slate-200"}`}
                                     >
-                                        <span className="w-6 h-6">{menu.icon}</span>
-                                        <span className={`${!open && "scale-0"}`}>{menu.title}</span>
-                                    </span>
-                                </Accordion.Title>
-                                {open ? (
-                                    <Accordion.Content className="p-2 bg-slate-200">
-                                        {menu.subMenu?.map((sub, idx) => (
-                                            <Link
-                                                key={`sub-acc-key-${idx}`}
-                                                href={sub.link}
-                                                className={
-                                                    `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${sub.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
-                                                }
-                                                onClick={() => handleActiveMenu(menu.title, sub.title)}
-                                            >
-                                                <span className={`text-base text-sm flex-1 origin-left duration-200`}>{sub.title}</span>
-                                            </Link>
-                                        ))}
-                                    </Accordion.Content>
-                                ) : (
-                                    <></>
-                                )}
-                            </Accordion.Panel>
-                        ) : <></>)
-                    }
-                </Accordion>
-            </ul>
+                                        <span
+                                            className={`p-2 flex items-center flex-row gap-3 ${menu.active ? "text-slate-100" : "text-gray-600"} text-base text-sm flex-1 origin-left duration-200`}
+                                            onClick={() => {
+                                                if (!open) setOpen(!open)
+                                            }}
+                                        >
+                                            <span className="w-6 h-6">{menu.icon}</span>
+                                            <span className={`${!open && "scale-0"}`}>{menu.title}</span>
+                                        </span>
+                                    </Accordion.Title>
+                                    {open ? (
+                                        <Accordion.Content className="p-2 bg-slate-200">
+                                            {menu.subMenu?.map((sub, idx) => (
+                                                <Link
+                                                    key={`sub-acc-key-${idx}`}
+                                                    href={sub.link}
+                                                    className={
+                                                        `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${sub.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
+                                                    }
+                                                    onClick={() => handleActiveMenu(menu.title, sub.title)}
+                                                >
+                                                    <span className={`text-base text-sm flex-1 origin-left duration-200`}>{sub.title}</span>
+                                                </Link>
+                                            ))}
+                                        </Accordion.Content>
+                                    ) : (
+                                        <></>
+                                    )}
+                                </Accordion.Panel>
+                            ) : <></>)
+                        }
+                    </Accordion>
+                </ul>
 
-            <button onClick={() => logoutUser()} className="text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-2 w-full">
-                <span><IconLogout classes='w-5 h-5 rotate-180' /></span>
-                <span className={`text-base text-sm flex-1 origin-left duration-200 text-start ${!open && "scale-0"}`}>Cerrar sesión</span>
-            </button>
+                <button onClick={() => logoutUser()} className="text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-2 w-full">
+                    <span><IconLogout classes='w-5 h-5 rotate-180' /></span>
+                    <span className={`text-base text-sm flex-1 origin-left duration-200 text-start ${!open && "scale-0"}`}>Cerrar sesión</span>
+                </button>
+            </div>
         </div>
     )
 }
