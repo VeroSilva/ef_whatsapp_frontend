@@ -3,10 +3,9 @@ import { IconChevron } from "../Icons/IconChevron"
 import { IconLogout } from "../Icons/IconLogout";
 import useUser from "../../hooks/useUser";
 import Link from "next/link";
-import { IconTemplates } from "../Icons/IconTemplates";
+import { IconMessages } from "../Icons/IconMessages";
 import { IconUsers } from "../Icons/IconUsers";
 import { IconTag } from "../Icons/IconTag";
-import Image from "next/image";
 import { CompanyPhones } from "@/app/interfaces/user";
 import { IconHome } from "../Icons/IconHome";
 import { IconPhone } from "../Icons/IconPhone";
@@ -15,6 +14,7 @@ import { IconForward } from "../Icons/IconForward";
 import { IconMegaphone } from "../Icons/IconMegaphone";
 import { Accordion } from 'flowbite-react';
 import "./styles.scss"
+import { IconTemplates } from "../Icons/IconTemplates";
 
 export const Sidebar = () => {
     const [open, setOpen] = useState(true);
@@ -58,6 +58,13 @@ export const Sidebar = () => {
             active: false
         },
         {
+            title: "Admin. Plantillas",
+            link: "/pages/admin-templates",
+            icon: <IconTemplates classes="w-6 h-6" />,
+            show: userState.role === "1",
+            active: false
+        },
+        {
             title: "Etiquetas",
             link: "/pages/tags",
             icon: <IconTag classes="w-6 h-6" />,
@@ -81,7 +88,7 @@ export const Sidebar = () => {
         },
         {
             title: "Chats",
-            icon: <IconTemplates classes="w-6 h-6" />,
+            icon: <IconMessages classes="w-6 h-6" />,
             subMenu: getSubMenu("/pages/conversation"),
             open: true,
             show: userState.role === "1" || userState.role === "3",

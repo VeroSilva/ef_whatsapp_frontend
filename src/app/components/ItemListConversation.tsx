@@ -14,7 +14,7 @@ import { IconSticker } from './Icons/IconSticker';
 import { IconVideoCamera } from './Icons/IconVideoCamera';
 import { transformDate } from '@/app/utils/transformDate';
 import { formatPhoneNumber } from '../utils/formatPhone';
-import { IconTemplates } from './Icons/IconTemplates';
+import { IconMessages } from './Icons/IconMessages';
 import { IconReply } from './Icons/IconReply';
 import { IconWarning } from './Icons/IconWarning';
 import { markAsRead } from '@/app/services/api';
@@ -141,7 +141,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                                                     conversation.message_type === "location" ?
                                                         <><IconLocation classes="w-5 h-5 text-slate-500 inline-block" /> Ubicación</> :
                                                         conversation.message_type === "template" ?
-                                                            <><IconTemplates classes='w-5 h-5 text-slate-500 inline-block' /> Template</> :
+                                                            <><IconMessages classes='w-5 h-5 text-slate-500 inline-block' /> Template</> :
                                                             conversation.message_type === "button" ?
                                                                 <><IconReply classes='w-5 h-5 text-slate-500 inline-block' /> Respuesta template</> :
                                                                 conversation.message_type === "interactive" ?
