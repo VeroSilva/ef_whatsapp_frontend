@@ -31,10 +31,10 @@ interface ColourOption {
 
 export const Sidebar = () => {
     const { logoutUser, userState } = useUser();
+    const { setActivePhone } = useActivePhone();
     const [open, setOpen] = useState(true);
     const [phoneOptions, setPhoneOptions] = useState<ColourOption[]>([]);
     const [defaultPhone, setDefaultPhone] = useState<ColourOption[]>([]);
-    const { setActivePhone } = useActivePhone();
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
@@ -148,25 +148,22 @@ export const Sidebar = () => {
         },
         {
             title: "Respuestas rápidas",
+            link: "/pages/quick-answers",
             icon: <IconForward classes="w-6 h-6" />,
-            subMenu: getSubMenu("/pages/quick-answers"),
-            open: false,
             show: userState.role === "1",
             active: false
         },
         {
             title: "Chats",
+            link: "/pages/conversation",
             icon: <IconMessages classes="w-6 h-6" />,
-            subMenu: getSubMenu("/pages/conversation"),
-            open: true,
             show: userState.role === "1" || userState.role === "3",
             active: false
         },
         {
             title: "Flujos",
+            link: "/pages/templates-flows",
             icon: <IconFlow classes="w-6 h-6" />,
-            subMenu: getSubMenu("/pages/templates-flows"),
-            open: false,
             show: userState.role === "1",
             active: false
         },

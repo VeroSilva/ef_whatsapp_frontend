@@ -223,9 +223,12 @@ export const getContact = async (id, token) => {
   return response;
 };
 
-export const getTemplates = async (token, company_phone_id) => {
+export const getTemplates = async (token, company_phone_id, onlyLink) => {
+  let url = `${process.env.API_URL}/template/${company_phone_id}`;
+  // if (onlyLink) url += `/link=${onlyLink}`
+
   const response = await fetch(
-    `${process.env.API_URL}/template/${company_phone_id}`,
+    url,
     {
       method: "GET",
       headers: {

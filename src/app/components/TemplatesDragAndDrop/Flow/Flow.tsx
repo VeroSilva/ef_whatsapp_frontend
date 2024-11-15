@@ -23,6 +23,7 @@ import { getFlows, updateFlows } from '@/app/services/api';
 import { dataMessageToSend } from '@/app/utils/messages';
 import { IconCheckCircle } from '../../Icons/IconCheckCircle';
 import { IconInfo } from '../../Icons/IconInfo';
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 const nodeTypes = {
     templateNode: TemplateNode,
@@ -41,9 +42,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
     const [jsonToSend, setJsonToSend] = useState([]);
     const { templatesToSendState } = useTemplatesToSend();
     const { userState } = useUser();
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const { activePhone } = useActivePhone();
     const { templatesState } = useTemplates();
     const [loadingSave, setLoadingSave] = useState(false);
     const [alert, setAlert] = useState({
@@ -211,7 +210,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
     const handleSaveFlow = () => {
         setLoadingSave(true)
 
-        updateFlows(userState.token, phoneId, jsonToSend).then((res) => {
+        updateFlows(userState.token, activePhone, jsonToSend).then((res) => {
             setJsonToSend([])
             setLoadingSave(false)
 
@@ -377,7 +376,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
 
     useEffect(() => {
         if (!(templatesState.length === 1 && templatesState[0].id === 0)) {
-            getFlows(userState.token, phoneId, activeFlow).then((res) => {
+            getFlows(userState.token, activePhone, activeFlow).then((res) => {
                 res.map((item: any) => {
                     const { id, position, type, targetEdgeId, sourceEdgeId } = item.node;
 

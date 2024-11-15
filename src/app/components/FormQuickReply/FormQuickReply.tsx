@@ -1,10 +1,10 @@
 import useUser from "@/app/hooks/useUser";
 import { createQuickAnswer, editQuickAnswers } from "@/app/services/api";
-import { usePathname } from "next/navigation";
 import { ChangeEvent, useState, KeyboardEvent, useEffect } from "react";
 import { IconLoading } from "../Icons/IconLoading";
 import { IconX } from "../Icons/IconX";
 import { MessageInteractive } from "../Message/MessageInteractive/MessageInteractive";
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 export const FormQuickReply = ({ handleLoadQuickAnswers, setAlert, quickAnswersData, handleOpenModal }: { handleLoadQuickAnswers: Function, setAlert: Function, quickAnswersData?: any, handleOpenModal: Function }) => {
     const [inputValue, setInputValue] = useState<string>('');
@@ -14,9 +14,7 @@ export const FormQuickReply = ({ handleLoadQuickAnswers, setAlert, quickAnswersD
     const [activeTab, setActiveTab] = useState<string>("multi");
     const [loading, setLoading] = useState(false);
     const { userState } = useUser();
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const { activePhone } = useActivePhone();
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
@@ -50,7 +48,7 @@ export const FormQuickReply = ({ handleLoadQuickAnswers, setAlert, quickAnswersD
         }
 
         if (!quickAnswersData) {
-            createQuickAnswer(dataToSend, phoneId, userState.token)
+            createQuickAnswer(dataToSend, activePhone, userState.token)
                 .then((res) => {
                     setLoading(false)
                     handleOpenModal(false)
@@ -71,7 +69,7 @@ export const FormQuickReply = ({ handleLoadQuickAnswers, setAlert, quickAnswersD
                     }
                 })
         } else {
-            editQuickAnswers(dataToSend, quickAnswersData.id, phoneId, userState.token).then((res) => {
+            editQuickAnswers(dataToSend, quickAnswersData.id, activePhone, userState.token).then((res) => {
                 setLoading(false)
                 handleOpenModal(false)
                 handleLoadQuickAnswers()

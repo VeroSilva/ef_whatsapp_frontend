@@ -17,7 +17,7 @@ import { Tag } from "@/app/interfaces/conversations";
 import { useSocket } from "@/app/context/socket/SocketContext";
 import { getCatalog, getTags } from "@/app/services/api";
 import useCatalog from '@/app/hooks/useCatalog';
-import { usePathname } from "next/navigation";
+import useActivePhone from "../../hooks/useActivePhone";
 
 export const Chat = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -32,10 +32,8 @@ export const Chat = () => {
     const [previewType, setPreviewType] = useState<string>("")
     const { socketInstance } = useSocket();
     const { setCatalogState } = useCatalog();
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
     const { setTagsState } = useTag();
+    const { activePhone } = useActivePhone();
 
     useEffect(() => {
         if (selectedFile !== null) {
@@ -82,7 +80,7 @@ export const Chat = () => {
     }, [userState.token, activeConversationState.tags, socketInstance])
 
     useEffect(() => {
-        getCatalog(userState.token, phoneId).then((res) => {
+        getCatalog(userState.token, activePhone).then((res) => {
             setCatalogState(res.catalog)
         })
 

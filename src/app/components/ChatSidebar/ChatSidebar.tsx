@@ -10,11 +10,11 @@ import useChatFilters from "../../hooks/useChatFilters";
 import { ConversationSkeleton } from "../Skeleton/Conversation";
 import { ItemListConversation } from "../ItemListConversation";
 import { ModalCreateConversartion } from "../ModalCreateConversastion/ModalCreateConversastion";
-import { usePathname } from 'next/navigation';
 import useChatsRead from "@/app/hooks/useChatsRead";
 import { useSocket } from "@/app/context/socket/SocketContext";
 import { ChatFilters } from "../Chat/ChatFilters/ChatFilters";
 import { IconWarning } from "../Icons/IconWarning";
+import useActivePhone from "../../hooks/useActivePhone";
 
 export const ChatSidebar = () => {
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -27,14 +27,12 @@ export const ChatSidebar = () => {
     const loadingRefConversation = useRef(false);
     const { userState } = useUser();
     //@ts-ignore
-    const { activeConversationState } = useActiveConversation();
+    const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const containerRef = useRef<HTMLDivElement>(null);
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
     const { chatsReadState, setChatsRead } = useChatsRead();
     const { socketInstance } = useSocket();
     const { chatFiltersState, setChatFiltersState } = useChatFilters();
+    const { activePhone } = useActivePhone();
 
     useEffect(() => {
         handleClearPaginateConversation();
@@ -66,7 +64,7 @@ export const ChatSidebar = () => {
         const updateConversationListener = (payload: any) => {
             if (payload.table === "messages" && payload.action === "insert") {
                 if (
-                    phoneId.toString() === payload.data.conversation.company_phone_id &&
+                    activePhone.toString() === payload.data.conversation.company_phone_id &&
                     (!payload.data.conversation.user_assigned_id ||
                         (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id)
                     )
@@ -97,7 +95,7 @@ export const ChatSidebar = () => {
                     });
                 }
             } else if (payload.table === "messages" && payload.action === "update") {
-                if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+                if (activePhone.toString() === payload.data.conversation.company_phone_id) {
                     setConversations((prevConversations) => {
                         const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
@@ -116,7 +114,7 @@ export const ChatSidebar = () => {
         const newConversationListener = (payload: any) => {
             setConversations((prevConversations) => {
                 if (
-                    phoneId.toString() === payload.data.company_phone_id &&
+                    activePhone.toString() === payload.data.company_phone_id &&
                     (!payload.data.user_assigned_id ||
                         (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id)
                     )
@@ -124,7 +122,7 @@ export const ChatSidebar = () => {
                     const filteredConversations = prevConversations.filter(
                         (conversation: any) => {
                             return conversation?.company_phone_id !== null &&
-                                conversation.company_phone_id === phoneId.toString() &&
+                                conversation.company_phone_id === activePhone.toString() &&
                                 (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
                         }
                     );
@@ -140,14 +138,13 @@ export const ChatSidebar = () => {
                 const filteredConversations = prevConversations.filter((conversation: any) => {
                     return conversation?.data?.id !== payload.data.id &&
                         conversation?.company_phone_id !== null &&
-                        phoneId.toString() === conversation.company_phone_id &&
+                        activePhone.toString() === conversation.company_phone_id &&
                         (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
                 });
 
                 return filteredConversations;
             });
         }
-
 
         const conversationTagListener = (payload: any) => {
             if (payload.data.tags) {
@@ -181,6 +178,12 @@ export const ChatSidebar = () => {
         };
     }, [conversations, chatsReadState, socketInstance]);
 
+    useEffect(() => {
+        setLoadingInitialConversations(true);
+        loadConversations(true);
+        resetActiveConversation();
+    }, [activePhone])
+    
     const handleScroll = () => {
         const container = containerRef.current;
         if (container) {
@@ -237,10 +240,13 @@ export const ChatSidebar = () => {
             limitConversation,
             filtersToSend,
             userState.token,
-            phoneId
+            activePhone
         )
             .then((res) => {
-                setConversations((prevConversations) => [...prevConversations, ...res.conversations]);
+                setConversations((prevConversations) => {
+                    if (clear) return [...res.conversations]
+                    else return [...prevConversations, ...res.conversations]
+                });
                 setPageConversation(res.currentPage);
                 setTotalPagesConversation(res.totalPages);
             })
@@ -250,7 +256,7 @@ export const ChatSidebar = () => {
             .finally(() => {
                 loadingRefConversation.current = false;
                 setLoadingConversations(false);
-                setLoadingInitialConversations(false)
+                setLoadingInitialConversations(false);
             });
     }
 
@@ -259,6 +265,7 @@ export const ChatSidebar = () => {
             setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
         }
     };
+    
     return (
         <>
             <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto min-h-full bg-slate-50 border border-gray-200" ref={containerRef}>

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/app/components/Sidebar/Sidebar";
 import { SkeletonTable } from "@/app/components/Skeleton/Table";
-import { usePaginateTable } from "../../../hooks/usePaginateTable"
+import { usePaginateTable } from "../../hooks/usePaginateTable"
 import { deleteQuickAnswers, getCatalog, getQuickAnswers } from "@/app/services/api";
-import useUser from "../../../hooks/useUser"
+import useUser from "../../hooks/useUser"
 import { IconEdit } from "@/app/components/Icons/IconEdit";
 import { IconTrash } from "@/app/components/Icons/IconTrash";
 import { Modal } from "@/app/components/Modal/Modal";
@@ -13,11 +13,12 @@ import { IconLoading } from "@/app/components/Icons/IconLoading";
 import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
 import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
 import { FormQuickReply } from "@/app/components/FormQuickReply/FormQuickReply";
 import useCatalog from '@/app/hooks/useCatalog';
 import { IconCheck } from "@/app/components/Icons/IconCheck";
 import { IconX } from "@/app/components/Icons/IconX";
+import useActivePhone from "../../hooks/useActivePhone";
 
 const QuickAnswers = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -29,12 +30,10 @@ const QuickAnswers = (): JSX.Element => {
     const { slice, range } = usePaginateTable({ data: relation, page, rowsPerPage });
     const { userState } = useUser();
     const { setCatalogState } = useCatalog();
+    const { activePhone } = useActivePhone();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
 
     const [alert, setAlert] = useState({
         type: "",
@@ -65,15 +64,15 @@ const QuickAnswers = (): JSX.Element => {
     }, [alert])
 
     useEffect(() => {
-        getCatalog(userState.token, phoneId).then((res) => {
+        getCatalog(userState.token, activePhone).then((res) => {
             setCatalogState(res.catalog)
         })
-    }, [])
+    }, [activePhone]);
 
     const handleLoadQuickAnswers = () => {
         setLoading(true)
 
-        getQuickAnswers(userState.token, phoneId).then((res => {
+        getQuickAnswers(userState.token, activePhone).then((res => {
             setLoading(false)
             setRelation(res)
         }))
@@ -82,7 +81,7 @@ const QuickAnswers = (): JSX.Element => {
     const handleDeleteRelation = () => {
         setLoadingDeleteRelation(true);
 
-        deleteQuickAnswers(quickAnswersData.id, phoneId, userState.token).then((res => {
+        deleteQuickAnswers(quickAnswersData.id, activePhone, userState.token).then((res => {
             setLoadingDeleteRelation(false);
             handleOpenDeleteModal(false);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Modal, Spinner } from 'flowbite-react';
+import { Modal } from 'flowbite-react';
 import Image from "next/image";
 import { Message as IMessage } from "../../../interfaces/conversations";
 import { Reaction } from "../../../interfaces/reactions";
@@ -11,9 +11,9 @@ import useUser from "@/app/hooks/useUser";
 //@ts-ignore
 import newMessageAudio from '../../../../../sounds/receive.mp3';
 import { getMessagesByConversation } from '@/app/services/api';
-import { usePathname } from "next/navigation";
 import { useSocket } from '@/app/context/socket/SocketContext';
 import { convertDateFormatAndRelative } from '@/app/utils/transformDate';
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 interface ActiveConversationProps {
     highlightedText: string
@@ -29,6 +29,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const [updatedMessages, setUpdatedMessages] = useState<IMessage[]>([]);
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const { userState } = useUser();
+    const { activePhone } = useActivePhone();
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
     const loadingRefMessage = useRef(false);
@@ -37,9 +38,6 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     const [limitMessage, setLimitMessage] = useState(150);
     const [lastConversation, setLastConversation] = useState(0);
     const [loadingInitialMessages, setLoadingInitialMessages] = useState<boolean>(false);
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
     const { socketInstance } = useSocket();
 
     useEffect(() => {
@@ -48,7 +46,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         }
 
         const newMessageListener = (payload: any) => {
-            if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+            if (activePhone.toString() === payload.data.conversation.company_phone_id) {
                 if (activeConversationState.id === payload.data.conversation.id) {
                     setMessages((currentMessages) => [...currentMessages, payload.data.message]);
                 }
@@ -58,7 +56,7 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
         };
 
         const updateMessageListener = (payload: any) => {
-            if (phoneId.toString() === payload.data.conversation.company_phone_id) {
+            if (activePhone.toString() === payload.data.conversation.company_phone_id) {
                 setMessages(prevMessages => {
                     const messageIndex = prevMessages.findIndex(message => message.id === payload.data.message.id);
 

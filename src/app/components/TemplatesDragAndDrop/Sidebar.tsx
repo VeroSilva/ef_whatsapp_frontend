@@ -5,17 +5,15 @@ import useTemplates from "../../hooks/useTemplates";
 import { IconLoading } from '../Icons/IconLoading';
 import useUser from "../../hooks/useUser"
 import { importTemplates } from '@/app/services/api';
-import { usePathname } from "next/navigation";
 import { IconCheckCircle } from '../Icons/IconCheckCircle';
 import { IconInfo } from '../Icons/IconInfo';
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 const Sidebar = ({ handleSaveFlow, loadingSave }: { handleSaveFlow: () => void, loadingSave: boolean }) => {
     const { templatesState } = useTemplates();
-    const [loadingImport, setLoadingImport] = useState(false)
     const { userState } = useUser();
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const { activePhone } = useActivePhone();
+    const [loadingImport, setLoadingImport] = useState(false)
     const [alert, setAlert] = useState({
         type: "",
         message: "",
@@ -32,7 +30,7 @@ const Sidebar = ({ handleSaveFlow, loadingSave }: { handleSaveFlow: () => void, 
     const handleImportTemplates = () => {
         setLoadingImport(true)
 
-        importTemplates(userState.token, phoneId).then((res) => {
+        importTemplates(userState.token, activePhone).then((res) => {
             setLoadingImport(false)
             setAlert({
                 type: "success",

@@ -1,10 +1,9 @@
 "use client"
 import { useEffect, useRef } from 'react';
 import { redirect } from 'next/navigation';
-import useUser from "../../../hooks/useUser";
-import useActiveConversation from "../../../hooks/useActiveConversation";
+import useUser from "../../hooks/useUser";
+import useActiveConversation from "../../hooks/useActiveConversation";
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
-import { ModalCreateConversartion } from '@/app/components/ModalCreateConversastion/ModalCreateConversastion';
 //@ts-ignore
 import { Chat } from '@/app/components/Chat/Chat';
 import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
@@ -14,7 +13,7 @@ import { useSocket } from '@/app/context/socket/SocketContext';
 const Conversation = (): JSX.Element => {
     const { userState } = useUser();
     //@ts-ignore
-    const { activeConversationState, resetActiveConversation, setActiveConversation } = useActiveConversation();
+    const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const socketRef = useRef<Socket | null>(null);
     const { setSocketInstance } = useSocket();
 

@@ -7,18 +7,16 @@ import { getCatalog, getUserById } from '@/app/services/api';
 import { IconPlus } from '../Icons/IconPlus';
 import { Flow } from './Flow/Flow';
 import useUser from '@/app/hooks/useUser';
-import { usePathname } from 'next/navigation';
 import useCatalog from '@/app/hooks/useCatalog';
 import { Modal } from "@/app/components/Modal/Modal";
 import { SelectTags } from '../Selects/SelectTags/SelectTags';
 import useTags from '@/app/hooks/useTags';
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 const TemplatesDragAndDrop = () => {
     const { userState } = useUser();
     const { tagsState } = useTags();
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const { activePhone } = useActivePhone();
     const { setCatalogState } = useCatalog();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [tag, setTag] = useState<any>([])
@@ -34,7 +32,7 @@ const TemplatesDragAndDrop = () => {
     ])
 
     useEffect(() => {
-        getCatalog(userState.token, phoneId).then((res) => {
+        getCatalog(userState.token, activePhone).then((res) => {
             setCatalogState(res.catalog)
         })
     }, [])
@@ -42,7 +40,7 @@ const TemplatesDragAndDrop = () => {
     useEffect(() => {
         if (userState.id !== 0 && !(tagsState.length === 1 && tagsState[0].id === 0)) {
             getUserById(userState.id, userState.token).then((res) => {
-                const phoneData = res?.company_phones?.filter((phone: any) => phone.company_phone_id === phoneId)[0]
+                const phoneData = res?.company_phones?.filter((phone: any) => phone.company_phone_id === activePhone)[0]
 
                 phoneData?.flows?.forEach((flow: any, index: number) => {
                     const flowId = Number(flow.flow_id);

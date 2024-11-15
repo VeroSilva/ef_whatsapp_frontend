@@ -9,7 +9,6 @@ import { createConversation, getTemplates } from "@/app/services/api"
 import useUser from "@/app/hooks/useUser"
 import { dataMessageToSend } from "@/app/utils/messages"
 import { InputSendMessage } from "../../InputSendMessage/InputSendMessage"
-import { usePathname } from "next/navigation"
 import useActiveConversation from "@/app/hooks/useActiveConversation";
 import useActiveMessageReply from "@/app/hooks/useActiveMessageReply"
 import { MessageContent } from "../../Message/MessageContent/MessageContent"
@@ -18,6 +17,7 @@ import { initialStateActiveMessageReply } from "@/app/context/activeMessageReply
 import { MessageDataToSend } from "@/app/interfaces/conversations"
 import { Template } from "@/app/interfaces/template"
 import { ChatTemplateList } from "../ChatTemplateList/ChatTemplateList"
+import useActivePhone from "@/app//hooks/useActivePhone";
 
 export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversationPhone, setPreviewType, setShowPreview }: { conversationId: number, setSelectedFile: Function, newConversationPhone?: string, setPreviewType: Function, setShowPreview: Function }) => {
     const [messageToSend, setMessageToSend] = useState<string>("")
@@ -25,9 +25,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
     const { sendMessage, isLoading } = useMessage()
     const { userState } = useUser()
     const { setActiveConversation } = useActiveConversation()
-    const pathname = usePathname();
-    const parts = pathname.split('/');
-    const phoneId = Number(parts[parts.length - 1]);
+    const { activePhone } = useActivePhone();
     const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
     const [activeTemplateList, setActiveTemplateList] = useState(false);
     const [templatesList, setTemplatesList] = useState<Template[]>([]);
@@ -36,7 +34,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
         if (conversationId === -1) {
             const dataToSend = await dataMessageToSend({ data, type })
 
-            createConversation({ to: newConversationPhone, messageData: dataToSend, company_phone_id: phoneId }, userState.token)
+            createConversation({ to: newConversationPhone, messageData: dataToSend, company_phone_id: activePhone }, userState.token)
                 .then((res) => {
                     const { contact, id } = res
                     setActiveConversation({ contact, id, tags: [] })
@@ -62,7 +60,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
         if (messageToSend.startsWith('*')) {
             setActiveTemplateList(true);
 
-            getTemplates(userState.token, phoneId).then((res) => setTemplatesList(res.templates));
+            getTemplates(userState.token, activePhone).then((res) => setTemplatesList(res.templates));
         } else {
             setActiveTemplateList(false);
         }
