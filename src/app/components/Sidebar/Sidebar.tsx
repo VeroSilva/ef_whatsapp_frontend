@@ -31,7 +31,7 @@ interface ColourOption {
 
 export const Sidebar = () => {
     const { logoutUser, userState } = useUser();
-    const { setActivePhone } = useActivePhone();
+    const { activePhone, setActivePhone } = useActivePhone();
     const [open, setOpen] = useState(true);
     const [phoneOptions, setPhoneOptions] = useState<ColourOption[]>([]);
     const [defaultPhone, setDefaultPhone] = useState<ColourOption[]>([]);
@@ -234,7 +234,10 @@ export const Sidebar = () => {
             getPhones(userState.token).then(((res: any) => {
                 const options = res.map((item: any) => ({ value: item.id, label: `${item.alias} +${item.phone}`, color: "#075985" }));
                 const firstPhone = userState?.company_phones ? userState?.company_phones[0]?.company_phone_id : 1;
-                const defaultUserPhone = options.filter((option: any) => option.value === firstPhone);
+                const defaultUserPhone = options.filter((option: any) => {
+                    if (activePhone) return option.value === activePhone
+                    else option.value === firstPhone        
+                });
 
                 setPhoneOptions(options);
                 setDefaultPhone(defaultUserPhone);
