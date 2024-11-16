@@ -13,20 +13,17 @@ import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { redirect } from "next/navigation";
 import useActivePhone from "../../hooks/useActivePhone";
 import { IconEdit } from "@/app/components/Icons/IconEdit";
+import { FormAdminTemplate } from "@/app/components/FormAdminTemplate/FormAdminTemplate";
 
 const AdminTemplates = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
-    // const [loadingDeleteUser, setLoadingDeleteUser] = useState(false);
     const [template, setTemplate] = useState([]);
     const [campaignData, setCampaignData] = useState<any>({});
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: template, page, rowsPerPage });
     const { userState } = useUser();
-    const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
-    // const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-    // const [showEditPasswordModal, setShowEditPasswordModal] = useState<boolean>(false);
     const [alert, setAlert] = useState({
         type: "",
         message: "",
@@ -42,7 +39,7 @@ const AdminTemplates = (): JSX.Element => {
 
     useEffect(() => {
         handleLoadTemplates()
-    }, []);
+    }, [activePhone]);
 
     useEffect(() => {
         if (alert.show) {
@@ -69,20 +66,11 @@ const AdminTemplates = (): JSX.Element => {
         setShowEditModal(show);
     };
 
-    const handleOpenModal = (show: boolean) => {
-        setShowModal(show);
-    };
-
     return (
         <>
             <Sidebar />
 
             <div className="flex-1 h-full p-8 bg-slate-200">
-                <button
-                    className="main-button mb-4"
-                    onClick={() => handleOpenModal(true)}
-                >Nueva Campaña</button>
-
                 <div className="relative overflow-x-auto w-full rounded-md">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b border-gray-300">
@@ -162,12 +150,12 @@ const AdminTemplates = (): JSX.Element => {
                 show={showEditModal}
                 width="500px"
             >
-                {/* <FormEditPassword
-                    handleOpenModal={handleOpenEditPasswordModal}
-                    setAlert={setAlert}
+                <FormAdminTemplate
                     data={campaignData}
-                /> */}
-                <></>
+                    handleOpenModal={handleOpenEditModal}
+                    setAlert={setAlert}
+                    handleLoadTemplates={handleLoadTemplates}
+                />
             </Modal>
             {/* END: Edit Password User Modal */}
 

@@ -225,7 +225,7 @@ export const getContact = async (id, token) => {
 
 export const getTemplates = async (token, company_phone_id, onlyLink) => {
   let url = `${process.env.API_URL}/template/${company_phone_id}`;
-  // if (onlyLink) url += `/link=${onlyLink}`
+  if (onlyLink) url += `?links=${onlyLink}`
 
   const response = await fetch(
     url,
@@ -242,6 +242,27 @@ export const getTemplates = async (token, company_phone_id, onlyLink) => {
 
   return response;
 };
+
+export const editTemplate = async (token, id, link) => {
+  const response = await fetch(
+    `${process.env.API_URL}/template/header-link/${id}`,
+    {
+      method: "POST",
+      body: JSON.stringify({link}),
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  )
+  
+  const status = response.status;
+  const data = await response.json();
+  
+  return { status, data };
+}
 
 export const importTemplates = async (token, company_phone_id) => {
   const response = await fetch(
