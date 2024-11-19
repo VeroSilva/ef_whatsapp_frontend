@@ -18,7 +18,6 @@ import { IconTemplates } from "../Icons/IconTemplates";
 import Select, { StylesConfig } from 'react-select';
 //@ts-ignore
 import chroma from 'chroma-js';
-import { getPhones } from "@/app/services/api";
 import useActivePhone from "../../hooks/useActivePhone";
 
 interface ColourOption {
@@ -126,7 +125,7 @@ export const Sidebar = () => {
             active: false
         },
         {
-            title: "Admin. Plantillas",
+            title: "Admin. Templates",
             link: "/pages/admin-templates",
             icon: <IconTemplates classes="w-6 h-6" />,
             show: userState.role === "1",
@@ -231,17 +230,15 @@ export const Sidebar = () => {
         }
 
         if (userState.company_phones) {
-            getPhones(userState.token).then(((res: any) => {
-                const options = res.map((item: any) => ({ value: item.id, label: `${item.alias} +${item.phone}`, color: "#075985" }));
-                const firstPhone = userState?.company_phones ? userState?.company_phones[0]?.company_phone_id : 1;
-                const defaultUserPhone = options.filter((option: any) => {
-                    if (activePhone) return option.value === activePhone
-                    else option.value === firstPhone        
-                });
+            const options = userState.company_phones.map((item: any) => ({ value: item.company_phone_id, label: `${item.alias} +${item.phone}`, color: "#075985" }));
+            const firstPhone = userState?.company_phones ? userState?.company_phones[0]?.company_phone_id : 1;
+            const defaultUserPhone = options.filter((option: any) => {
+                if (activePhone) return option.value === activePhone
+                else option.value === firstPhone        
+            });
 
-                setPhoneOptions(options);
-                setDefaultPhone(defaultUserPhone);
-            }))
+            setPhoneOptions(options);
+            setDefaultPhone(defaultUserPhone);
         }
     }, [userState.company_phones]);
 
