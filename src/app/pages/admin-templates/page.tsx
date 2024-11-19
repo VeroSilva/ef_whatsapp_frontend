@@ -145,7 +145,7 @@ const AdminTemplates = (): JSX.Element => {
 
             {/* BEGIN: Edit Password User Modal */}
             <Modal
-                title="Editar template"
+                title={`Editar template <strong>${campaignData.name}</strong>`}
                 onClose={() => handleOpenEditModal(false)}
                 show={showEditModal}
                 width="500px"

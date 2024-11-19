@@ -41,7 +41,11 @@ export const Modal: React.FC<ModalProps> = ({ show, width, height, title, childr
         <div className={`modal-backdrop modal-open`}>
             <div className="modal" style={modalStyle}>
                 <div className="modal-header">
-                    <div className="modal-title">{title}</div>
+                    <div
+                        className="modal-title"
+                        dangerouslySetInnerHTML={{ __html: String(title) }}
+                    ></div>
+
                     <button className="close-button" onClick={handleClose}>
                         <IconX classes='w-6 h-6' />
                     </button>
