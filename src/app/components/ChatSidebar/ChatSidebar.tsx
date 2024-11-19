@@ -272,20 +272,20 @@ export const ChatSidebar = () => {
                 <div className="box intro-y bg-slate-50 ">
                     <div className="bg-slate-50 sticky top-0 z-40">
                         <div className="flex items-center justify-between px-5 pt-5">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-2xl pe-2">
                                 <div className="group relative">
                                     <ChatFilters handleLoadConversations={handleClearPaginateConversation} />
                                     <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Más filtros</span>
                                 </div>
-                                <div className="group relative">
+                                <div className="group relative flex items-center">
                                     <button onClick={() => handleFilterUnread()} >
-                                        <IconUnread classes={`w-6 h-6 ${chatFiltersState.unread ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
+                                        <IconUnread classes={`w-5 h-5 ${chatFiltersState.unread ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
                                     </button>
-                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leidos</span>
+                                    <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes no leídos</span>
                                 </div>
-                                <div className="group relative">
+                                <div className="group relative flex items-center">
                                     <button onClick={() => handleFilterOverdue()} >
-                                        <IconWarning classes={`w-5 h-5 ${chatFiltersState.overdue ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
+                                        <IconWarning classes={`w-4 h-4 ${chatFiltersState.overdue ? 'text-sky-600 ' : 'text-slate-500 '} ml-auto`} />
                                     </button>
                                     <span className="z-50 whitespace-nowrap fixed top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">Filtrar mensajes que necesitan recontacto</span>
                                 </div>
