@@ -62,11 +62,12 @@ export const ChatSidebar = () => {
         }
 
         const updateConversationListener = (payload: any) => {
+
             if (payload.table === "messages" && payload.action === "insert") {
                 if (
                     activePhone.toString() === payload.data.conversation.company_phone_id &&
                     (!payload.data.conversation.user_assigned_id ||
-                        (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id)
+                        (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id) || userState.role == "1"
                     )
                 ) {
                     setConversations(prevConversations => {
@@ -123,7 +124,7 @@ export const ChatSidebar = () => {
                         (conversation: any) => {
                             return conversation?.company_phone_id !== null &&
                                 conversation.company_phone_id === activePhone.toString() &&
-                                (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id);
+                                (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id || userState.role == "1");
                         }
                     );
 
@@ -183,7 +184,7 @@ export const ChatSidebar = () => {
         loadConversations(true);
         resetActiveConversation();
     }, [activePhone])
-    
+
     const handleScroll = () => {
         const container = containerRef.current;
         if (container) {
@@ -265,7 +266,7 @@ export const ChatSidebar = () => {
             setConversations((prevConversations) => [...prevConversations.filter((c) => c.id !== id)]);
         }
     };
-    
+
     return (
         <>
             <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 overflow-auto min-h-full bg-slate-50 border border-gray-200" ref={containerRef}>
