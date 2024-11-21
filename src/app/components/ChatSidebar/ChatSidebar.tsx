@@ -96,7 +96,12 @@ export const ChatSidebar = () => {
                     });
                 }
             } else if (payload.table === "messages" && payload.action === "update") {
-                if (activePhone.toString() === payload.data.conversation.company_phone_id) {
+                if (
+                    activePhone.toString() === payload.data.conversation.company_phone_id &&
+                    (!payload.data.conversation.user_assigned_id ||
+                        (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id) || userState.role == "1"
+                    )
+                ) {
                     setConversations((prevConversations) => {
                         const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
 
@@ -117,7 +122,7 @@ export const ChatSidebar = () => {
                 if (
                     activePhone.toString() === payload.data.company_phone_id &&
                     (!payload.data.user_assigned_id ||
-                        (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id)
+                        (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id) || userState.role == "1"
                     )
                 ) {
                     const filteredConversations = prevConversations.filter(
