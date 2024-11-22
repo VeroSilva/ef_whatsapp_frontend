@@ -87,22 +87,15 @@ export const Sidebar = () => {
         }),
     };
 
-    const getSubMenu = (link: string): any[] => {
-        const submenu: any[] = [];
-
-        userState?.company_phones?.map((phone: CompanyPhones) => {
-            submenu.push({
-                title: `${phone.alias} +${phone.phone}`,
-                link: `${link}/${phone.company_phone_id}`,
-                active: false,
-                show: true
-            })
-        })
-
-        return submenu
-    }
-
-    const [menuItems, setMenuItems] = useState([
+    const [menuItems, setMenuItems] = useState<Array<{
+        title: string;
+        link: string;
+        icon: JSX.Element;
+        show: boolean;
+        active: boolean;
+        subMenu?: Array<{ title: string; link: string; active: boolean; show: boolean }>;
+        isDivider?: boolean;
+    }>>([
         {
             title: "Inicio",
             link: "/pages/home",
@@ -125,13 +118,6 @@ export const Sidebar = () => {
             active: false
         },
         {
-            title: "Admin. Templates",
-            link: "/pages/admin-templates",
-            icon: <IconTemplates classes="w-6 h-6" />,
-            show: userState.role === "1",
-            active: false
-        },
-        {
             title: "Etiquetas",
             link: "/pages/tags",
             icon: <IconTag classes="w-6 h-6" />,
@@ -142,6 +128,21 @@ export const Sidebar = () => {
             title: "Teléfonos",
             link: "/pages/phones",
             icon: <IconPhone classes="w-6 h-6" />,
+            show: userState.role === "1",
+            active: false
+        },
+        {
+            isDivider: true,
+            title: "",
+            link: "#",
+            icon: <></>,
+            show: true,
+            active: false
+        },
+        {
+            title: "Admin. Templates",
+            link: "/pages/admin-templates",
+            icon: <IconTemplates classes="w-6 h-6" />,
             show: userState.role === "1",
             active: false
         },
@@ -234,7 +235,7 @@ export const Sidebar = () => {
             const firstPhone = userState?.company_phones ? userState?.company_phones[0]?.company_phone_id : 1;
             const defaultUserPhone = options.filter((option: any) => {
                 if (activePhone) return option.value === activePhone
-                else option.value === firstPhone        
+                else option.value === firstPhone
             });
 
             setPhoneOptions(options);
@@ -256,20 +257,27 @@ export const Sidebar = () => {
                 alt="Logo EF Perfumes"
             /> */}
 
-            <Select
-                closeMenuOnSelect
-                value={defaultPhone}
-                options={phoneOptions}
-                styles={colourStyles}
-                onChange={handleSelectChange}
-            />
-
             <hr className="border my-4" />
 
-            <div>
+            <div className="h-modal flex flex-col justify-between">
                 <ul className="border-b border-gray-300">
                     {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
                         if (menu.show) {
+                            if (menu.isDivider) {
+                                return (<>
+                                    <li key={`divider-${index}`} className="my-4">
+                                        <hr className="border" />
+                                    </li>
+                                    <Select
+                                        closeMenuOnSelect
+                                        value={defaultPhone}
+                                        options={phoneOptions}
+                                        styles={colourStyles}
+                                        onChange={handleSelectChange}
+                                    />
+                                </>
+                                );
+                            }
                             return (
                                 <li key={`menu-item-${index}`}>
                                     {
