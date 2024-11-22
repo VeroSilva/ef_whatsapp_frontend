@@ -101,7 +101,7 @@ export const Sidebar = () => {
             link: "/pages/home",
             icon: <IconHome classes="w-6 h-6" />,
             show: true,
-            active: false
+            active: true
         },
         {
             title: "Usuarios",
