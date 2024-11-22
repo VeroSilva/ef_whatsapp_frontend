@@ -40,6 +40,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const logoutUser = (): void => {
     dispatch({ type: "logout" });
     setIsLoggedIn(false);
+    if (typeof window !== "undefined") {
+      window.localStorage.clear();
+    }
   };
 
   return (
