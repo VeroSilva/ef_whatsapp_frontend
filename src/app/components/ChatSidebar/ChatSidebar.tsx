@@ -142,12 +142,8 @@ export const ChatSidebar = () => {
         const deleteConversationListener = (payload: any) => {
             setConversations((prevConversations) => {
                 const filteredConversations = prevConversations.filter((conversation: any) => {
-                    return conversation?.data?.id !== payload.data.id &&
-                        conversation?.company_phone_id !== null &&
-                        activePhone.toString() === conversation.company_phone_id &&
-                        (!conversation.user_assigned_id || conversation.user_assigned_id === userState.id || userState.role == "1");
+                    return conversation?.id !== payload.data.id;
                 });
-
                 return filteredConversations;
             });
         }
