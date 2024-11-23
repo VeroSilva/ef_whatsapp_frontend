@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 import useChatFilters from "@/app/hooks/useChatFilters";
 import useUsersList from "@/app/hooks/useUsersList";
 
-interface ColourOption {
+export interface ColourOption {
     value: number;
     label: string;
     color: string;
@@ -13,12 +13,7 @@ interface ColourOption {
     isDisabled?: boolean
 }
 
-export const UsersListSelect = ({ handleChange }: { handleChange: any }) => {
-    const { usersListState } = useUsersList();
-    const { chatFiltersState } = useChatFilters();
-    const [options, setOptions] = useState<ColourOption[]>([]);
-    const [selectedUsersOption, setSelectedUsersOption] = useState<any>([])
-
+export const UsersListSelect = ({ handleChange, selectedOptions, options, isClearable }: { handleChange: any, selectedOptions: ColourOption[], options: ColourOption[], isClearable?: boolean }) => {
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
         option: (styles, { data, isDisabled, isFocused, isSelected }) => {
@@ -71,41 +66,17 @@ export const UsersListSelect = ({ handleChange }: { handleChange: any }) => {
         }),
     };
 
-    useEffect(() => {
-        if (usersListState && usersListState.length > 0) {
-            const userOptions = usersListState.map((user: any) => ({
-                value: user.id,
-                label: user.username,
-                color: "#075985",
-            }));
-            setOptions(userOptions);
-        }
-    }, [usersListState]);
-
-    useEffect(() => {
-        if (options.length > 0 && chatFiltersState.user_assigned_id) {
-            const current = options.find(
-                (opt) => opt.value === Number(chatFiltersState.user_assigned_id)
-            );
-            setSelectedUsersOption(current || null);
-        }
-    }, [chatFiltersState.user_assigned_id, options]);
-
-    const handleSelectChange = (selectedOption: ColourOption | null) => {
-        setSelectedUsersOption(selectedOption);
-        if (handleChange) {
-            handleChange(selectedOption ? selectedOption.value : null);
-        }
-    };
+    //reestructurar para que options suceda aquí
 
     return (
         <Select
-            value={selectedUsersOption ?? []}
+            value={selectedOptions ?? []}
             options={options}
             styles={colourStyles}
-            onChange={handleSelectChange}
-            isClearable
+            onChange={handleChange}
+            isClearable={isClearable ?? false}
             isSearchable
+            placeholder={'Seleccione usuario'}
         />
     )
 }

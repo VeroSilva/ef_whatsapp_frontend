@@ -43,7 +43,9 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             setActiveConversation({
                 contact: conversation.contact,
                 id: conversation.id,
-                tags: conversation.tags
+                tags: conversation.tags,
+                user_assigned_id: conversation.user_assigned_id,
+                user_assigned_name: conversation.user_assigned_name,
             })
             markAsRead(userState.token, conversation.id)
             handleOpenConversation(conversation.id)
@@ -163,17 +165,16 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                 {conversation.user_assigned_name && (
                     <>
                         <span className="text-xs text-slate-800">Asignado a: </span>
-                        <span className="text-xs font-bold uppercase text-green-800">
+                        <span className="text-xs font-bold uppercase text-teal-800">
                             {conversation.user_assigned_name}
                         </span>
                     </>
                 )}
                 {!conversation.user_assigned_name && (
-                    <span className="text-xs font-bold uppercase text-red-600">
+                    <span className="text-xs text-gray-500">
                         Sin Asignar
                     </span>
                 )}
-                <hr className="border border-slate-400 w-full" />
             </div>
         </div>
     )

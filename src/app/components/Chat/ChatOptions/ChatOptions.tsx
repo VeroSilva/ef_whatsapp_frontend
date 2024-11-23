@@ -4,9 +4,7 @@ import { IconTag } from "../../Icons/IconTag";
 import { Modal } from "@/app/components/Modal/Modal";
 import { FormField, Tag } from "@/app/interfaces/conversations";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
-//@ts-ignore
-import chroma from 'chroma-js';
-import { addTagToConversation, deleteConversation, getTags, removeTagToConversation } from "@/app/services/api";
+import { addTagToConversation, assignUserToConversation, deleteConversation, removeTagToConversation } from "@/app/services/api";
 import useUser from "@/app/hooks/useUser"
 import { IconDoubleCheck } from "../../Icons/IconDoubleCheck";
 import { IconTrash } from "../../Icons/IconTrash";
@@ -18,12 +16,16 @@ import { ColourOption, SelectTags } from "../../Selects/SelectTags/SelectTags";
 import { FormInfoTag } from "../../FormTag/FormInfoTag";
 import { IconCheckCircle } from "../../Icons/IconCheckCircle";
 import { IconInfo } from "../../Icons/IconInfo";
+import { IconUser } from "../../Icons/IconUser";
+import { UsersListSelect } from "../ChatFilters/UsersListSelect/UsersListSelect";
+import useUsersList from "@/app/hooks/useUsersList";
 
 export const ChatOptions = () => {
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const { setChatsRead } = useChatsRead()
     const { userState } = useUser();
     const { tagsState } = useTag();
+    const { usersListState } = useUsersList();
     const [showDropdown, setShowDropdown] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
     const [selectedTags, setSelectedTags] = useState<ColourOption[]>([])
@@ -33,12 +35,15 @@ export const ChatOptions = () => {
     const [selectedTagId, setSelectedTagId] = useState(0);
     const [tagFormFields, setTagFormFields] = useState<FormField[]>([]);
     const [isSavingTagInfo, setIsSavingTagInfo] = useState<boolean>(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [showAssignUserModal, setShowAssignUserModal] = useState<boolean>(false);
+    const [options, setOptions] = useState<any>([]);
+    const [selectedUsersOption, setSelectedUsersOption] = useState<any>([]);
     const [alert, setAlert] = useState({
         type: "",
         message: "",
         show: false
     });
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
@@ -83,6 +88,10 @@ export const ChatOptions = () => {
         setShowInfoModal(!showInfoModal)
     }
 
+    const handleOpenAssignUserModal = () => {
+        setShowAssignUserModal(!showAssignUserModal)
+    }
+
     const handleSelectChange = (options: ColourOption[]) => {
         const toDelete = selectedTags.filter(item1 => 
             !options.some(item2 => item2.value === item1.value)
@@ -113,6 +122,13 @@ export const ChatOptions = () => {
 
             removeTagToConversation(activeConversationState.id, selectedItem.id, userState.token)
         }
+    };
+
+    const handleSelectUsersChange = (option: any) => {
+        setSelectedUsersOption(option);
+
+        assignUserToConversation(activeConversationState.id, option.value, userState.token)
+            .then((res) => handleOpenAssignUserModal());
     };
 
     const handleUnselectTagForm = () => {
@@ -192,6 +208,27 @@ export const ChatOptions = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (usersListState && usersListState.length > 0) {
+            const userOptions = usersListState.map((user: any) => ({
+                value: user.id,
+                label: user.username,
+                color: "#075985",
+            }));
+            setOptions(userOptions);
+        }
+    }, [usersListState]);
+
+    useEffect(() => {
+        if (options.length > 0 && activeConversationState.user_assigned_id) {
+            const current = options.find(
+                (opt: any) => opt.value === activeConversationState.user_assigned_id
+            );
+
+            setSelectedUsersOption(current || null);
+        }
+    }, [activeConversationState.user_assigned_id, options]);
+
     return (
         <div
             className="relative"
@@ -235,6 +272,15 @@ export const ChatOptions = () => {
                         </label>
                     </li>}
 
+                    {userState.role == "1" && <li
+                        className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
+                        onClick={handleOpenAssignUserModal}
+                    >
+                        <label htmlFor="file-input" id="file-label-2" className="text-sm flex justify-center items-center gap-2 cursor-pointer">
+                            Asignar usuario
+                            <IconUser classes="w-5 h-5 text-slate-500" />
+                        </label>
+                    </li>}
                 </ul>
             }
 
@@ -280,7 +326,7 @@ export const ChatOptions = () => {
             </Modal >
             {/* END: Delete Conversation Modal */}
 
-            {/* START: Delete Conversation Modal */}
+            {/* START: Add info tag */}
             <Modal
                 title="Agregar información de etiqueta"
                 onClose={() => {
@@ -317,6 +363,17 @@ export const ChatOptions = () => {
                         </button>
                     </div>
                 </>
+            </Modal>
+            {/* END: Add info tag */}
+
+            <Modal
+                title="Asignar usuario"
+                onClose={handleOpenAssignUserModal}
+                show={showAssignUserModal}
+                width="500px"
+                height="500px"
+            >
+                <UsersListSelect handleChange={handleSelectUsersChange} selectedOptions={selectedUsersOption} options={options} />
             </Modal>
 
             <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 w-[200px] ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">

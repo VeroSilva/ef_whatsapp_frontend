@@ -10,7 +10,7 @@ import { INITIAL_STATE } from "@/app/context/chatFilters/ChatFiltersProvider";
 import { IconUnread } from "../../Icons/IconUnread";
 import { IconWarning } from "../../Icons/IconWarning";
 import "./styles.scss"
-import { UsersListSelect } from "./UsersListSelect/UsersListSelect";
+import { ColourOption, UsersListSelect } from "./UsersListSelect/UsersListSelect";
 import useUser from "@/app/hooks/useUser";
 import useUsersList from "@/app/hooks/useUsersList";
 
@@ -22,13 +22,17 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [errorDate, setErrorDate] = useState("");
+    const [options, setOptions] = useState<ColourOption[]>([]);
+    const [selectedUsersOption, setSelectedUsersOption] = useState<any>([]);
 
     const handleSelectChange = (options: any) => {
         setChatFiltersState({ ...chatFiltersState, tags: options })
     };
 
-    const handleSelectUsersChange = (option: any) => {
-        setChatFiltersState({ ...chatFiltersState, user_assigned_id: option ?? undefined });
+    const handleSelectUsersChange = (selectedOption: ColourOption | null) => {
+        setSelectedUsersOption(selectedOption);
+
+        setChatFiltersState({ ...chatFiltersState, user_assigned_id: selectedOption ? selectedOption.value : null });
     };
 
     const onChangeDate = (dates: any) => {
@@ -76,6 +80,26 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
 
         setChatFiltersState({ ...chatFiltersState, startDate: null, endDate: null })
     }
+
+    useEffect(() => {
+        if (usersListState && usersListState.length > 0) {
+            const userOptions = usersListState.map((user: any) => ({
+                value: user.id,
+                label: user.username,
+                color: "#075985",
+            }));
+            setOptions(userOptions);
+        }
+    }, [usersListState]);
+
+    useEffect(() => {
+        if (options.length > 0 && chatFiltersState.user_assigned_id) {
+            const current = options.find(
+                (opt) => opt.value === Number(chatFiltersState.user_assigned_id)
+            );
+            setSelectedUsersOption(current || null);
+        }
+    }, [chatFiltersState.user_assigned_id, options]);
 
     return (
         <>
@@ -217,7 +241,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                         </span>
                                     </label>
 
-                                    <UsersListSelect handleChange={handleSelectUsersChange} />
+                                    <UsersListSelect handleChange={handleSelectUsersChange} selectedOptions={selectedUsersOption} options={options} isClearable />
                                 </div>
                                 : null
                             }

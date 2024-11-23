@@ -9,7 +9,9 @@ interface ActiveConversationProviderProps {
 export interface ContainerActiveConversation {
   contact: Contact,
   id: number,
-  tags: Tag[]
+  tags: Tag[],
+  user_assigned_id: number | null,
+  user_assigned_name: string
 }
 
 export const INITIAL_STATE: ContainerActiveConversation = {
@@ -22,7 +24,9 @@ export const INITIAL_STATE: ContainerActiveConversation = {
     id: 0
   },
   id: 0,
-  tags: []
+  tags: [],
+  user_assigned_id: null,
+  user_assigned_name: ""
 };
 
 export const ACTIVE_CONVERSATION = "activeConversation";

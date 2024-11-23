@@ -120,6 +120,23 @@ export const createConversation = async (data, token) => {
   return response;
 };
 
+export const assignUserToConversation = async (conversastionId, userId, token) => {
+  const response = await fetch(`${process.env.API_URL}/conversation/${conversastionId}/user/${userId}`, {
+    method: "POST",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  });
+
+  const status = response.status;
+  const data = response //no viene mensaje?;
+
+  return { status, data };
+};
+
 export const deleteConversation = async (id, token) => {
   const response = await fetch(`${process.env.API_URL}/conversation/${id}`, {
     method: "DELETE",
