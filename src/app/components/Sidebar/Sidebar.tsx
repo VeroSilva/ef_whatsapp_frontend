@@ -258,17 +258,17 @@ export const Sidebar = () => {
                 <IconChevron classes={`w-6 h-6 duration-200 ${open && "rotate-180"}`} />
             </button>
 
-            {/* <Image
-                src={open ? "/images/logo/LogoEF_PERFUMES_Horizontal.png" : "/images/logo/LogoEF_PERFUMES_Vertical.png"}
-                width={200}
-                height={100}
-                className="h-[50px] w-auto"
-                alt="Logo EF Perfumes"
-            /> */}
+            {open && userState.image && (
+                <img
+                    src={userState.image}
+                    alt="User Image"
+                    className="w-fit h-auto"
+                />
+            )}
 
             <hr className="border my-4" />
 
-            <div className="h-modal flex flex-col justify-between">
+            <div className="flex flex-col justify-between">
                 <ul className="border-b border-gray-300">
                     {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
                         if (menu.show) {
@@ -285,6 +285,7 @@ export const Sidebar = () => {
                                             options={phoneOptions}
                                             styles={colourStyles}
                                             onChange={handleSelectChange}
+                                            classNamePrefix={`${!open ? "w-full" : ""}`}
                                         />
                                     </React.Fragment>
                                 );

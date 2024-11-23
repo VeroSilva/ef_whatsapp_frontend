@@ -136,13 +136,16 @@ const Users = (): JSX.Element => {
                                     Rol
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
+                                    Imagen
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-center">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <SkeletonTable col={3} />
+                                <SkeletonTable col={4} />
                             ) : (
                                 slice.map((user, index) => {
                                     const role = user.role && roles.find(role => role.id === user.role);
@@ -157,6 +160,19 @@ const Users = (): JSX.Element => {
                                                         <span className={`rounded-lg text-xs text-white px-2 py-1 ${role.classes}`}>{role.name}</span> :
                                                         <span className="bg-gray-500 text-xs text-white rounded-lg px-2 py-1">No registrado</span>
                                                 }
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                {user.image ? (
+                                                    <div className="flex justify-center">
+                                                        <img
+                                                            src={user.image}
+                                                            alt="User Image"
+                                                            style={{ maxWidth: "100px", maxHeight: "100px" }}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    "No Imagen"
+                                                )}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex justify-center items-center">

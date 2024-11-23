@@ -3,6 +3,7 @@ export interface User {
     token: string;
     company_phones?: [CompanyPhones]
     role?: string,
+    image?: string,
     id: number
 }
 

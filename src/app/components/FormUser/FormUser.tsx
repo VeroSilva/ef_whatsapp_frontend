@@ -12,6 +12,7 @@ import chroma from 'chroma-js';
 import { FormSelectSchedules } from "./FormSelectSchedules/FormSelectSchedules";
 import { IconSort } from "../Icons/IconSort";
 import { Accordion } from "../Accordion/Accordion";
+import { IconImage } from "../Icons/IconImage";
 
 type Schedule = {
     days: string[];
@@ -30,7 +31,8 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
         password: "",
         role: "",
         company_phones_ids: "",
-        weight: ""
+        weight: "",
+        image: "",
     });
     const [scheduleGroup, setScheduleGroup] = useState<Schedule[]>([]);
 
@@ -56,7 +58,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
 
     useEffect(() => {
         if (data) {
-            const { username, password, role, company_phones_ids, weight } = data;
+            const { username, password, role, company_phones_ids, weight, image } = data;
 
             if (userState.company_phones && !!userState.company_phones.length) {
                 setSelectedNumbers(userState.company_phones.filter((phone: CompanyPhones) => company_phones_ids && company_phones_ids.split(',').includes(String(phone.company_phone_id))))
@@ -68,7 +70,8 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                 password,
                 role,
                 company_phones_ids: selectedNumbers.map((phone: CompanyPhones) => phone.company_phone_id).join(','),
-                weight
+                weight,
+                image
             });
 
             setScheduleGroup(data.work_schedule ?? []);
@@ -97,14 +100,16 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     company_phones_ids,
                     password,
                     role,
-                    username
+                    username,
+                    image
                 } = credentials;
 
                 dataUser = {
                     company_phones_ids,
                     password,
                     role,
-                    username
+                    username,
+                    image
                 }
             } else {
                 dataUser = {
@@ -134,8 +139,8 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     }
                 });
             } else {
-                const { username, role, company_phones_ids, weight} = credentials
-                editUser({ username, role, company_phones_ids, weight, work_schedule: scheduleGroup }, data.id, userState.token).then((res) => {
+                const { username, role, company_phones_ids, weight, image } = credentials
+                editUser({ username, role, company_phones_ids, weight, work_schedule: scheduleGroup, image }, data.id, userState.token).then((res) => {
                     setLoadingCreate(false)
                     handleOpenModal(false)
 
@@ -239,7 +244,7 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                             onChange={(e) => setCredentials({ ...credentials, weight: e.target.value })}
                         />
                     </div>
-                    
+
                     <div className="relative">
                         <h6 className="block uppercase tracking-wide text-gray-700 text-xs text-start font-bold mb-2">Seleccione para asignar</h6>
                         <div className="flex flex-wrap gap-2">
@@ -297,6 +302,20 @@ export const FormUser = ({ type, roles, setAlert, handleLoadUsers, handleOpenMod
                     </Accordion>
                 </>
             }
+
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <IconImage classes="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    id="input-group-image"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                    placeholder="Image URL"
+                    value={credentials.image ?? ""}
+                    onChange={(e) => setCredentials({ ...credentials, image: e.target.value })}
+                />
+            </div>
 
             {errorCredentials && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">

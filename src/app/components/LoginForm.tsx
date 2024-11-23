@@ -38,7 +38,8 @@ export const LoginForm = () => {
                             token: d.token,
                             role: d.role,
                             company_phones: d.company_phones,
-                            id: d.id
+                            id: d.id,
+                            image: d.image
                         })
 
                         setLoading(false)
