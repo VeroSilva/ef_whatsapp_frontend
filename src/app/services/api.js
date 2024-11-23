@@ -42,6 +42,8 @@ export const getConversations = async (
 
   if (filter.tags) url += `&tags=${filter.tags}`;
 
+  if (filter.user_assigned_id) url += `&user_assigned_id=${filter.user_assigned_id}`;
+
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -281,8 +283,12 @@ export const importTemplates = async (token, company_phone_id) => {
   return response;
 };
 
-export const getUsers = async (token) => {
-  const response = await fetch(`${process.env.API_URL}/user`, {
+export const getUsers = async (token, filters) => {
+  let url = `${process.env.API_URL}/user`
+
+  if (filters) url += `?company_phone_id=${filters.company_phone_id}&role=${filters.role}`
+ 
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       Accept: "*/*",

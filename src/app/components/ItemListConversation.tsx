@@ -72,7 +72,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     return (
         <div
             className={
-                "cursor-pointer flex flex-wrap items-start border-b border-t border-slate-200/60 group/item py-5 px-5 -mb-px last:border-b-0 " +
+                "cursor-pointer flex flex-wrap items-start border-b border-t border-slate-200/60 group/item py-2 px-5 -mb-px last:border-b-0 " +
                 (isUnread ? "bg-teal-100" : "hover:bg-slate-100")
             }
             onClick={handleClick}
@@ -80,9 +80,11 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
             <div className='w-full mb-2 flex gap-2 flex-wrap'>
                 <SelectedTags tags={conversation.tags} />
             </div>
+
             <div className="w-14 h-14 flex-none image-fit mr-1">
                 <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />
             </div>
+
             <div className="ml-2 overflow-hidden flex-1">
                 <div className="flex items-center">
                     <a href="#" className="font-medium overflow-hidden overflow-ellipsis whitespace-nowrap">
@@ -156,6 +158,10 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className="w-full mt-2">
+            <span className="text-xs text-slate-800">Asignado a: </span><span className="text-xs text-slate-800 font-bold uppercase">{conversation.user_assigned_name}</span>
             </div>
         </div>
     )

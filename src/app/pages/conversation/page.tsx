@@ -9,6 +9,9 @@ import { Chat } from '@/app/components/Chat/Chat';
 import { ChatSidebar } from '@/app/components/ChatSidebar/ChatSidebar';
 import { Socket, io } from 'socket.io-client';
 import { useSocket } from '@/app/context/socket/SocketContext';
+import { getUsers } from '@/app/services/api';
+import useUsersListState from '@/app/hooks/useUsersList';
+import useActivePhone from "@/app/hooks/useActivePhone";
 
 const Conversation = (): JSX.Element => {
     const { userState } = useUser();
@@ -16,6 +19,8 @@ const Conversation = (): JSX.Element => {
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const socketRef = useRef<Socket | null>(null);
     const { setSocketInstance } = useSocket();
+    const { setUsersListState } = useUsersListState();
+    const { activePhone } = useActivePhone();
 
     useEffect(() => {
         if (!userState || userState.token === "") {
@@ -24,7 +29,13 @@ const Conversation = (): JSX.Element => {
     }, [userState]);
 
     useEffect(() => {
-        if (activeConversationState.id === -1) resetActiveConversation()
+        getUsers(userState.token, { company_phone_id: activePhone, role: 3 }).then((res => {
+            setUsersListState(res)
+        }))
+    }, [activePhone])
+
+    useEffect(() => {
+        if (activeConversationState.id === -1) resetActiveConversation();
     }, [])
 
     useEffect(() => {

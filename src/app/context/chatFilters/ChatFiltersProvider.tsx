@@ -13,6 +13,7 @@ export interface ChatFiltersType {
   stardDate: string,
   endDate: string,
   tags: [],
+  user_assigned_id: string | undefined
 }
 
 export const INITIAL_STATE: ChatFiltersType = {
@@ -21,7 +22,8 @@ export const INITIAL_STATE: ChatFiltersType = {
   overdue: false,
   stardDate: "",
   endDate: "",
-  tags: []
+  tags: [],
+  user_assigned_id: undefined
 };
 
 export const CHAT_FILTERS_DATA = "chat_filters";
@@ -52,7 +54,8 @@ export const ChatFiltersProvider: React.FC<ChatFiltersProviderProps> = ({ childr
       ) ||
       chatFiltersState.overdue ||
       chatFiltersState.unread ||
-      !!chatFiltersState.tags.length
+      !!chatFiltersState.tags.length ||
+      (chatFiltersState.user_assigned_id && chatFiltersState.user_assigned_id !== "")
     ) setChatFiltersActive(true)
     else setChatFiltersActive(false)
   }, [chatFiltersState])

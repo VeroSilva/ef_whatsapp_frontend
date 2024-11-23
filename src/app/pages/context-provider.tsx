@@ -12,6 +12,7 @@ import { SocketProvider } from '../context/socket/SocketContext';
 import { TagsProvider } from '../context/tags/TagsProvider';
 import { ChatFiltersProvider } from '../context/chatFilters/ChatFiltersProvider';
 import { ActivePhoneProvider } from '../context/activePhone/ActivePhoneProvider';
+import { UsersListProvider } from '../context/usersList/UsersListProvider';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -26,15 +27,17 @@ export default function ContextProvider({ children }: ThemeProviderProps) {
             <ActiveMessageReplyProvider>
               <TemplatesProvider>
                 <TagsProvider>
-                  <CatalogProvider>
-                    <TemplatesToSendProvider>
-                      <ChatReadProvider>
-                        <ChatFiltersProvider>
-                          {children}
-                        </ChatFiltersProvider>
-                      </ChatReadProvider>
-                    </TemplatesToSendProvider>
-                  </CatalogProvider>
+                  <UsersListProvider>
+                    <CatalogProvider>
+                      <TemplatesToSendProvider>
+                        <ChatReadProvider>
+                          <ChatFiltersProvider>
+                            {children}
+                          </ChatFiltersProvider>
+                        </ChatReadProvider>
+                      </TemplatesToSendProvider>
+                    </CatalogProvider>
+                  </UsersListProvider>
                 </TagsProvider>
               </TemplatesProvider>
             </ActiveMessageReplyProvider>
