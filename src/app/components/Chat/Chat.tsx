@@ -118,48 +118,52 @@ export const Chat = () => {
                     activeConversationState.id !== 0 ?
                         <>
                             <div className="h-full flex flex-col relative">
-                                <div className="flex flex-col sm:flex-row border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-4">
-                                    <div className="flex items-center">
-                                        <div className="w-16 h-16 flex-none relative">
-                                            <MemoizedGenerateInitialsImage name={(activeConversationState.contact.name ?? "")} color="#0d9488" />
-                                        </div>
+                                <div className="border-b border-slate-200/60 px-5 py-4">
+                                    <div className="flex flex-col sm:flex-row">
+                                        <div className="flex items-center">
+                                            <div className="w-16 h-16 flex-none relative">
+                                                <MemoizedGenerateInitialsImage name={(activeConversationState.contact.name ?? "")} color="#0d9488" />
+                                            </div>
 
-                                        <div className="ml-3 mr-auto">
-                                            <div className="flex items-center">
-                                                <div className="font-medium text-base">
-                                                    {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== ""
-                                                        ? <>
-                                                            <span className="block">{activeConversationState.contact.name}</span>
-                                                            <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
-                                                        </>
-                                                        : formatPhoneNumber(activeConversationState.contact.phone)}
+                                            <div className="ml-3 mr-auto">
+                                                <div className="flex items-center">
+                                                    <div className="font-medium text-base">
+                                                        {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== ""
+                                                            ? <>
+                                                                <span className="block">{activeConversationState.contact.name}</span>
+                                                                <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
+                                                            </>
+                                                            : formatPhoneNumber(activeConversationState.contact.phone)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="relative ms-4">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                                <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                                            <div className="relative ms-4">
+                                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                    <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
+                                                </div>
+                                                <input
+                                                    ref={inputRef}
+                                                    type="search"
+                                                    id="default-search"
+                                                    className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 input-sky"
+                                                    placeholder="Buscar coincidencia"
+                                                    required
+                                                    value={searchText}
+                                                    onChange={(e) => setSearchText(e.target.value)}
+                                                    onKeyDown={handleKeyDown}
+                                                />
                                             </div>
-                                            <input
-                                                ref={inputRef}
-                                                type="search"
-                                                id="default-search"
-                                                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 input-sky"
-                                                placeholder="Buscar coincidencia"
-                                                required
-                                                value={searchText}
-                                                onChange={(e) => setSearchText(e.target.value)}
-                                                onKeyDown={handleKeyDown}
-                                            />
+                                        </div>
+                                        <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
+                                            <div className='w-full mb-2 flex gap-2 flex-wrap items-center'>
+                                                <ChatOptions />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
-                                        <div className='w-full mb-2 flex gap-2 flex-wrap items-center'>
-                                            {activeConversationState && <SelectedTags tags={updatedTags} />}
 
-                                            <ChatOptions />
-                                        </div>
+                                    <div className="flex gap-2 mt-2">
+                                        {activeConversationState && <SelectedTags tags={updatedTags} isInChat />}
                                     </div>
                                 </div>
 

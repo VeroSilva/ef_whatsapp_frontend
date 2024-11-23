@@ -426,19 +426,25 @@ export const deleteTag = async (id, token) => {
   return response;
 };
 
-export const addTagToConversation = async (idConversation, idTag, token) => {
+export const addTagToConversation = async (idConversation, idTag, token, fields) => {
+  const bodyData = fields ? JSON.stringify({ fields }) : null;
+  
   const response = await fetch(
     `${process.env.API_URL}/conversation/${idConversation}/tag/${idTag}`,
     {
       method: "POST",
+      body: bodyData,
       headers: {
         Authorization: token,
         "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+        "Content-Type": "application/json",
       },
     }
-  ).then((res) => res.json());
-
-  return response;
+  )
+  const status = response.status;
+  const data = await response.json();
+  
+  return { status, data };
 };
 
 export const removeTagToConversation = async (idConversation, idTag, token) => {

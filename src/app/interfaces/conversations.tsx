@@ -7,11 +7,20 @@ export interface Contact {
     id: number
 }
 
+export type FormField = {
+    id: string; // Identificador único del campo
+    type: "decimal" | "text" | "date"; // Tipo de campo
+    name: string; // Nombre del campo
+    value?: string; // Valor del campo
+};
+
 export interface Tag {
-    id: number,
+    id?: number,
     name: string,
     color: string,
-    description: string
+    description: string,
+    hasNestedForm: boolean;
+    fields: FormField[];
 }
 
 export interface Conversation {

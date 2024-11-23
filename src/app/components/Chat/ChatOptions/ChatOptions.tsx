@@ -2,32 +2,43 @@ import { useEffect, useRef, useState } from "react"
 import { IconEllipsisVertical } from "../../Icons/IconEllipsisVertical"
 import { IconTag } from "../../Icons/IconTag";
 import { Modal } from "@/app/components/Modal/Modal";
-import { Tag } from "@/app/interfaces/conversations";
+import { FormField, Tag } from "@/app/interfaces/conversations";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
 //@ts-ignore
 import chroma from 'chroma-js';
 import { addTagToConversation, deleteConversation, getTags, removeTagToConversation } from "@/app/services/api";
 import useUser from "@/app/hooks/useUser"
-import { IconX } from "../../Icons/IconX";
 import { IconDoubleCheck } from "../../Icons/IconDoubleCheck";
 import { IconTrash } from "../../Icons/IconTrash";
 import { markAsUnread } from '@/app/services/api';
 import { IconLoading } from "../../Icons/IconLoading";
 import useChatsRead from "@/app/hooks/useChatsRead";
 import useTag from "@/app/hooks/useTags";
+import { ColourOption, SelectTags } from "../../Selects/SelectTags/SelectTags";
+import { FormInfoTag } from "../../FormTag/FormInfoTag";
+import { IconCheckCircle } from "../../Icons/IconCheckCircle";
+import { IconInfo } from "../../Icons/IconInfo";
 
 export const ChatOptions = () => {
-    const [showDropdown, setShowDropdown] = useState<boolean>(false)
-    const [showModal, setShowModal] = useState<boolean>(false)
-    const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    //@ts-ignore
     const { activeConversationState, resetActiveConversation } = useActiveConversation();
     const { setChatsRead } = useChatsRead()
     const { userState } = useUser();
-    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
     const { tagsState } = useTag();
+    const [showDropdown, setShowDropdown] = useState<boolean>(false)
+    const [showModal, setShowModal] = useState<boolean>(false)
+    const [selectedTags, setSelectedTags] = useState<ColourOption[]>([])
+    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+    const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+    const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
+    const [selectedTagId, setSelectedTagId] = useState(0);
+    const [tagFormFields, setTagFormFields] = useState<FormField[]>([]);
+    const [isSavingTagInfo, setIsSavingTagInfo] = useState<boolean>(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [alert, setAlert] = useState({
+        type: "",
+        message: "",
+        show: false
+    });
 
     const handleOpenDropdown = () => {
         setShowDropdown(!showDropdown)
@@ -35,22 +46,6 @@ export const ChatOptions = () => {
 
     const handleOpenTagsModal = () => {
         setShowModal(!showModal)
-    }
-
-    const addTag = (tag: Tag) => {
-        const itemExists = selectedTags.some((item) => item.id === tag.id);
-        if (!itemExists) {
-            setSelectedTags((prevOptions: Tag[]): Tag[] => [...prevOptions, tag])
-        }
-
-        addTagToConversation(activeConversationState.id, tag.id, userState.token)
-    }
-
-    const removeTag = (id: number) => {
-        const updatedOptions = selectedTags.filter((item) => item.id !== id);
-        setSelectedTags(updatedOptions);
-
-        removeTagToConversation(activeConversationState.id, id, userState.token)
     }
 
     const handleMarkAsUnread = () => {
@@ -84,10 +79,96 @@ export const ChatOptions = () => {
         setShowDeleteModal(show);
     };
 
+    const handleOpenTagsInfoModal = () => {
+        setShowInfoModal(!showInfoModal)
+    }
+
+    const handleSelectChange = (options: ColourOption[]) => {
+        const toDelete = selectedTags.filter(item1 => 
+            !options.some(item2 => item2.value === item1.value)
+        );
+
+        const toAdd = options.filter(item2 => 
+            !selectedTags.some(item1 => item1.value === item2.value)
+        );
+
+        setSelectedTags(options);
+
+        if (!!toAdd.length) {
+            const addItem = toAdd[0];
+            const selectedItem: any = tagsState.filter((tag) => tag.id === addItem.value)[0];
+
+            if (selectedItem.hasNestedForm) {
+                setSelectedTagId(selectedItem.id);
+                setTagFormFields(selectedItem.fields);
+                handleOpenTagsInfoModal();
+            } else {
+                addTagToConversation(activeConversationState.id, selectedItem.id, userState.token)
+            }
+        }
+
+        if (!!toDelete.length) {
+            const deleteItem = toDelete[0];
+            const selectedItem: any = tagsState.filter((tag) => tag.id === deleteItem.value)[0];
+
+            removeTagToConversation(activeConversationState.id, selectedItem.id, userState.token)
+        }
+    };
+
+    const handleUnselectTagForm = () => {
+        setSelectedTags((prevState) => {
+            const filter = prevState.filter((item) => item.value !== selectedTagId);
+
+            return filter
+        });
+    }
+
+    const handleSaveTagInfo = () => {
+        setIsSavingTagInfo(true);
+
+        addTagToConversation(activeConversationState.id, selectedTagId, userState.token, tagFormFields)
+            .then(({ status, data }) => {
+                setIsSavingTagInfo(false);
+                handleOpenTagsInfoModal();
+                handleOpenTagsModal();
+
+                if (status === 200 || status === 201) {
+                    setAlert({
+                        type: "success",
+                        message: "Etiqueta asignada con éxito",
+                        show: true
+                    })
+                } else {
+                    setAlert({
+                        type: "error",
+                        message: "Ocurrió un error",
+                        show: true
+                    })
+                }
+            });
+    }
+
+    const isTagFormValid = () => {
+        return tagFormFields.every(item => item.hasOwnProperty('value') && item.value !== "")
+    }
+
     useEffect(() => {
-        setSelectedTags(activeConversationState.tags)
+        const options: ColourOption[] = activeConversationState.tags.map(tag => ({value: tag.id, label: tag.name, color: tag.color}));
+
+        setSelectedTags(options)
     }, [activeConversationState.tags])
 
+    useEffect(() => {
+        if (alert.show) {
+            setTimeout(() => {
+                setAlert({
+                    type: alert.type,
+                    message: alert.message,
+                    show: false
+                })
+            }, 3000);
+        }
+    }, [alert])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -162,55 +243,9 @@ export const ChatOptions = () => {
                 onClose={handleOpenTagsModal}
                 show={showModal}
                 width="500px"
+                height="500px"
             >
-                <h3 className="my-3 text-start font-semibold text-gray-800">Etiquetas seleccionadas:</h3>
-
-                {selectedTags.length > 0 &&
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {selectedTags.map((tag) => {
-                            const color = chroma(tag.color);
-                            const background = color.alpha(0.2).css()
-
-                            return (
-                                <span
-                                    key={`tag-${tag.id}`}
-                                    style={{ backgroundColor: background, border: `1px solid ${tag.color}` }}
-                                    className="rounded-full px-2 py-1 text-sm font-bold text-gray-800 text-gray-700 flex items-center"
-                                >
-                                    {tag.name}
-                                    <button
-                                        className="rounded-full"
-                                        onClick={() => removeTag(tag.id)}
-                                    >
-                                        <IconX classes="w-6 h-6 ms-1 text-gray-800" />
-                                    </button>
-                                </span>
-                            )
-                        })}
-                    </div>
-                }
-
-                <h3 className="my-3 text-start font-semibold text-gray-800">Selecciona etiquetas:</h3>
-
-                {tagsState.length > 0 &&
-                    <div className="flex flex-wrap gap-2">
-                        {tagsState.map((tag) => {
-                            const color = chroma(tag.color);
-                            const background = color.alpha(0.2).css()
-
-                            return (
-                                <span
-                                    key={`tag-${tag.id}`}
-                                    style={{ backgroundColor: background, border: `1px solid ${tag.color}` }}
-                                    className={`rounded-full px-2 py-1 text-xs font-bold text-gray-800 text-gray-700 cursor-pointer`}
-                                    onClick={() => addTag(tag)}
-                                >
-                                    {tag.name}
-                                </span>
-                            )
-                        })}
-                    </div>
-                }
+                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
             </Modal>
 
             {/* END: Delete Conversation Modal */}
@@ -244,6 +279,53 @@ export const ChatOptions = () => {
                 </div>
             </Modal >
             {/* END: Delete Conversation Modal */}
+
+            {/* START: Delete Conversation Modal */}
+            <Modal
+                title="Agregar información de etiqueta"
+                onClose={() => {
+                    handleOpenTagsInfoModal();
+                    handleUnselectTagForm();
+                }}
+                show={showInfoModal}
+                width="500px"
+            >
+                <>
+                    <FormInfoTag tagFormFields={tagFormFields} setTagFormFields={setTagFormFields} />
+
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            className="second-button"
+                            onClick={() => {
+                                handleOpenTagsInfoModal();
+                                handleUnselectTagForm();
+                            }}
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            onClick={handleSaveTagInfo}
+                            className={
+                                "main-button transition ease-in-out delay-50 flex " +
+                                (!isTagFormValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
+                            }
+                            disabled={!isTagFormValid()}
+                        >
+                            {isSavingTagInfo && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}
+                            Guardar
+                        </button>
+                    </div>
+                </>
+            </Modal>
+
+            <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 w-[200px] ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
+                {alert.type === "success" ?
+                    <span><IconCheckCircle classes="w-6 h-6 mr-2" /></span> :
+                    <span><IconInfo classes="w-6 h-6 mr-2" /></span>
+                }
+                <span>{alert.message}</span>
+            </div>
         </div>
     )
 }

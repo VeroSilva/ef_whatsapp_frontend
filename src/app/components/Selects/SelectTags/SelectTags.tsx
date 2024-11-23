@@ -4,8 +4,8 @@ import Select, { StylesConfig } from 'react-select';
 import chroma from 'chroma-js';
 import useTags from '@/app/hooks/useTags';
 
-interface ColourOption {
-    value: number;
+export interface ColourOption {
+    value?: number;
     label: string;
     color: string;
     isFixed?: boolean;
@@ -89,7 +89,7 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
     return (
         <Select
             closeMenuOnSelect={false}
-            defaultValue={selectedOptions ?? []}
+            value={selectedOptions ?? []}
             options={options}
             styles={colourStyles}
             onChange={handleChange}
