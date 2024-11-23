@@ -114,6 +114,22 @@ export const ChatSidebar = () => {
                         return prevConversations
                     });
                 }
+            } else if (payload.table === "user_conversation") {
+
+                const isRelevantConversation = activePhone.toString() === payload.data.conversation.company_phone_id && (!payload.data.conversation.user_assigned_id || payload.data.conversation.user_assigned_id === userState.id || userState.role == "1");
+
+                if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {
+                    setConversations((prevConversations) => {
+                        const updatedArray = [...prevConversations, payload.data.conversation];
+                        return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                    });
+                } else if ((payload.action === "update" && payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id !== userState.id) || payload.action === "delete") {
+                    setConversations((prevConversations) => {
+                        const filteredConversations = prevConversations.filter((conversation: any) => conversation?.id !== payload.data.conversation.id);
+                        return filteredConversations;
+                    });
+                }
+
             }
         }
 
