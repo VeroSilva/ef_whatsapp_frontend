@@ -266,7 +266,7 @@ export const Sidebar = () => {
                 />
             )}
 
-            <hr className="border my-4" />
+            <hr className="border my-1" />
 
             <div className="flex flex-col justify-between">
                 <ul className="border-b border-gray-300">
@@ -298,7 +298,7 @@ export const Sidebar = () => {
                                             key={`select-${index}`}
                                             href={menu.link}
                                             className={
-                                                `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
+                                                `text-gray-600 flex items-center gap-x-3 p-1 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
                                             }
                                             onClick={() => handleActiveMenu(menu.title)}
                                         >
