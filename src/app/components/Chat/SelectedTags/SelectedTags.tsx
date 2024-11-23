@@ -46,8 +46,8 @@ export const SelectedTags = ({ tags, isInChat }: { tags: any, isInChat?: boolean
                         <span className="text-sm">{currentTag?.description}</span>
                     </div>
 
-                    {currentTag?.fields.map((field) => (
-                        <div className="flex items-center mb-2 gap-2">
+                    {currentTag?.fields.map((field, index) => (
+                        <div className="flex items-center mb-2 gap-2" key={`idx-${index}`}>
                             <span className="block uppercase tracking-wide text-gray-700 text-xs font-bold">{field?.name}: </span>
                             <span className="text-sm">{field?.value}</span>
                         </div>
