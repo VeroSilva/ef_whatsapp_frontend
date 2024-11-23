@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { createPhone, editPhone } from "@/app/services/api"
 import useUser from "../../hooks/useUser"
 import { IconLoading } from "../Icons/IconLoading";
+import { ColourOption, SelectTags } from "../Selects/SelectTags/SelectTags";
 
 export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, data }: { type: string, setAlert: Function, handleLoadPhones: Function, handleOpenModal: Function, data?: any }) => {
     const [errorCredentials, setErrorCredentials] = useState(false);
     const [loadingCreate, setLoadingCreate] = useState(false);
+    const [selectedTags, setSelectedTags] = useState<ColourOption[]>([]);
     const [phoneData, setPhoneData] = useState({
         phone: "",
         company_id: "1",
@@ -39,6 +41,10 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
     const dataIsValid = () => {
         if (phoneData.phone === "" || phoneData.company_id === "" || phoneData.wp_phone_id === "" || phoneData.waba_id === "" || phoneData.bussines_id === "" || phoneData.wp_bearer_token === "" || phoneData.alias === "") return false;
         else return true;
+    };
+
+    const handleSelectChange = (options: ColourOption[]) => {
+        setSelectedTags(options);
     };
 
     const handleCreateUser = () => {
@@ -181,6 +187,10 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
                     value={phoneData.wp_bearer_token ?? ""}
                     onChange={(e) => setPhoneData({ ...phoneData, wp_bearer_token: e.target.value })}
                 />
+            </div>
+
+            <div className="relative">
+                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
             </div>
 
             {errorCredentials && (

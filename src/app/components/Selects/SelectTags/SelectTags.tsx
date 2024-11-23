@@ -16,6 +16,8 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { tagsState } = useTags();
 
+    console.log(tagsState)
+
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
         option: (styles, { data, isDisabled, isFocused, isSelected }) => {
@@ -94,7 +96,8 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
             styles={colourStyles}
             onChange={handleChange}
             // @ts-ignore
-            isMulti={isMulti}
+            isMulti={isMulti ?? false}
+            placeholder="Selecciona una o varias etiquetas"
         />
     )
 }

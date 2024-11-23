@@ -152,6 +152,7 @@ const TemplatesDragAndDrop = () => {
 
                         <SelectTags handleChange={handleSelectChange} selectedOptions={tag} flows={tabs} />
                     </div>
+                    
                     <button
                         className='main-button flex items-center justify-center self-center w-1/2'
                         onClick={handleAcceptTag}

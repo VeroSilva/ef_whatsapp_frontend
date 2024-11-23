@@ -7,8 +7,10 @@ import { CampaignUser, Campaing, ColourOption } from "@/app/interfaces/campaign"
 //@ts-ignore
 import chroma from 'chroma-js';
 import { User } from "@/app/interfaces/user";
+import { SelectTags } from "../Selects/SelectTags/SelectTags";
 
 export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenModal, data }: { type: string, setAlert: Function, handleLoadCampaigns: Function, handleOpenModal: Function, data?: any }) => {
+    const { userState } = useUser();
     const [errorCampaign, setErrorCampaign] = useState(false);
     const [loadingCreate, setLoadingCreate] = useState(false);
     const [usersOptions, setUsersOptions] = useState([]);
@@ -17,7 +19,7 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
         id_campaign: "",
         users: []
     });
-    const { userState } = useUser();
+    const [selectedTags, setSelectedTags] = useState<ColourOption[]>([]);
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
@@ -156,6 +158,10 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
         setSelectedOptions(options);
     }
 
+    const handleSelectChange = (options: ColourOption[]) => {
+        setSelectedTags(options);
+    };
+
     const CreateTagButton = () => (
         <button
             onClick={handleCreateCampaign}
@@ -201,6 +207,14 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
                     onChange={handleChange}
                     isMulti
                 />
+            </div>
+
+            <div>
+                <label className="block uppercase tracking-wide text-gray-700 text-xs text-left font-bold mb-2" htmlFor="grid-first-name">
+                    Etiqueta relacionada
+                </label>
+                
+                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
             </div>
 
             {errorCampaign && (
