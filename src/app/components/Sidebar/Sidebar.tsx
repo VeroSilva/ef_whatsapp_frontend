@@ -19,6 +19,7 @@ import Select, { StylesConfig } from 'react-select';
 //@ts-ignore
 import chroma from 'chroma-js';
 import useActivePhone from "../../hooks/useActivePhone";
+import React from "react";
 
 interface ColourOption {
     value: number;
@@ -264,18 +265,20 @@ export const Sidebar = () => {
                     {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
                         if (menu.show) {
                             if (menu.isDivider) {
-                                return (<>
-                                    <li key={`divider-${index}`} className="my-4">
-                                        <hr className="border" />
-                                    </li>
-                                    <Select
-                                        closeMenuOnSelect
-                                        value={defaultPhone}
-                                        options={phoneOptions}
-                                        styles={colourStyles}
-                                        onChange={handleSelectChange}
-                                    />
-                                </>
+                                return (
+                                    <React.Fragment key={`divider-${index}`}>
+                                        <li key={`divider-${index}`} className="my-4">
+                                            <hr className="border" />
+                                        </li>
+                                        <Select
+                                            key={`select-${index}`}
+                                            closeMenuOnSelect
+                                            value={defaultPhone}
+                                            options={phoneOptions}
+                                            styles={colourStyles}
+                                            onChange={handleSelectChange}
+                                        />
+                                    </React.Fragment>
                                 );
                             }
                             return (
@@ -283,6 +286,7 @@ export const Sidebar = () => {
                                     {
                                         menu.link &&
                                         <Link
+                                            key={`select-${index}`}
                                             href={menu.link}
                                             className={
                                                 `text-gray-600 flex items-center gap-x-3 p-2 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`

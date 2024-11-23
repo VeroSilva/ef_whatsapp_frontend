@@ -159,9 +159,21 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                     )}
                 </div>
             </div>
-
             <div className="w-full mt-2">
-            <span className="text-xs text-slate-800">Asignado a: </span><span className="text-xs text-slate-800 font-bold uppercase">{conversation.user_assigned_name}</span>
+                {conversation.user_assigned_name && (
+                    <>
+                        <span className="text-xs text-slate-800">Asignado a: </span>
+                        <span className="text-xs font-bold uppercase text-green-800">
+                            {conversation.user_assigned_name}
+                        </span>
+                    </>
+                )}
+                {!conversation.user_assigned_name && (
+                    <span className="text-xs font-bold uppercase text-red-600">
+                        Sin Asignar
+                    </span>
+                )}
+                <hr className="border border-slate-400 w-full" />
             </div>
         </div>
     )

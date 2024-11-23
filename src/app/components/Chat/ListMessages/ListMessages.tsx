@@ -203,9 +203,10 @@ export const ListMessages: React.FC<ActiveConversationProps> = ({
     };
 
     const Scroll = (force: boolean) => {
-        const { offsetHeight, scrollHeight, scrollTop } = messagesContainerRef.current as HTMLDivElement
+        if (!messagesContainerRef.current) return;
+        const { offsetHeight, scrollHeight, scrollTop } = messagesContainerRef.current as HTMLDivElement;
         if (scrollHeight <= scrollTop + offsetHeight + 100 || force) {
-            messagesContainerRef.current?.scrollTo(0, scrollHeight)
+            messagesContainerRef.current?.scrollTo(0, scrollHeight);
         }
     }
 

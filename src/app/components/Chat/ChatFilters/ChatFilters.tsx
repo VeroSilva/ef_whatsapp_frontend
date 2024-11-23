@@ -28,7 +28,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
     };
 
     const handleSelectUsersChange = (option: any) => {
-        setChatFiltersState({ ...chatFiltersState, user_assigned_id: option? option.value : undefined })
+        setChatFiltersState({ ...chatFiltersState, user_assigned_id: option ?? undefined });
     };
 
     const onChangeDate = (dates: any) => {
@@ -109,7 +109,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500 animate-ping"></div>
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500"></div>
                                             </>
-                                        ): null}
+                                        ) : null}
                                     </span>
                                 </label>
                                 <SelectTags handleChange={handleSelectChange} selectedOptions={chatFiltersState.tags} isMulti />
@@ -125,7 +125,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500 animate-ping"></div>
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500"></div>
                                             </>
-                                        ): null}  
+                                        ) : null}
                                     </span>
 
                                 </label>
@@ -164,7 +164,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500 animate-ping"></div>
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500"></div>
                                             </>
-                                        ): null}  
+                                        ) : null}
                                     </span>
                                 </label>
 
@@ -187,7 +187,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500 animate-ping"></div>
                                                 <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500"></div>
                                             </>
-                                        ): null}
+                                        ) : null}
                                     </span>
                                 </label>
 
@@ -213,10 +213,10 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
                                                     <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500 animate-ping"></div>
                                                     <div className="absolute top-0 -right-2 w-2 h-2 rounded-full bg-sky-500"></div>
                                                 </>
-                                            ): null}
+                                            ) : null}
                                         </span>
                                     </label>
-                                    
+
                                     <UsersListSelect handleChange={handleSelectUsersChange} />
                                 </div>
                                 : null

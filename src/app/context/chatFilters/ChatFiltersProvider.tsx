@@ -49,7 +49,7 @@ export const ChatFiltersProvider: React.FC<ChatFiltersProviderProps> = ({ childr
 
   useEffect(() => {
     if (
-      ((chatFiltersState.stardDate && chatFiltersState.stardDate !== "") || 
+      ((chatFiltersState.stardDate && chatFiltersState.stardDate !== "") ||
         (chatFiltersState.endDate && chatFiltersState.endDate !== "")
       ) ||
       chatFiltersState.overdue ||

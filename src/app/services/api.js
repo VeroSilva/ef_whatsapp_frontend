@@ -42,7 +42,8 @@ export const getConversations = async (
 
   if (filter.tags) url += `&tags=${filter.tags}`;
 
-  if (filter.user_assigned_id) url += `&user_assigned_id=${filter.user_assigned_id}`;
+  if (filter.user_assigned_id)
+    url += `&user_assigned_id=${filter.user_assigned_id}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -227,20 +228,17 @@ export const getContact = async (id, token) => {
 
 export const getTemplates = async (token, company_phone_id, onlyLink) => {
   let url = `${process.env.API_URL}/template/${company_phone_id}`;
-  if (onlyLink) url += `?links=${onlyLink}`
+  if (onlyLink) url += `?links=${onlyLink}`;
 
-  const response = await fetch(
-    url,
-    {
-      method: "GET",
-      headers: {
-        Accept: "*/*",
-        Authorization: token,
-        "Content-Type": "application/json",
-        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-      },
-    }
-  ).then((res) => res.json());
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
 
   return response;
 };
@@ -250,7 +248,7 @@ export const editTemplate = async (token, id, link) => {
     `${process.env.API_URL}/template/header-link/${id}`,
     {
       method: "POST",
-      body: JSON.stringify({link}),
+      body: JSON.stringify({ link }),
       headers: {
         Accept: "*/*",
         Authorization: token,
@@ -258,13 +256,13 @@ export const editTemplate = async (token, id, link) => {
         "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
       },
     }
-  )
-  
+  );
+
   const status = response.status;
   const data = await response.json();
-  
+
   return { status, data };
-}
+};
 
 export const importTemplates = async (token, company_phone_id) => {
   const response = await fetch(
@@ -284,10 +282,11 @@ export const importTemplates = async (token, company_phone_id) => {
 };
 
 export const getUsers = async (token, filters) => {
-  let url = `${process.env.API_URL}/user`
+  let url = `${process.env.API_URL}/user`;
 
-  if (filters) url += `?company_phone_id=${filters.company_phone_id}&role=${filters.role}`
- 
+  if (filters)
+    url += `?company_phone_id=${filters.company_phone_id}&role=${filters.role}`;
+
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -432,9 +431,14 @@ export const deleteTag = async (id, token) => {
   return response;
 };
 
-export const addTagToConversation = async (idConversation, idTag, token, fields) => {
+export const addTagToConversation = async (
+  idConversation,
+  idTag,
+  token,
+  fields
+) => {
   const bodyData = fields ? JSON.stringify({ fields }) : null;
-  
+
   const response = await fetch(
     `${process.env.API_URL}/conversation/${idConversation}/tag/${idTag}`,
     {
@@ -446,10 +450,10 @@ export const addTagToConversation = async (idConversation, idTag, token, fields)
         "Content-Type": "application/json",
       },
     }
-  )
+  );
   const status = response.status;
   const data = await response.json();
-  
+
   return { status, data };
 };
 
