@@ -760,3 +760,17 @@ export const deleteCampaign = async (id, token) => {
 
   return response;
 };
+
+export const getSchedule = async (token) => {
+  const response = await fetch(`${process.env.API_URL}/schedule`, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  }).then((res) => res.json());
+
+  return response;
+};

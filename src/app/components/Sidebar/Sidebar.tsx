@@ -13,6 +13,7 @@ import { IconFlow } from "../Icons/IconFlow";
 import { IconForward } from "../Icons/IconForward";
 import { IconMegaphone } from "../Icons/IconMegaphone";
 import { Accordion } from 'flowbite-react';
+import { IconCalendar } from "../Icons/IconCalendar";
 import "./styles.scss"
 import { IconTemplates } from "../Icons/IconTemplates";
 import Select, { StylesConfig } from 'react-select';
@@ -133,6 +134,13 @@ export const Sidebar = () => {
             active: false
         },
         {
+            title: "Masivos",
+            link: "/pages/schedule",
+            icon: <IconCalendar classes="w-6 h-6" />,
+            show: userState.role === "1",
+            active: false
+        },
+        {
             isDivider: true,
             title: "",
             link: "#",
@@ -141,7 +149,7 @@ export const Sidebar = () => {
             active: false
         },
         {
-            title: "Admin. Templates",
+            title: "Admin. Plantillas",
             link: "/pages/admin-templates",
             icon: <IconTemplates classes="w-6 h-6" />,
             show: userState.role === "1",
