@@ -254,7 +254,7 @@ const Tags = (): JSX.Element => {
 
                 <div className="flex justify-center space-x-4 mt-4">
                     <button
-                        className="second-button mb-8"
+                        className="second-button"
                         onClick={() => handleOpenDeleteModal(false)}
                     >
                         Cancelar

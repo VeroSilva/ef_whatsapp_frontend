@@ -43,7 +43,7 @@ export const Modal: React.FC<ModalProps> = ({ show, width, height, title, childr
                 <div className="modal-header">
                     <div
                         className="modal-title"
-                        dangerouslySetInnerHTML={{ __html: String(title) }}
+                        dangerouslySetInnerHTML={{ __html: title ? String(title) : "" }}
                     ></div>
 
                     <button className="close-button" onClick={handleClose}>

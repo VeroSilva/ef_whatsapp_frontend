@@ -257,7 +257,7 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button mb-8"
+                    className="second-button"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar
