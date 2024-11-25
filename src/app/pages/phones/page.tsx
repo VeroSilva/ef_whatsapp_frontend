@@ -17,9 +17,9 @@ import { IconFacebook } from "@/app/components/Icons/IconFacebook";
 import { IconCopy } from "@/app/components/Icons/IconCopy";
 import { FormPhones } from "@/app/components/FormPhones/FormPhones";
 import { redirect } from "next/navigation";
+import useTags from '@/app/hooks/useTags';
 
 const Users = (): JSX.Element => {
-
     const [loading, setLoading] = useState(false);
     const [loadingDeletePhone, setLoadingDeletePhone] = useState(false);
     const [phones, setPhones] = useState([]);
@@ -28,6 +28,7 @@ const Users = (): JSX.Element => {
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: phones, page, rowsPerPage });
     const { userState } = useUser();
+    const { tagsState } = useTags();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -131,6 +132,9 @@ const Users = (): JSX.Element => {
                                     Teléfono
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
+                                    Etiqueta
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-center text-xs">
                                     Catálogo ID
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs">
@@ -152,14 +156,16 @@ const Users = (): JSX.Element => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <SkeletonTable col={8} />
+                                <SkeletonTable col={9} />
                             ) : (
                                 slice.map((phone, index) => {
+                                    const currentTag: any = tagsState.filter((tag) => tag.id === Number(phone.tag_id))[0];
                                     return (
                                         <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{index + 1}</th>
                                             <td className="px-6 py-4 text-center text-xs">{phone.phone}</td>
                                             <td className="px-6 py-4 text-center text-xs">{phone.alias}</td>
+                                            <td className="px-6 py-4 text-center text-xs">{currentTag ? currentTag.name : ""}</td>
                                             <td className="px-6 py-4 text-center text-xs">{phone.catalog_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.wp_phone_id}</td>
                                             <td className="px-6 py-4 text-center text-xs max-w-[250px]">{phone.waba_id}</td>

@@ -12,10 +12,9 @@ import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
 import { ChatOptions } from "./ChatOptions/ChatOptions";
 import { SelectedTags } from "./SelectedTags/SelectedTags";
 import useUser from "@/app/hooks/useUser";
-import useTag from "@/app/hooks/useTags";
 import { Tag } from "@/app/interfaces/conversations";
 import { useSocket } from "@/app/context/socket/SocketContext";
-import { getCatalog, getTags } from "@/app/services/api";
+import { getCatalog } from "@/app/services/api";
 import useCatalog from '@/app/hooks/useCatalog';
 import useActivePhone from "../../hooks/useActivePhone";
 
@@ -32,7 +31,6 @@ export const Chat = () => {
     const [previewType, setPreviewType] = useState<string>("")
     const { socketInstance } = useSocket();
     const { setCatalogState } = useCatalog();
-    const { setTagsState } = useTag();
     const { activePhone } = useActivePhone();
 
     useEffect(() => {
@@ -83,10 +81,6 @@ export const Chat = () => {
         getCatalog(userState.token, activePhone).then((res) => {
             setCatalogState(res.catalog)
         })
-
-        getTags(userState.token).then((res => {
-            setTagsState(res)
-        }))
     }, [])
 
     function handleSearchTextChange() {

@@ -15,11 +15,13 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
     const [loadingCreate, setLoadingCreate] = useState(false);
     const [usersOptions, setUsersOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState<ColourOption[]>([]);
+    const [selectedOptionById, setSelectedOptionById] = useState<number | null>(null);
     const [dataCampaign, setDataCampaign] = useState<Campaing>({
         id_campaign: "",
-        users: []
+        users: [],
+        tag_id: null
     });
-    const [selectedTags, setSelectedTags] = useState<ColourOption[]>([]);
+    const [selectedTag, setSelectedTag] = useState<ColourOption>({} as ColourOption);
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
@@ -76,7 +78,7 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
 
     useEffect(() => {
         if (data && !!usersOptions.length) {
-            const { id_campaign, users} = data;
+            const { id_campaign, users, tag_id} = data;
             const usersIds = users.map((user: CampaignUser) => user.id);
             const currentOptions = usersOptions.filter((item : ColourOption) => usersIds.includes(item.value));
 
@@ -84,11 +86,14 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
                 ...dataCampaign,
                 id_campaign,
                 users: usersIds,
+                tag_id
             });
 
+            setSelectedOptionById(tag_id);
             setSelectedOptions(currentOptions);
         }
     }, [data, usersOptions]);
+
 
     useEffect(() => {
         getUsers(userState.token).then((res => {
@@ -158,8 +163,9 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
         setSelectedOptions(options);
     }
 
-    const handleSelectChange = (options: ColourOption[]) => {
-        setSelectedTags(options);
+    const handleSelectChange = (option: ColourOption) => {
+        setDataCampaign({...dataCampaign, tag_id: option.value});
+        setSelectedTag(option);
     };
 
     const CreateTagButton = () => (
@@ -206,6 +212,8 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
                     //@ts-ignore
                     onChange={handleChange}
                     isMulti
+                    placeholder="Seleccione uno o varios usuarios"
+                    className="text-start text-sm"
                 />
             </div>
 
@@ -214,7 +222,7 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
                     Etiqueta relacionada
                 </label>
                 
-                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
+                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTag} setSelectedOptions={setSelectedTag} selectedOptionById={selectedOptionById} />
             </div>
 
             {errorCampaign && (

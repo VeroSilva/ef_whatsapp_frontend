@@ -12,7 +12,7 @@ export interface ColourOption {
     isDisabled?: boolean
 }
 
-export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { handleChange: any, selectedOptions?: any, flows?: any, isMulti?: boolean }) => {
+export const SelectTags = ({ handleChange, selectedOptions, setSelectedOptions, selectedOptionById, flows, isMulti }: { handleChange: any, selectedOptions?: any, setSelectedOptions?: Function, selectedOptionById?: number | null, flows?: any, isMulti?: boolean }) => {
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { tagsState } = useTags();
 
@@ -70,6 +70,13 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
     };
 
     useEffect(() => {
+      if (selectedOptionById && !!options.length && setSelectedOptions) {
+        const current = options.filter((option) => option.value === Number(selectedOptionById))
+        setSelectedOptions(current);
+      }
+    }, [selectedOptionById, options]);
+    
+    useEffect(() => {
         if (tagsState.length > 1) {
             let availableTags = tagsState;
 
@@ -84,7 +91,7 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
                 ]);
             })
         }
-    }, [tagsState])
+    }, [tagsState]);
 
     return (
         <Select
@@ -95,7 +102,8 @@ export const SelectTags = ({ handleChange, selectedOptions, flows, isMulti }: { 
             onChange={handleChange}
             // @ts-ignore
             isMulti={isMulti ?? false}
-            placeholder="Selecciona una o varias etiquetas"
+            placeholder="Selecciona etiqueta"
+            className="text-start text-sm"
         />
     )
 }

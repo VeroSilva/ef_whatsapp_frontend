@@ -21,6 +21,8 @@ import Select, { StylesConfig } from 'react-select';
 import chroma from 'chroma-js';
 import useActivePhone from "../../hooks/useActivePhone";
 import React from "react";
+import { getTags } from "@/app/services/api";
+import useTag from "@/app/hooks/useTags";
 
 interface ColourOption {
     value: number;
@@ -33,6 +35,7 @@ interface ColourOption {
 export const Sidebar = () => {
     const { logoutUser, userState } = useUser();
     const { activePhone, setActivePhone } = useActivePhone();
+    const { setTagsState } = useTag();
     const [open, setOpen] = useState(true);
     const [phoneOptions, setPhoneOptions] = useState<ColourOption[]>([]);
     const [defaultPhone, setDefaultPhone] = useState<ColourOption[]>([]);
@@ -252,6 +255,12 @@ export const Sidebar = () => {
         }
     }, [userState.company_phones]);
 
+    useEffect(() => {
+        getTags(userState.token).then((res => {
+            setTagsState(res)
+        }));
+    }, [])
+    
     return (
         <div className={`bg-slate-100 z-50 shadow-sm p-5 pt-8 relative duration-200 h-full rounded-tl-md rounded-bl-md ${open ? "w-72" : "w-20"}`}>
             <button className="p-1 bg-sky-800 text-slate-100 rounded-full absolute -right-3 top-9" onClick={() => setOpen(!open)}>

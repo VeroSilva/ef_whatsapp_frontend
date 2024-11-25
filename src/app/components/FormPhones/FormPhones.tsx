@@ -3,12 +3,14 @@ import { createPhone, editPhone } from "@/app/services/api"
 import useUser from "../../hooks/useUser"
 import { IconLoading } from "../Icons/IconLoading";
 import { ColourOption, SelectTags } from "../Selects/SelectTags/SelectTags";
+import { Phone } from "@/app/interfaces/phone";
 
 export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, data }: { type: string, setAlert: Function, handleLoadPhones: Function, handleOpenModal: Function, data?: any }) => {
     const [errorCredentials, setErrorCredentials] = useState(false);
     const [loadingCreate, setLoadingCreate] = useState(false);
-    const [selectedTags, setSelectedTags] = useState<ColourOption[]>([]);
-    const [phoneData, setPhoneData] = useState({
+    const [selectedTags, setSelectedTags] = useState<ColourOption>({} as ColourOption);
+    const [selectedOptionById, setSelectedOptionById] = useState<number | null>(null);
+    const [phoneData, setPhoneData] = useState<Phone>({
         phone: "",
         company_id: "1",
         catalog_id: "",
@@ -16,13 +18,14 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
         waba_id: "",
         bussines_id: "",
         wp_bearer_token: "",
-        alias: ""
+        alias: "",
+        tag_id: null
     });
     const { userState } = useUser();
 
     useEffect(() => {
         if (data) {
-            const { phone, company_id, catalog_id, wp_phone_id, waba_id, bussines_id, wp_bearer_token, alias } = data;
+            const { phone, company_id, catalog_id, wp_phone_id, waba_id, bussines_id, wp_bearer_token, alias, tag_id } = data;
 
             setPhoneData({
                 ...phoneData,
@@ -33,8 +36,11 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
                 waba_id,
                 bussines_id,
                 wp_bearer_token,
-                alias
+                alias,
+                tag_id
             });
+
+            setSelectedOptionById(tag_id);
         }
     }, [data]);
 
@@ -43,8 +49,9 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
         else return true;
     };
 
-    const handleSelectChange = (options: ColourOption[]) => {
-        setSelectedTags(options);
+    const handleSelectChange = (option: ColourOption) => {
+        setPhoneData({...phoneData, tag_id: option.value ?? null});
+        setSelectedTags(option);
     };
 
     const handleCreateUser = () => {
@@ -100,7 +107,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
         <button
             onClick={handleCreateUser}
             className={
-                "main-button transition ease-in-out delay-50 flex mb-8 " +
+                "main-button transition ease-in-out delay-50 flex" +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}
@@ -190,7 +197,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
             </div>
 
             <div className="relative">
-                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
+                <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} setSelectedOptions={setSelectedTags} selectedOptionById={selectedOptionById} />
             </div>
 
             {errorCredentials && (
@@ -205,7 +212,7 @@ export const FormPhones = ({ type, setAlert, handleLoadPhones, handleOpenModal, 
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button
-                    className="second-button mb-8"
+                    className="second-button"
                     onClick={() => handleOpenModal(false)}
                 >
                     Cancelar

@@ -17,6 +17,7 @@ import { FormEditPassword } from "@/app/components/FormUser/FormEditPassword/For
 import { redirect } from "next/navigation";
 import { CampaignUser } from "@/app/interfaces/campaign";
 import { FormCampaign } from "@/app/components/FormCampaign/FormCampaign";
+import useTags from '@/app/hooks/useTags';
 
 const Campaigns = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ const Campaigns = (): JSX.Element => {
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: campaigns, page, rowsPerPage });
     const { userState } = useUser();
+    const { tagsState } = useTags();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -132,24 +134,30 @@ const Campaigns = (): JSX.Element => {
                                     Usuarios
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-center">
+                                    Etiqueta
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-center">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <SkeletonTable col={3} />
+                                <SkeletonTable col={4} />
                             ) : (
                                 slice.map((campaign, index) => {
+                                    const currentTag: any = tagsState.filter((tag) => tag.id === Number(campaign.tag_id))[0];
+
                                     return (
                                         <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{campaign.id}</th>
+                                            <td scope="row" className="px-6 py-4 font-medium text-gray-900 text-center whitespace-nowrap dark:text-white">{campaign.id}</td>
                                             <td className="px-6 py-4 text-center">{campaign.id_campaign}</td>
                                             <td className="px-6 py-4 text-center flex gap-2 justify-center">{
                                                 campaign.users.map((user: CampaignUser) => (
                                                     <span className="rounded-lg text-xs text-blue-900 px-2 py-1 bg-slate-100" key={`user-${user.id}`}>{user.username}</span>
                                                 ))
                                             }</td>
+                                            <td className="px-6 py-4 text-center">{currentTag ? currentTag.name : ""}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex justify-center items-center">
                                                     <a

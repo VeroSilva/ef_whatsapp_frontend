@@ -16,7 +16,6 @@ import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { FormTag } from "@/app/components/FormTag/FormTag";
 import { redirect } from "next/navigation";
 import { MassiveAssigment } from "@/app/components/MassiveAssigment/MassiveAssigment";
-import useTag from "../../hooks/useTags";
 
 const Tags = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -27,7 +26,6 @@ const Tags = (): JSX.Element => {
     const [page, setPage] = useState(1);
     const { slice, range } = usePaginateTable({ data: tags, page, rowsPerPage });
     const { userState } = useUser();
-    const { setTagsState } = useTag();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -46,9 +44,6 @@ const Tags = (): JSX.Element => {
 
     useEffect(() => {
         handleLoadTags();
-        getTags(userState.token).then((res => {
-            setTagsState(res)
-        }))
     }, []);
 
     useEffect(() => {

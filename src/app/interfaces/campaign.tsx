@@ -13,5 +13,6 @@ export interface ColourOption {
 
 export interface Campaing {
     id_campaign: string,
-    users: number[]
+    users: number[],
+    tag_id?: number | null;
 }

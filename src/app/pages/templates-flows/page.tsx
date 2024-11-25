@@ -5,7 +5,7 @@ import 'reactflow/dist/style.css';
 import { Sidebar } from '@/app/components/Sidebar/Sidebar';
 import TemplatesDragAndDrop from '@/app/components/TemplatesDragAndDrop/TemplatesDragAndDrop';
 import useTemplates from "../../hooks/useTemplates"
-import { getTags, getTemplates } from '@/app/services/api';
+import { getTemplates } from '@/app/services/api';
 import useUser from "../../hooks/useUser";
 import useTag from "../../hooks/useTags";
 import { redirect } from "next/navigation";
@@ -27,10 +27,6 @@ const TemplatesFlows = () => {
         getTemplates(userState.token, activePhone).then((res) => {
             setTemplatesState(res.templates)
         })
-
-        getTags(userState.token).then((res => {
-            setTagsState(res)
-        }))
     }, [activePhone])
 
     return (
