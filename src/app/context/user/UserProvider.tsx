@@ -34,6 +34,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(userState.token !== "");
 
   const loginUser = (user: User): void => {
+    localStorage.clear();
     dispatch({ type: "login", payload: user });
     setIsLoggedIn(true);
   };
