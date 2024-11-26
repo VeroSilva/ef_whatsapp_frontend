@@ -12,9 +12,8 @@ import { redirect } from "next/navigation";
 import useActivePhone from "../../hooks/useActivePhone";
 
 const TemplatesFlows = () => {
-    const { setTemplatesState } = useTemplates();
+    const { setTemplatesState, templatesState } = useTemplates();
     const { userState } = useUser();
-    const { setTagsState } = useTag();
     const { activePhone } = useActivePhone();
 
     useEffect(() => {
@@ -24,6 +23,8 @@ const TemplatesFlows = () => {
     }, [userState]);
 
     useEffect(() => {
+        setTemplatesState([])
+
         getTemplates(userState.token, activePhone).then((res) => {
             setTemplatesState(res.templates)
         })

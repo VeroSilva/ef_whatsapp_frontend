@@ -388,9 +388,9 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                 case "header":
                                     template?.components.forEach((cp: any) => {
                                         if (cp.type === "HEADER") {
-                                            if (cp.format === "IMAGE") cp.example.header_handle[0] = component.parameters[0].image.link
-                                            if (cp.format === "VIDEO") cp.example.header_handle[0] = component.parameters[0].video.link
-                                            if (cp.format === "TEXT") cp.example.header_text[0] = component.parameters[0].text
+                                            if (cp.format === "IMAGE" && cp.example) cp.example.header_handle[0] = component.parameters[0].image.link
+                                            if (cp.format === "VIDEO" && cp.example) cp.example.header_handle[0] = component.parameters[0].video.link
+                                            if (cp.format === "TEXT" && cp.example) cp.example.header_text[0] = component.parameters[0].text
                                         }
                                     })
                                     break;
@@ -399,7 +399,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                                     template?.components.forEach((cp: any) => {
                                         if (cp.type === "BODY") {
                                             component.parameters.forEach((param: any, index: number) => {
-                                                if (param.type === "text") {
+                                                if (param.type === "text" && cp.example) {
                                                     cp.example.body_text[0][index] = param.text
                                                 }
                                             });

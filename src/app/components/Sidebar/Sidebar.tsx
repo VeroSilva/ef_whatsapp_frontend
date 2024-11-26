@@ -39,6 +39,10 @@ export const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const [phoneOptions, setPhoneOptions] = useState<ColourOption[]>([]);
     const [defaultPhone, setDefaultPhone] = useState<ColourOption[]>([]);
+    const [companyLogo, setCompanyLogo] = useState<string | undefined>(undefined);
+    const adminMenu = [1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 11];
+    const telemarketingMenu = [7, 10];
+    const techMenu = [1];
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
@@ -93,90 +97,102 @@ export const Sidebar = () => {
     };
 
     const [menuItems, setMenuItems] = useState<Array<{
+        id: number;
         title: string;
         link: string;
         icon: JSX.Element;
-        show: boolean;
+        show?: boolean;
         active: boolean;
         subMenu?: Array<{ title: string; link: string; active: boolean; show: boolean }>;
         isDivider?: boolean;
     }>>([
         {
+            id: 1,
             title: "Inicio",
             link: "/pages/home",
             icon: <IconHome classes="w-6 h-6" />,
-            show: true,
+            show: false,
             active: true
         },
         {
+            id: 2,
             title: "Usuarios",
             link: "/pages/users",
             icon: <IconUsers classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 3,
             title: "Campañas",
             link: "/pages/campaigns",
             icon: <IconMegaphone classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 4,
             title: "Etiquetas",
             link: "/pages/tags",
             icon: <IconTag classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 5,
             title: "Teléfonos",
             link: "/pages/phones",
             icon: <IconPhone classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 6,
             title: "Masivos",
             link: "/pages/schedule",
             icon: <IconCalendar classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
             isDivider: true,
+            id: 7,
             title: "",
             link: "#",
             icon: <></>,
-            show: true,
+            show: false, 
             active: false
         },
         {
+            id: 8,
             title: "Admin. Plantillas",
             link: "/pages/admin-templates",
             icon: <IconTemplates classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 9,
             title: "Respuestas rápidas",
             link: "/pages/quick-answers",
             icon: <IconForward classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false, 
             active: false
         },
         {
+            id: 10,
             title: "Chats",
             link: "/pages/conversation",
             icon: <IconMessages classes="w-6 h-6" />,
-            show: userState.role === "1" || userState.role === "3",
+            show: false, 
             active: false
         },
         {
+            id: 11,
             title: "Flujos",
             link: "/pages/templates-flows",
             icon: <IconFlow classes="w-6 h-6" />,
-            show: userState.role === "1",
+            show: false,
             active: false
         },
     ])
@@ -256,6 +272,20 @@ export const Sidebar = () => {
     }, [userState.company_phones]);
 
     useEffect(() => {
+      if (userState.image !== "") setCompanyLogo(userState.image)
+    }, [userState.image])
+
+    useEffect(() => {
+      if (userState.role !== "") {
+        const menuToShow =  userState.role === "1" ? adminMenu : userState.role === "3" ? telemarketingMenu : techMenu;
+
+        setMenuItems((prev) =>
+            prev.map((item) => ({ ...item, show: menuToShow.includes(item.id) }))
+        );
+      }
+    }, [userState.role])
+
+    useEffect(() => {
         getTags(userState.token).then((res => {
             setTagsState(res)
         }));
@@ -267,9 +297,9 @@ export const Sidebar = () => {
                 <IconChevron classes={`w-6 h-6 duration-200 ${open && "rotate-180"}`} />
             </button>
 
-            {open && userState.image && (
+            {open && companyLogo && (
                 <img
-                    src={userState.image}
+                    src={companyLogo}
                     alt="User Image"
                     className="w-fit h-auto"
                 />
@@ -279,46 +309,43 @@ export const Sidebar = () => {
 
             <div className="flex flex-col justify-between">
                 <ul className="border-b border-gray-300">
-                    {menuItems.filter((m) => !m.subMenu).map((menu, index) => {
-                        if (menu.show) {
-                            if (menu.isDivider) {
-                                return (
-                                    <React.Fragment key={`divider-${index}`}>
-                                        <li key={`divider-${index}`} className="my-4">
-                                            <hr className="border" />
-                                        </li>
-                                        <Select
-                                            key={`select-${index}`}
-                                            closeMenuOnSelect
-                                            value={defaultPhone}
-                                            options={phoneOptions}
-                                            styles={colourStyles}
-                                            onChange={handleSelectChange}
-                                            classNamePrefix={`${!open ? "w-full" : ""}`}
-                                        />
-                                    </React.Fragment>
-                                );
-                            }
-                            return (
+                    {menuItems.filter((m) => !m.subMenu).map((menu, index) => (
+                        menu.show ? (
+                            menu.isDivider ? (
+                                <React.Fragment key={`divider-${index}`}>
+                                    <li
+                                        // key={`divider-${index}`}
+                                        className="my-4"
+                                    >
+                                        <hr className="border" />
+                                    </li>
+                                    <Select
+                                        // key={`select-${index}`}
+                                        closeMenuOnSelect
+                                        value={defaultPhone}
+                                        options={phoneOptions}
+                                        styles={colourStyles}
+                                        onChange={handleSelectChange}
+                                        classNamePrefix={`${!open ? "w-full" : ""}`}
+                                    />
+                                </React.Fragment>
+                            ) : (
                                 <li key={`menu-item-${index}`}>
-                                    {
-                                        menu.link &&
-                                        <Link
-                                            key={`select-${index}`}
-                                            href={menu.link}
-                                            className={
-                                                `text-gray-600 flex items-center gap-x-3 p-1 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
-                                            }
-                                            onClick={() => handleActiveMenu(menu.title)}
-                                        >
-                                            <span>{menu.icon}</span>
-                                            <span className={`text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>{menu.title}</span>
-                                        </Link>
-                                    }
+                                    <Link
+                                        key={`select-${index}`}
+                                        href={menu.link ?? "#"}
+                                        className={
+                                            `text-gray-600 flex items-center gap-x-3 p-1 hover:bg-gray-200 rounded-md my-1 ${menu.active && "bg-sky-800 text-slate-100 hover:text-gray-600"}`
+                                        }
+                                        onClick={() => handleActiveMenu(menu.title)}
+                                    >
+                                        <span>{menu.icon}</span>
+                                        <span className={`text-base text-sm flex-1 origin-left duration-200 ${!open && "scale-0"}`}>{menu.title}</span>
+                                    </Link>
                                 </li>
                             )
-                        }
-                    })}
+                        ): null
+                    ))}
 
                     <Accordion className="border-none" collapseAll>
                         {menuItems

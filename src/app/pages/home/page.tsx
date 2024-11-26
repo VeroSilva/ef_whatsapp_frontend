@@ -32,11 +32,14 @@ const Home = (): JSX.Element => {
     const [startDate, setStartDate] = useState(initMonth);
     const [endDate, setEndDate] = useState(endMonth);
     const [loading, setLoading] = useState(false);
+    const [userRole, setUserRole] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         if (!userState || userState.token === "") {
             redirect('/pages/login')
         }
+
+        if (userState.role) setUserRole(userState.role)
     }, [userState]);
 
     const handleLoadDashboardReport = (startFormatted: String, endFormatted: String) => {
@@ -92,7 +95,7 @@ const Home = (): JSX.Element => {
         <>
             <Sidebar />
             <div className="grid grid-cols-12 min-h-full flex-1 bg-slate-50 box rounded-tr-md rounded-br-md border border-gray-200">
-                {userState.role == "3" &&
+                {(userRole && userRole == "3") &&
                     <div className="left-side col-span-12 xl:col-span-4 2xl:col-span-3 bg-slate-50 border border-gray-200">
                         <div className="box intro-y bg-slate-50 ">
                             <div className="bg-slate-50 sticky top-0 z-40">
@@ -135,7 +138,7 @@ const Home = (): JSX.Element => {
                         </div>
                     </div>
                 }
-                {(userState.role == "1" || userState.role == "2") &&
+                {userRole && (userRole == "1" || userRole == "2") &&
                     <>
                         <div className="col-span-6 m-2 mx-5">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
