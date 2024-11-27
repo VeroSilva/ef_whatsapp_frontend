@@ -17,7 +17,6 @@ import Sidebar from '../Sidebar';
 import { uniqueIdGenerator } from '@/app/utils/functions';
 import useTemplatesToSend from '@/app/hooks/useTemplatesToSend';
 import useUser from '@/app/hooks/useUser';
-import { usePathname } from 'next/navigation';
 import useTemplates from '@/app/hooks/useTemplates';
 import { getFlows, updateFlows } from '@/app/services/api';
 import { dataMessageToSend } from '@/app/utils/messages';
@@ -69,7 +68,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     index === existingMessageIndex ? { ...message, text } : message
                 );
             } else {
-                const messageId = id || generateUniqueId();
+                const messageId = id || uniqueIdGenerator();
                 return [...prevMessages, { id: messageId, text }];
             }
         });
@@ -83,7 +82,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     index === existingImageIndex ? { ...img, image } : img
                 );
             } else {
-                const imageId = id || generateUniqueId();
+                const imageId = id || uniqueIdGenerator();
                 return [...prevImages, { id: imageId, image }];
             }
         });
@@ -97,7 +96,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     index === existingImageIndex ? { ...vid, video } : vid
                 );
             } else {
-                const videoId = id || generateUniqueId();
+                const videoId = id || uniqueIdGenerator();
                 return [...prevVideos, { id: videoId, video }];
             }
         });
@@ -111,7 +110,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     index === existingAudioIndex ? { ...aud, audio } : aud
                 );
             } else {
-                const audioId = id || generateUniqueId();
+                const audioId = id || uniqueIdGenerator();
                 return [...prevAudios, { id: audioId, audio }];
             }
         });
@@ -125,7 +124,7 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
                     index === existingInteractiveIndex ? { ...int, interactive } : int
                 );
             } else {
-                const interactiveId = id || generateUniqueId();
+                const interactiveId = id || uniqueIdGenerator();
                 return [...prevInteractive, { id: interactiveId, interactive }];
             }
         });
@@ -605,6 +604,17 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
         }
     }, [alert])
 
+    useEffect(() => {
+        setNodes(initialNode);
+        setEdges([]);
+        setJsonToSend([]);
+        setMessages([]);
+        setImages([]);
+        setVideos([]);
+        setAudios([]);
+        setInteractives([]);
+    }, [activePhone]);
+
     return (
         <>
             <ReactFlowProvider>
@@ -640,8 +650,4 @@ export const Flow = ({ initialNode, activeFlow }: { initialNode: any, activeFlow
             </div>
         </>
     )
-}
-
-function generateUniqueId(): number {
-    throw new Error('Function not implemented.');
 }

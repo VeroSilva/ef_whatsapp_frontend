@@ -39,6 +39,17 @@ const TemplatesDragAndDrop = () => {
 
     useEffect(() => {
         if (userState.id !== 0 && !(tagsState.length === 1 && tagsState[0].id === 0)) {
+            setTabs([
+                {
+                    name: "Principal",
+                    id: 0,
+                    initialNode: [
+                        { id: 'client-message', type: 'input', position: { x: 0, y: 0 }, data: { label: "Mensaje cliente" } }
+                    ],
+                    show: true
+                }
+            ])
+
             getUserById(userState.id, userState.token).then((res) => {
                 const phoneData = res?.company_phones?.filter((phone: any) => phone.company_phone_id === activePhone)[0]
 
@@ -72,7 +83,7 @@ const TemplatesDragAndDrop = () => {
                 })
             })
         }
-    }, [userState, tagsState])
+    }, [userState, tagsState, activePhone])
 
     const handleOpenModal = () => {
         setShowModal(!showModal);
@@ -114,7 +125,7 @@ const TemplatesDragAndDrop = () => {
                     <div className="w-full flex gap-4 items-center overflow-auto tags-container">
                         {tabs.map((tab, index) => (
                             <button
-                                key={`btn-tab-${index}`}
+                                key={`btn-tab-${tab.id}-${index}`}
                                 className={`p-2 rounded text-nowrap	${tab.show ? "bg-sky-800 text-slate-100" : "bg-slate-300"}`}
                                 onClick={() => handleActiveTab(tab.id)}
                             >
@@ -133,7 +144,7 @@ const TemplatesDragAndDrop = () => {
 
                 {tabs.map((tab, index) => (
                     <>
-                        {tab.show && <Flow key={`tab-${index}`} initialNode={tab.initialNode} activeFlow={tab.id} />}
+                        {tab.show && <Flow key={`tab-${tab.id}-${index}`} initialNode={tab.initialNode} activeFlow={tab.id} />}
                     </>
                 ))
                 }
