@@ -97,7 +97,7 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
         <button
             onClick={handleCreateTag}
             className={
-                "main-button transition ease-in-out delay-50 flex mb-8 " +
+                "main-button transition ease-in-out delay-50 flex " +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}

@@ -172,7 +172,7 @@ export const FormCampaign = ({ type, setAlert, handleLoadCampaigns, handleOpenMo
         <button
             onClick={handleCreateCampaign}
             className={
-                "main-button transition ease-in-out delay-50 flex mb-8 " +
+                "main-button transition ease-in-out delay-50 flex " +
                 (!dataIsValid() ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-sky-700")
             }
             disabled={!dataIsValid()}

@@ -312,7 +312,7 @@ const Users = (): JSX.Element => {
                         Cancelar
                     </button>
                     <button
-                        className="bg-red-800 text-white rounded-md text-sm px-4 py-2 mb-8 transition ease-in-out delay-50 flex"
+                        className="bg-red-800 text-white rounded-md text-sm px-4 py-2 transition ease-in-out delay-50 flex"
                         onClick={handleDeleteUser}
                     >
                         {loadingDeleteUser && <IconLoading classes="w-6 h-6 text-slate-100 me-2" />}

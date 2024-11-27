@@ -20,6 +20,8 @@ export const formatPhoneNumber = (number: string): string => {
 function getCountryCode(number: string): string | null {
     const countryCodes = ['51'];
 
+    if (!number) return null;
+
     for (const code of countryCodes) {
         if (number.startsWith(code)) {
             return code;
