@@ -202,6 +202,10 @@ export const ChatSidebar = () => {
         resetActiveConversation();
     }, [activePhone])
 
+    useEffect(() => {
+        if (chatFiltersState.search === "") handleClearPaginateConversation();
+    }, [chatFiltersState.search])
+
     const handleScroll = () => {
         const container = containerRef.current;
         if (container) {

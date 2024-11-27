@@ -60,7 +60,8 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
     }
 
     const highlightText = (text: string, filter: string) => {
-        const regex = new RegExp(`(${filter})`, 'gi');
+        const escapedFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedFilter})`, 'gi');
         const parts = text ? text.split(regex) : [];
 
         return parts.map((part, index) => {
