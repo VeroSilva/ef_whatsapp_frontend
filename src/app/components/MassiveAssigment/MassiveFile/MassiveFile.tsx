@@ -15,10 +15,12 @@ export const MassiveFile = ({ handleShowModal, setAlert }: { handleShowModal: Fu
     const [loadingAssign, setLoadingAssing] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [conversations, setConversations] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState([]);
     const { userState } = useUser();
     const imageInputRef = useRef<HTMLInputElement>(null)
 
     const handleSelectTagsChange = (option: any) => {
+        setSelectedOptions(option)
         setTagToAssign(option.value)
     };
 
@@ -100,7 +102,7 @@ export const MassiveFile = ({ handleShowModal, setAlert }: { handleShowModal: Fu
                     <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
                         <strong>*</strong> Selecciona tag a asignar
                     </label>
-                    <SelectTags handleChange={handleSelectTagsChange} />
+                    <SelectTags handleChange={handleSelectTagsChange} selectedOptions={selectedOptions} />
                 </div>
             </div>
 

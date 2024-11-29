@@ -31,6 +31,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
         search: "",
         unread: false
     });
+    const [selectedOptions, setSelectedOptions] = useState([]);
     const [steps, setSteps] = useState([
         { number: 1, label: "Filtrar", current: true, ready: false },
         { number: 2, label: "Seleccionar tags", current: false, ready: false },
@@ -45,6 +46,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
     const handleSelectChange = (option: any) => {
         const idsString = option.map((option: any) => option.value).join()
 
+        setSelectedOptions(option)
         setFilters((prevFilters) => ({ ...prevFilters, tags: idsString }))
     };
 
@@ -233,7 +235,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
                                 Selecciona tags
                             </label>
-                            <SelectTags handleChange={handleSelectChange} isMulti />
+                            <SelectTags handleChange={handleSelectChange} selectedOptions={selectedOptions} isMulti />
                         </div>
 
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -280,7 +282,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
                                 Selecciona tag a asignar
                             </label>
-                            <SelectTags handleChange={handleSelectTagsChange} />
+                            <SelectTags handleChange={handleSelectTagsChange} selectedOptions={selectedOptions} />
                         </div>
 
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
