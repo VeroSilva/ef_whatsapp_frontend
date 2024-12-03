@@ -62,7 +62,6 @@ export const ChatSidebar = () => {
         }
 
         const updateConversationListener = (payload: any) => {
-
             if (payload.table === "messages" && payload.action === "insert") {
                 if (
                     activePhone.toString() === payload.data.conversation.company_phone_id &&
@@ -115,21 +114,28 @@ export const ChatSidebar = () => {
                     });
                 }
             } else if (payload.table === "user_conversation") {
-
                 const isRelevantConversation = activePhone.toString() === payload.data.conversation.company_phone_id && (!payload.data.conversation.user_assigned_id || payload.data.conversation.user_assigned_id === userState.id || userState.role == "1");
 
-                if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {
-                    setConversations((prevConversations) => {
-                        const updatedArray = [...prevConversations, payload.data.conversation];
-                        return updatedArray.sort((a, b) => Number(b.message_created_at) - Number(a.message_created_at));
+                if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {  
+                    setConversations(prevConversations => {
+                        const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation_id);
+    
+                        if (chatIndex !== -1) {
+                            const updatedArray = [...prevConversations];
+                            updatedArray[chatIndex] = payload.data.conversation;
+
+                            return updatedArray
+                        }
+    
+                        return prevConversations;
                     });
                 } else if ((payload.action === "update" && payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id !== userState.id) || payload.action === "delete") {
                     setConversations((prevConversations) => {
                         const filteredConversations = prevConversations.filter((conversation: any) => conversation?.id !== payload.data.conversation.id);
+
                         return filteredConversations;
                     });
                 }
-
             }
         }
 

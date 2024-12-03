@@ -31,6 +31,7 @@ export const ChatOptions = () => {
     const [selectedTags, setSelectedTags] = useState<ColourOption[]>([])
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+    const [showConfirmAssignModal, setShowConfirmAssignModal] = useState<boolean>(false);
     const [loadingDeleteConversation, setLoadingDeleteConversation] = useState(false);
     const [selectedTagId, setSelectedTagId] = useState(0);
     const [tagFormFields, setTagFormFields] = useState<FormField[]>([]);
@@ -38,6 +39,7 @@ export const ChatOptions = () => {
     const [showAssignUserModal, setShowAssignUserModal] = useState<boolean>(false);
     const [options, setOptions] = useState<any>([]);
     const [selectedUsersOption, setSelectedUsersOption] = useState<any>([]);
+    const [userToAssign, setUserToAssign] = useState<any>({});
     const [alert, setAlert] = useState({
         type: "",
         message: "",
@@ -125,11 +127,19 @@ export const ChatOptions = () => {
     };
 
     const handleSelectUsersChange = (option: any) => {
-        setSelectedUsersOption(option);
-
-        assignUserToConversation(activeConversationState.id, option.value, userState.token)
-            .then((res) => handleOpenAssignUserModal());
+        setShowConfirmAssignModal(true);
+        setUserToAssign(option);
     };
+
+    const handleAssignUser = () => {
+        setSelectedUsersOption(userToAssign);
+
+        assignUserToConversation(activeConversationState.id, userToAssign.value, userState.token)
+            .then((res) => {
+                setShowConfirmAssignModal(false);
+                setShowAssignUserModal(false);
+            });
+    }
 
     const handleUnselectTagForm = () => {
         setSelectedTags((prevState) => {
@@ -220,7 +230,7 @@ export const ChatOptions = () => {
     }, [usersListState]);
 
     useEffect(() => {
-        if (options.length > 0 && activeConversationState.user_assigned_id) {
+        if (options.length > 0) {
             const current = options.find(
                 (opt: any) => opt.value === activeConversationState.user_assigned_id
             );
@@ -272,7 +282,7 @@ export const ChatOptions = () => {
                         </label>
                     </li>}
 
-                    {userState.role == "1" && <li
+                    <li
                         className="my-2 p-3 hover:bg-slate-200 cursor-pointer"
                         onClick={handleOpenAssignUserModal}
                     >
@@ -280,10 +290,11 @@ export const ChatOptions = () => {
                             Asignar usuario
                             <IconUser classes="w-5 h-5 text-slate-500" />
                         </label>
-                    </li>}
+                    </li>
                 </ul>
             }
 
+            {/* START: Assign tags Modal */}
             <Modal
                 title="Gestiona las etiquetas de este chat"
                 onClose={handleOpenTagsModal}
@@ -293,15 +304,43 @@ export const ChatOptions = () => {
             >
                 <SelectTags handleChange={handleSelectChange} selectedOptions={selectedTags} isMulti />
             </Modal>
+            {/* END: Assign tags Modal */}
 
-            {/* END: Delete Conversation Modal */}
+            {/* START: Assign user Modal */}
             <Modal
-                // title="Eliminar usuario usuario"
+                onClose={() => setShowConfirmAssignModal(false)}
+                show={showConfirmAssignModal}
+                width="500px"
+            >
+                <div className="text-xl">Estás seguro?</div>
+                <div className="text-slate-500 mt-2">
+                    Quieres asignar la conversación de: <strong>{activeConversationState.contact.name} - {activeConversationState.contact.phone}</strong> al usuario <strong>{userToAssign.name}</strong>?{" "}
+                </div>
+
+                <div className="flex justify-center space-x-4 mt-4">
+                    <button
+                        className="second-button"
+                        onClick={() => setShowConfirmAssignModal(false)}
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        className="bg-sky-800 text-white rounded-md text-sm px-4 py-2 transition ease-in-out delay-50 flex"
+                        onClick={handleAssignUser}
+                    >
+                        Sí, asignar
+                    </button>
+                </div>
+            </Modal>
+            {/* END: Assign user Modal */}
+
+            {/* START: Delete Conversation Modal */}
+            <Modal
                 onClose={() => handleOpenDeleteModal(false)}
                 show={showDeleteModal}
                 width="500px"
             >
-                <div className="text-xl mt-5">Estás seguro?</div>
+                <div className="text-xl">Estás seguro?</div>
                 <div className="text-slate-500 mt-2">
                     Quieres eliminar la conversación de: <strong>{activeConversationState.contact.name} - {activeConversationState.contact.phone}</strong>?{" "}
                     <br />
