@@ -11,8 +11,8 @@ const GenerateInitialsImage = ({ name, color }: { name: string, color: string })
 
   // Estilos para el contenedor del círculo
   const containerStyle: React.CSSProperties = {
-    width: '50px', // Cambiar el tamaño según sea necesario
-    height: '50px',
+    width: '100%', // Cambiar el tamaño según sea necesario
+    height: '100%',
     borderRadius: '50%',
     display: 'flex',
     justifyContent: 'center',

@@ -84,7 +84,7 @@ export const ItemListConversation = ({ conversation, handleOpenConversation, act
                 <SelectedTags tags={conversation.tags} />
             </div>
 
-            <div className="w-14 h-14 flex-none image-fit mr-1">
+            <div className="w-10 h-10 flex-none image-fit mr-1">
                 <MemoizedGenerateInitialsImage name={conversation.contact.name ?? ""} color="#115e59" />
             </div>
 

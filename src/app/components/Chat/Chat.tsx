@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { ActiveConversationSkeleton } from "../Skeleton/ActiveConversation"
 import { ListMessages } from "./ListMessages/ListMessages";
 import Image from "next/image";
 import useActiveConversation from "@/app/hooks/useActiveConversation";
 import { MemoizedGenerateInitialsImage } from "@/app/utils/generateUserImage";
 import { formatPhoneNumber } from "@/app/utils/formatPhone";
-import { IconSearch } from "../Icons/IconSearch";
 import React from "react";
 import { ConversationPreview } from "../ConversationPreview/ConversationPreview/ConversationPreview";
 import { ChatBottomSection } from "./ChatBottomSection/ChatBottomSection";
@@ -168,7 +167,7 @@ const ChatComponent = () => {
                                 <div className="border-b border-slate-200/60 px-5 py-4">
                                     <div className="flex flex-col sm:flex-row">
                                         <div className="flex items-center">
-                                            <div className="w-16 h-16 flex-none relative">
+                                            <div className="w-12 h-12 flex-none relative">
                                                 <MemoizedGenerateInitialsImage name={(activeConversationState.contact.name ?? "")} color="#0d9488" />
                                             </div>
 
@@ -177,20 +176,28 @@ const ChatComponent = () => {
                                                     <div className="font-medium text-base">
                                                         {isEditingName ? (
                                                             <>
-                                                                <input
-                                                                    type="text"
-                                                                    value={editedName}
-                                                                    onChange={handleNameChange}
-                                                                    maxLength={25}
-                                                                    className={`border ${inputError ? 'border-red-500' : 'border-gray-300'} rounded p-1`}
-                                                                />
-                                                                <button onClick={handleConfirmEdit} >
-                                                                    <IconCheck classes="ml-2 w-5 h-5" />
-                                                                </button>
-                                                                <button onClick={handleCancelEdit} >
-                                                                    <IconX classes="ml-2 w-5 h-5" />
-                                                                </button>
-                                                                <br />
+                                                                <div className="flex items-center gap-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={editedName}
+                                                                        onChange={handleNameChange}
+                                                                        maxLength={25}
+                                                                        className={`input-sky border ${inputError ? 'border-red-500' : 'border-gray-300'} rounded p-1`}
+                                                                    />
+                                                                    <button
+                                                                        className="rounded-full bg-green-100 w-5 h-5 flex items-center justify-center"
+                                                                        onClick={handleConfirmEdit}
+                                                                    >
+                                                                        <IconCheck classes="w-4 h-4 text-green-800" />
+                                                                    </button>
+                                                                    <button
+                                                                        className="rounded-full bg-pink-100 w-5 h-5 flex items-center justify-center"
+                                                                        onClick={handleCancelEdit}
+                                                                    >
+                                                                        <IconX classes="w-4 h-4 text-pink-800" />
+                                                                    </button>
+                                                                </div>
+                                                                
                                                                 {inputError && <span className="text-red-500 text-sm">{errorMessage}</span>}
                                                                 <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
                                                             </>
@@ -198,9 +205,9 @@ const ChatComponent = () => {
                                                             <>
                                                                 {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== "" ? (
                                                                     <>
-                                                                        <span className="block">{activeConversationState.contact.name}
+                                                                        <span className="flex items-center">{activeConversationState.contact.name}
                                                                             <button onClick={handleEditClick} >
-                                                                                <IconEdit classes="ml-2 w-5 h-5" />
+                                                                                <IconEdit classes="ml-2 w-4 h-4 text-teal-600" />
                                                                             </button>
                                                                         </span>
 
