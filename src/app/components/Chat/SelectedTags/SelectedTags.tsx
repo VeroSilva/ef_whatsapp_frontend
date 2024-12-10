@@ -25,11 +25,11 @@ export const SelectedTags = ({ tags, isInChat }: { tags: any, isInChat?: boolean
                     style={{ backgroundColor: tag.color }}
                     className={`rounded-full px-2 py-1 text-xs font-bold ${tag.hasNestedForm ? "cursor-pointer" : "cursor-default"} flex gap-1 items-center ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
                     onClick={() => {
-                        if (tag.hasNestedForm) handleShowTagInfo(tag)}
-                    }
+                        if (tag.hasNestedForm && tag.fields) handleShowTagInfo(tag)
+                    }}
                 >
                     {tag.name}
-                    {isInChat && tag.hasNestedForm ?
+                    {(isInChat && tag.hasNestedForm && tag.fields) ?
                         <span><IconInfo classes={`w-5 h-5 ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`} /></span>
                         : null
                     }
