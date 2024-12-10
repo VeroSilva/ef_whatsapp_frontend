@@ -116,17 +116,17 @@ export const ChatSidebar = () => {
             } else if (payload.table === "user_conversation") {
                 const isRelevantConversation = activePhone.toString() === payload.data.conversation.company_phone_id && (!payload.data.conversation.user_assigned_id || payload.data.conversation.user_assigned_id === userState.id || userState.role == "1");
 
-                if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {  
+                if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {
                     setConversations(prevConversations => {
                         const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation_id);
-    
+
                         if (chatIndex !== -1) {
                             const updatedArray = [...prevConversations];
                             updatedArray[chatIndex] = payload.data.conversation;
 
                             return updatedArray
                         }
-    
+
                         return prevConversations;
                     });
                 } else if ((payload.action === "update" && payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id !== userState.id) || payload.action === "delete") {
@@ -187,18 +187,37 @@ export const ChatSidebar = () => {
             }
         }
 
+        const conversationContactListener = (payload: any) => {
+            if (payload.data) {
+                setConversations(prevConversations => {
+                    const chatIndex = prevConversations.findIndex(chat => chat.contact.id === payload.data.id);
+
+                    if (chatIndex !== -1) {
+                        const updatedArray = [...prevConversations];
+                        updatedArray[chatIndex].contact.name = payload.data.name;
+
+                        return updatedArray;
+                    }
+
+                    return prevConversations;
+                });
+            }
+        }
+
         const socket = socketInstance;
 
         socket.on('update_conversation', updateConversationListener);
         socket.on('new_conversation', newConversationListener);
         socket.on('delete_conversation', deleteConversationListener);
         socket.on('conversation_tags', conversationTagListener);
+        socket.on('update_contact', conversationContactListener);
 
         return () => {
             socket.off('update_conversation', updateConversationListener);
             socket.off('new_conversation', newConversationListener);
             socket.off('delete_conversation', deleteConversationListener);
             socket.off('conversation_tags', conversationTagListener);
+            socket.off('update_contact', conversationContactListener);
         };
     }, [conversations, chatsReadState, socketInstance]);
 

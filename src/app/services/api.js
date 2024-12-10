@@ -120,19 +120,26 @@ export const createConversation = async (data, token) => {
   return response;
 };
 
-export const assignUserToConversation = async (conversastionId, userId, token) => {
-  const response = await fetch(`${process.env.API_URL}/conversation/${conversastionId}/user/${userId}`, {
-    method: "POST",
-    headers: {
-      Accept: "*/*",
-      Authorization: token,
-      "Content-Type": "application/json",
-      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
-    },
-  });
+export const assignUserToConversation = async (
+  conversastionId,
+  userId,
+  token
+) => {
+  const response = await fetch(
+    `${process.env.API_URL}/conversation/${conversastionId}/user/${userId}`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "*/*",
+        Authorization: token,
+        "Content-Type": "application/json",
+        "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+      },
+    }
+  );
 
   const status = response.status;
-  const data = response //no viene mensaje?;
+  const data = response; //no viene mensaje?;
 
   return { status, data };
 };
@@ -232,6 +239,21 @@ export const markAsUnread = async (token, idConversation) => {
 export const getContact = async (id, token) => {
   const response = await fetch(`${process.env.API_URL}/contact/${id}`, {
     method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: token,
+      "Content-Type": "application/json",
+      "x-ef-perfumes": process.env.API_CUSTOM_HEADER,
+    },
+  });
+
+  return response;
+};
+
+export const updateContact = async (id, fields, token) => {
+  const response = await fetch(`${process.env.API_URL}/contact/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(fields),
     headers: {
       Accept: "*/*",
       Authorization: token,

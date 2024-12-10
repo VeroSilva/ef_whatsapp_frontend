@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { ActiveConversationSkeleton } from "../Skeleton/ActiveConversation"
 import { ListMessages } from "./ListMessages/ListMessages";
 import Image from "next/image";
@@ -14,11 +14,15 @@ import { SelectedTags } from "./SelectedTags/SelectedTags";
 import useUser from "@/app/hooks/useUser";
 import { Tag } from "@/app/interfaces/conversations";
 import { useSocket } from "@/app/context/socket/SocketContext";
-import { getCatalog } from "@/app/services/api";
+import { getCatalog, updateContact } from "@/app/services/api";
 import useCatalog from '@/app/hooks/useCatalog';
 import useActivePhone from "../../hooks/useActivePhone";
+import { IconEdit } from "../Icons/IconEdit";
+import { IconCheck } from "../Icons/IconCheck";
+import { IconX } from "../Icons/IconX";
 
-export const Chat = () => {
+
+const ChatComponent = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [loadingInitialMessages, setLoadingInitialMessages] = useState<boolean>(false);
     const [searchText, setSearchText] = useState("");
@@ -32,6 +36,54 @@ export const Chat = () => {
     const { socketInstance } = useSocket();
     const { setCatalogState } = useCatalog();
     const { activePhone } = useActivePhone();
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editedName, setEditedName] = useState("");
+    const [inputError, setInputError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const handleEditClick = useCallback(() => {
+        setIsEditingName(true);
+        setInputError(false);
+        setErrorMessage("");
+    }, []);
+
+    const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedName(e.target.value);
+    }, []);
+
+    const handleCancelEdit = useCallback(() => {
+        setEditedName(activeConversationState.contact.name ?? "");
+        setIsEditingName(false);
+    }, [activeConversationState]);
+
+    const handleConfirmEdit = useCallback(async () => {
+        const nameRegex = /^[a-zA-Z0-9@,.\- áéíóúüñ{}[\]*;:!'""]+$/
+        if (!editedName.trim()) {
+            setInputError(true);
+            setErrorMessage("No puede estar vacío este campo");
+            return;
+        }
+        if (!nameRegex.test(editedName)) {
+            setInputError(true);
+            setErrorMessage("El nombre tiene caracteres inválidos");
+            return;
+        }
+        setInputError(false);
+        setErrorMessage("");
+        try {
+            await updateContact(activeConversationState.contact.id, { name: editedName }, userState.token);
+            setActiveConversation((prevActiveConversation: any) => ({
+                ...prevActiveConversation,
+                contact: {
+                    ...prevActiveConversation.contact,
+                    name: editedName,
+                },
+            }));
+            setIsEditingName(false);
+        } catch (error) {
+            console.error("Error updating contact name:", error);
+        }
+    }, [editedName, activeConversationState.contact.id, userState.token, setActiveConversation]);
 
     useEffect(() => {
         if (selectedFile !== null) {
@@ -47,6 +99,7 @@ export const Chat = () => {
 
     useEffect(() => {
         if (activeConversationState.id !== 0) setUpdatedTags(activeConversationState.tags)
+        setEditedName(activeConversationState.contact.name ?? "");
     }, [activeConversationState])
 
     useEffect(() => {
@@ -83,7 +136,7 @@ export const Chat = () => {
         })
     }, [])
 
-    function handleSearchTextChange() {
+    const handleSearchTextChange = useCallback(() => {
         if (searchText !== '') {
             const regex = new RegExp(`(${searchText})`, 'gi');
             //@ts-ignore
@@ -91,17 +144,17 @@ export const Chat = () => {
         } else {
             setHighlightedText('');
         }
-    }
+    }, [searchText]);
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
             handleSearchTextChange();
         }
-    };
+    }, [handleSearchTextChange]);
 
-    const handleClosePreview = () => {
+    const handleClosePreview = useCallback(() => {
         setShowPreview(false);
-    }
+    }, []);
 
     return (
         <div className="col-span-12 xl:col-span-8 2xl:col-span-9 overflow-auto">
@@ -122,17 +175,47 @@ export const Chat = () => {
                                             <div className="ml-3 mr-auto">
                                                 <div className="flex items-center">
                                                     <div className="font-medium text-base">
-                                                        {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== ""
-                                                            ? <>
-                                                                <span className="block">{activeConversationState.contact.name}</span>
+                                                        {isEditingName ? (
+                                                            <>
+                                                                <input
+                                                                    type="text"
+                                                                    value={editedName}
+                                                                    onChange={handleNameChange}
+                                                                    maxLength={25}
+                                                                    className={`border ${inputError ? 'border-red-500' : 'border-gray-300'} rounded p-1`}
+                                                                />
+                                                                <button onClick={handleConfirmEdit} >
+                                                                    <IconCheck classes="ml-2 w-5 h-5" />
+                                                                </button>
+                                                                <button onClick={handleCancelEdit} >
+                                                                    <IconX classes="ml-2 w-5 h-5" />
+                                                                </button>
+                                                                <br />
+                                                                {inputError && <span className="text-red-500 text-sm">{errorMessage}</span>}
                                                                 <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
                                                             </>
-                                                            : formatPhoneNumber(activeConversationState.contact.phone)}
+                                                        ) : (
+                                                            <>
+                                                                {activeConversationState && activeConversationState.contact.name && activeConversationState.contact.name !== "" ? (
+                                                                    <>
+                                                                        <span className="block">{activeConversationState.contact.name}
+                                                                            <button onClick={handleEditClick} >
+                                                                                <IconEdit classes="ml-2 w-5 h-5" />
+                                                                            </button>
+                                                                        </span>
+
+                                                                        <span className="block text-gray-500 text-sm">{formatPhoneNumber(activeConversationState.contact.phone)}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    formatPhoneNumber(activeConversationState.contact.phone)
+                                                                )}
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="relative ms-4">
+                                            {/* <div className="relative ms-4">
                                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                                     <IconSearch classes="w-5 h-5 absolute inset-y-0 left-0 my-auto text-slate-400 ml-3" />
                                                 </div>
@@ -147,7 +230,7 @@ export const Chat = () => {
                                                     onChange={(e) => setSearchText(e.target.value)}
                                                     onKeyDown={handleKeyDown}
                                                 />
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <div className="flex items-center sm:ml-auto mt-5 sm:mt-0 border-t sm:border-0 border-slate-200/60 pt-3 sm:pt-0 -mx-5 sm:mx-0 px-5 sm:px-0">
                                             <div className='w-full mb-2 flex gap-2 flex-wrap items-center'>
@@ -192,3 +275,5 @@ export const Chat = () => {
         </div>
     )
 }
+
+export const Chat = React.memo(ChatComponent);
