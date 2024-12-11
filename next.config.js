@@ -26,6 +26,7 @@ const nextConfig = {
       "vzla.efperfumes.com",
       "scontent-*.xx.fbcdn.net",
       "scontent.xx.fbcdn.net",
+      "lacasadelperfumista.com",
     ],
     remotePatterns: [
       {

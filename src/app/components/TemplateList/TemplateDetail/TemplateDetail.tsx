@@ -83,7 +83,7 @@ export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }
             })
 
             if (headerData && headerData.example) {
-                const parameterData = headerData.format.toLowerCase() === "image" || headerData.format.toLowerCase() === "video" ? { link: inputHeaderVariable } : inputHeaderVariable
+                const parameterData = headerData.format.toLowerCase() === "image" || headerData.format.toLowerCase() === "video" ? { link: inputHeaderVariable } : (headerData.format.toLowerCase() === "document" ? { link: inputHeaderVariable, filename: "Archivo PDF" } : inputHeaderVariable)
 
                 setTemplateToSend((prevState: any) => ({
                     ...prevState,
@@ -180,12 +180,12 @@ export const TemplateDetail = ({ template, setIsReadyToSend, setTemplateToSend }
                             <>
                                 <h3 className="font-semibold text-center mb-3 text-slate-700">HEADER</h3>
 
-                                {headerData.format === "IMAGE" || headerData.format === "VIDEO" ?
+                                {headerData.format === "IMAGE" || headerData.format === "VIDEO" || headerData.format === "DOCUMENT" ?
                                     <input
                                         type="text"
                                         id="file-input-image"
                                         className="border border-slate-300 rounded-md m-2 w-full mb-6"
-                                        placeholder="Link de imagen"
+                                        placeholder="Link de imagen o documento"
                                         value={inputHeaderVariable ?? ""}
                                         onChange={e => handleInputHeaderChange(e.target.value)}
                                     /> :
