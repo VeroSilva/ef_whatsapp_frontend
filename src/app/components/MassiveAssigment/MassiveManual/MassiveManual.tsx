@@ -282,7 +282,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
                                 Selecciona tag a asignar
                             </label>
-                            <SelectTags handleChange={handleSelectTagsChange} selectedOptions={selectedOptions} />
+                            <SelectTags handleChange={handleSelectTagsChange} selectedOptions={tagToAssign} setSelectedOptions={setTagToAssign} />
                         </div>
 
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
