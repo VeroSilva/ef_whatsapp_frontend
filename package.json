@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-prod": "npx pm2 start ecosystem.config.js"
   },
   "dependencies": {
     "@types/node": "20.2.5",
@@ -24,6 +25,7 @@
     "flowbite-react": "^0.7.0",
     "next": "13.4.4",
     "nookies": "^2.5.2",
+    "pm2": "^5.4.3",
     "react": "18.2.0",
     "react-audio-player": "^0.17.0",
     "react-chartjs-2": "^5.2.0",
