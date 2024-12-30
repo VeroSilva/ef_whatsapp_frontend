@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "ef-whatsapp-prod-front",
       script: "npm",
-      args: "start-app",
+      args: "start",
       env: {
         PORT: 9002,
       },
