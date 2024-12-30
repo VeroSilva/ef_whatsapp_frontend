@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    // "start": "next start",
     "lint": "next lint",
-    "start-prod": "npx pm2 start ecosystem.config.js"
+    "start": "pm2 start ecosystem.config.cjs --only ef-whatsapp-prod-front",
+    "stop": "pm2 stop ef-whatsapp-prod-front",
+    "restart": "pm2 restart ef-whatsapp-prod-front",
   },
   "dependencies": {
     "@types/node": "20.2.5",

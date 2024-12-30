@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "ef-whatsapp-prod-front-1",
+      name: "ef-whatsapp-prod-front",
       script: "npm",
       args: "start",
       env: {
