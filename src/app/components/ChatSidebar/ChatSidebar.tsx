@@ -20,7 +20,7 @@ export const ChatSidebar = () => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [pageConversation, setPageConversation] = useState(0);
     const [totalPagesConversation, setTotalPagesConversation] = useState(0);
-    const [limitConversation, setLimitConversation] = useState(25);
+    const [limitConversation, setLimitConversation] = useState(8);
     const [conversations, setConversations] = useState<IConversation[]>([]);
     const [loadingInitialConversations, setLoadingInitialConversations] = useState<boolean>(false);
     const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
