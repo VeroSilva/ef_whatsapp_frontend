@@ -2,6 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { Modal } from '@/app/components/Modal/Modal';
 import useActiveConversation from '@/app/hooks/useActiveConversation';
 
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+import es from 'react-phone-number-input/locale/es'
+
 interface ModalProps {
     show: boolean;
     handleOpenModal: Function;
@@ -29,8 +33,8 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
         handleOpenModal(false);
     }, [newPhone]);
 
-    const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewPhone(e.target.value);
+    const handlePhoneInputChange = useCallback((value?: string) => {
+        setNewPhone(value || "");
     }, []);
 
     const CreateConversationButton = () => (
@@ -59,15 +63,11 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
                 <label htmlFor="phone" className="text-sm text-gray-800 font-semibold">
                     Número de teléfono:
                 </label>
-                <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    placeholder="Ingresa el número de teléfono"
-                    className="border border-gray-300 rounded-lg p-2 input-sky"
+                <PhoneInput
+                    placeholder="Enter phone number"
                     value={newPhone}
-                    onChange={handlePhoneChange}
-                />
+                    onChange={handlePhoneInputChange}
+                    labels={es} />
             </div>
 
             <div className="flex justify-end space-x-4 mt-4">
