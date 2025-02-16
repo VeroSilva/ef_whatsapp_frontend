@@ -6,7 +6,7 @@ export const InputSendMessage = ({ handleSendMessage, setMessageToSend, messageT
     const { setActiveMessageReply } = useActiveMessageReply();
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && messageToSend.trim() !== '') {
             event.preventDefault()
             handleSendMessage("text", messageToSend, () => {
                 setActiveMessageReply(initialStateActiveMessageReply)
