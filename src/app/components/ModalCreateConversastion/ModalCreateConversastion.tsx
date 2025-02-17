@@ -73,7 +73,10 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
             <div className="flex justify-end space-x-4 mt-4">
                 <button
                     className="second-button"
-                    onClick={() => handleOpenModal(false)}
+                    onClick={() => {
+                        handleOpenModal(false)
+                        handlePhoneInputChange("")
+                    }}
                 >
                     Cancelar
                 </button>

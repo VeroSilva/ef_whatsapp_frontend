@@ -15,13 +15,14 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
         description: "",
         color: "",
         hasNestedForm: false,
+        isMultiple: false,
         fields: [],
     });
     const { userState } = useUser();
 
     useEffect(() => {
         if (data) {
-            const { name, description, color, hasNestedForm, fields } = data;
+            const { name, description, color, hasNestedForm, isMultiple, fields } = data;
 
             setDataTag({
                 ...dataTag,
@@ -29,6 +30,7 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
                 description,
                 color,
                 hasNestedForm,
+                isMultiple,
                 fields
             });
         }
@@ -111,7 +113,15 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
         setDataTag((prev) => ({
             ...prev,
             hasNestedForm: !prev.hasNestedForm,
+            isMultiple: false,
             fields: !prev.hasNestedForm ? [] : prev.fields, // Limpia los campos si desactiva
+        }));
+    };
+
+    const handleToggleIsMultipleForm = () => {
+        setDataTag((prev) => ({
+            ...prev,
+            isMultiple: !prev.isMultiple,
         }));
     };
 
@@ -119,21 +129,21 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
         setDataTag((prev) => ({
             ...prev,
             fields: prev.fields.map((field) =>
-            field.id === id ? { ...field, [key]: value } : field
+                field.id === id ? { ...field, [key]: value } : field
             ),
         }));
     };
-      
+
     const addField = (type: "decimal" | "text" | "date") => {
         setDataTag((prev) => ({
             ...prev,
             fields: [
-            ...prev.fields,
-            { id: crypto.randomUUID(), type, name: "" }, // Agrega un nuevo campo con un ID único
+                ...prev.fields,
+                { id: crypto.randomUUID(), type, name: "" }, // Agrega un nuevo campo con un ID único
             ],
         }));
     };
-      
+
     const removeField = (id: string) => {
         setDataTag((prev) => ({
             ...prev,
@@ -200,6 +210,21 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
             </label>
 
             {dataTag.hasNestedForm && (
+                <label className="inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        onChange={handleToggleIsMultipleForm}
+                        checked={dataTag.isMultiple}
+                    />
+
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-sky-600"></div>
+
+                    <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Asignacion Multiple</span>
+                </label>
+            )}
+
+            {dataTag.hasNestedForm && (
                 <div>
                     <div className="flex gap-2 mb-4">
                         <button type="button" className="flex gap-2 text-xs rounded-xl bg-slate-100 p-2 cursor-pointer" onClick={() => addField("decimal")}>
@@ -253,7 +278,7 @@ export const FormTag = ({ type, setAlert, handleLoadTags, handleOpenModal, data 
                         </div>
                     ))}
                 </div>
-            )} 
+            )}
 
             <div className="flex justify-end space-x-4 mt-4">
                 <button

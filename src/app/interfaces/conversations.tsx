@@ -20,6 +20,7 @@ export interface Tag {
     color: string,
     description: string,
     hasNestedForm: boolean;
+    isMultiple: boolean;
     fields: FormField[];
 }
 
