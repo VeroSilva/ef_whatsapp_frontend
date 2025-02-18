@@ -30,6 +30,7 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
             id: -1,
             tags: []
         });
+        handlePhoneInputChange("")
 
         handleOpenModal(false);
     }, [newPhone]);

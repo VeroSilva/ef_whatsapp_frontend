@@ -60,7 +60,12 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
         if (messageToSend.startsWith('*')) {
             setActiveTemplateList(true);
 
-            getTemplates(userState.token, activePhone).then((res) => setTemplatesList(res.templates));
+            getTemplates(userState.token, activePhone).then((res) => {
+                const filteredTemplates = res.templates.filter((template: Template) =>
+                    template.name.toLowerCase().includes(messageToSend.slice(1).toLowerCase())
+                );
+                setTemplatesList(filteredTemplates);
+            });
         } else {
             setActiveTemplateList(false);
         }
