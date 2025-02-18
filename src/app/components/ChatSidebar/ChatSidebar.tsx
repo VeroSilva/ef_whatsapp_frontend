@@ -67,7 +67,8 @@ export const ChatSidebar = () => {
                     activePhone.toString() === payload.data.conversation.company_phone_id &&
                     (!payload.data.conversation.user_assigned_id ||
                         (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id) || userState.role == "1"
-                    )
+                    ) &&
+                    (!chatFiltersState.search || payload.data.conversation.contact.name.includes(chatFiltersState.search) || payload.data.conversation.contact.phone.includes(chatFiltersState.search))
                 ) {
                     setConversations(prevConversations => {
                         const chatIndex = prevConversations.findIndex(chat => chat.id === payload.data.conversation.id);
@@ -99,7 +100,8 @@ export const ChatSidebar = () => {
                     activePhone.toString() === payload.data.conversation.company_phone_id &&
                     (!payload.data.conversation.user_assigned_id ||
                         (payload.data.conversation.user_assigned_id && payload.data.conversation.user_assigned_id === userState.id) || userState.role == "1"
-                    )
+                    ) &&
+                    (!chatFiltersState.search || payload.data.conversation.contact.name.includes(chatFiltersState.search) || payload.data.conversation.contact.phone.includes(chatFiltersState.search))
                 ) {
                     setConversations((prevConversations) => {
                         const chatIndex = prevConversations.findIndex((chat) => chat.id === payload.data.conversation.id);
@@ -114,7 +116,8 @@ export const ChatSidebar = () => {
                     });
                 }
             } else if (payload.table === "user_conversation") {
-                const isRelevantConversation = activePhone.toString() === payload.data.conversation.company_phone_id && (!payload.data.conversation.user_assigned_id || payload.data.conversation.user_assigned_id === userState.id || userState.role == "1");
+                const isRelevantConversation = activePhone.toString() === payload.data.conversation.company_phone_id && (!payload.data.conversation.user_assigned_id || payload.data.conversation.user_assigned_id === userState.id || userState.role == "1") &&
+                    (!chatFiltersState.search || payload.data.conversation.contact.name.includes(chatFiltersState.search) || payload.data.conversation.contact.phone.includes(chatFiltersState.search));
 
                 if ((payload.action === "insert" || payload.action === "update") && isRelevantConversation) {
                     setConversations(prevConversations => {
@@ -145,7 +148,8 @@ export const ChatSidebar = () => {
                     activePhone.toString() === payload.data.company_phone_id &&
                     (!payload.data.user_assigned_id ||
                         (payload.data.user_assigned_id && payload.data.user_assigned_id === userState.id) || userState.role == "1"
-                    )
+                    ) &&
+                    (!chatFiltersState.search || payload.data.contact.name.includes(chatFiltersState.search) || payload.data.contact.phone.includes(chatFiltersState.search))
                 ) {
                     const filteredConversations = prevConversations.filter(
                         (conversation: any) => {

@@ -72,6 +72,7 @@ export const ChatFilters = ({ handleLoadConversations }: { handleLoadConversatio
     const handleCleanFilters = () => {
         setChatFiltersState(INITIAL_STATE)
         setShowFilterModal(false)
+        handleLoadConversations()
     }
 
     const handleClearDates = () => {

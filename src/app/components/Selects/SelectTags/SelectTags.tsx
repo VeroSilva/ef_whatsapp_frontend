@@ -3,6 +3,7 @@ import Select, { StylesConfig } from 'react-select';
 //@ts-ignore
 import chroma from 'chroma-js';
 import useTags from '@/app/hooks/useTags';
+import useUser from '@/app/hooks/useUser'; // Import useUser hook
 
 export interface ColourOption {
     value?: number;
@@ -10,11 +11,13 @@ export interface ColourOption {
     color: string;
     isFixed?: boolean;
     isDisabled?: boolean
+    hasNestedForm?: boolean
 }
 
 export const SelectTags = ({ handleChange, selectedOptions, setSelectedOptions, selectedOptionById, flows, isMulti }: { handleChange: any, selectedOptions?: any, setSelectedOptions?: Function, selectedOptionById?: number | null, flows?: any, isMulti?: boolean }) => {
     const [options, setOptions] = useState<ColourOption[]>([]);
     const { tagsState } = useTags();
+    const { userState } = useUser(); // Get user state
 
     const colourStyles: StylesConfig<ColourOption, true> = {
         control: (styles) => ({ ...styles, backgroundColor: 'white' }),
@@ -66,16 +69,17 @@ export const SelectTags = ({ handleChange, selectedOptions, setSelectedOptions, 
                 backgroundColor: data.color,
                 color: 'white',
             },
+            display: data.hasNestedForm && userState.role == "1" ? 'none' : 'flex', // Add validation for removal
         }),
     };
 
     useEffect(() => {
-      if (selectedOptionById && !!options.length && setSelectedOptions) {
-        const current = options.filter((option) => option.value === Number(selectedOptionById))
-        setSelectedOptions(current);
-      }
+        if (selectedOptionById && !!options.length && setSelectedOptions) {
+            const current = options.filter((option) => option.value === Number(selectedOptionById))
+            setSelectedOptions(current);
+        }
     }, [selectedOptionById, options]);
-    
+
     useEffect(() => {
         if (tagsState.length > 1) {
             let availableTags = tagsState;
@@ -104,6 +108,7 @@ export const SelectTags = ({ handleChange, selectedOptions, setSelectedOptions, 
             isMulti={isMulti ?? false}
             placeholder="Selecciona etiqueta"
             className="text-start text-sm"
+            isClearable={false} // Disable the "X" button
         />
     )
 }

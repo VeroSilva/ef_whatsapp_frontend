@@ -95,11 +95,11 @@ export const ChatOptions = () => {
     }
 
     const handleSelectChange = (options: ColourOption[]) => {
-        const toDelete = selectedTags.filter(item1 => 
+        const toDelete = selectedTags.filter(item1 =>
             !options.some(item2 => item2.value === item1.value)
         );
 
-        const toAdd = options.filter(item2 => 
+        const toAdd = options.filter(item2 =>
             !selectedTags.some(item1 => item1.value === item2.value)
         );
 
@@ -179,7 +179,7 @@ export const ChatOptions = () => {
     }
 
     useEffect(() => {
-        const options: ColourOption[] = activeConversationState.tags.map(tag => ({value: tag.id, label: tag.name, color: tag.color}));
+        const options: ColourOption[] = activeConversationState.tags.map(tag => ({ value: tag.id, label: tag.name, color: tag.color, hasNestedForm: tag.hasNestedForm }));
 
         setSelectedTags(options)
     }, [activeConversationState.tags])

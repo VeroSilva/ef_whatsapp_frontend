@@ -4,6 +4,7 @@ import useActiveConversation from '@/app/hooks/useActiveConversation';
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
+// @ts-ignore
 import es from 'react-phone-number-input/locale/es'
 
 interface ModalProps {
