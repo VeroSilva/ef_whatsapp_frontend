@@ -69,7 +69,7 @@ export const SelectTags = ({ handleChange, selectedOptions, setSelectedOptions, 
                 backgroundColor: data.color,
                 color: 'white',
             },
-            display: data.hasNestedForm && userState.role == "1" ? 'none' : 'flex', // Add validation for removal
+            display: data.hasNestedForm && userState.role !== "1" ? 'none' : 'flex', // Add validation for removal
         }),
     };
 
