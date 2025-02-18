@@ -8,12 +8,22 @@ import { getSchedule } from "@/app/services/api";
 import useUser from "../../hooks/useUser";
 import { redirect } from "next/navigation";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
+import { Modal } from "@/app/components/Modal/Modal";
+import { MassiveAssigment } from "@/app/components/MassiveAssigment/MassiveAssigment";
+import { IconCheckCircle } from "@/app/components/Icons/IconCheckCircle";
+import { IconInfo } from "@/app/components/Icons/IconInfo";
 
 const Schedule = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
     const [schedule, setSchedule] = useState([]);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [page, setPage] = useState(1);
+    const [showAssignmentModal, setShowassignmentModal] = useState<boolean>(false);
+    const [alert, setAlert] = useState({
+        type: "",
+        message: "",
+        show: false
+    });
     const { slice, range } = usePaginateTable({ data: schedule, page, rowsPerPage });
     const { userState } = useUser();
 
@@ -22,6 +32,18 @@ const Schedule = (): JSX.Element => {
             redirect('/pages/login');
         }
     }, [userState]);
+
+    useEffect(() => {
+        if (alert.show) {
+            setTimeout(() => {
+                setAlert({
+                    type: alert.type,
+                    message: alert.message,
+                    show: false
+                })
+            }, 3000);
+        }
+    }, [alert]);
 
     useEffect(() => {
         handleLoadSchedule();
@@ -33,6 +55,10 @@ const Schedule = (): JSX.Element => {
             setSchedule(res);
             setLoading(false);
         });
+    };
+
+    const handleOpenAssigmentModal = (show: boolean) => {
+        setShowassignmentModal(show);
     };
 
     const getStatus = (item: any) => {
@@ -55,6 +81,11 @@ const Schedule = (): JSX.Element => {
             <Sidebar />
 
             <div className="flex-1 h-full p-8 bg-slate-200">
+                <button
+                    className="main-button mb-4"
+                    onClick={() => handleOpenAssigmentModal(true)}
+                >Asignación masiva</button>
+
                 <div className="relative overflow-x-auto w-full rounded-md">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b border-gray-300">
@@ -127,6 +158,29 @@ const Schedule = (): JSX.Element => {
                 </div>
                 {/* END: Pagination */}
             </div>
+
+            {/* START: Asignación Masiva Modal */}
+            <Modal
+                title="Asignación masiva de etiquetas"
+                onClose={() => handleOpenAssigmentModal(false)}
+                show={showAssignmentModal}
+                width="800px"
+            >
+                <div>
+                    <MassiveAssigment handleShowModal={handleOpenAssigmentModal} setAlert={setAlert} />
+                </div>
+            </Modal>
+            {/* END: Asignación Masiva Modal */}
+
+            {/* {alert.show && */}
+            <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
+                {alert.type === "success" ?
+                    <IconCheckCircle classes="w-6 h-6 mr-2" /> :
+                    <IconInfo classes="w-6 h-6 mr-2" />
+                }
+                <span>{alert.message}</span>
+            </div>
+            {/* } */}
         </>
     );
 };

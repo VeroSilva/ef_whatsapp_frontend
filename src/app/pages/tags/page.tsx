@@ -15,7 +15,6 @@ import { IconInfo } from "@/app/components/Icons/IconInfo";
 import { TableFooter } from "@/app/components/TableFooter/TableFooter";
 import { FormTag } from "@/app/components/FormTag/FormTag";
 import { redirect } from "next/navigation";
-import { MassiveAssigment } from "@/app/components/MassiveAssigment/MassiveAssigment";
 
 const Tags = (): JSX.Element => {
     const [loading, setLoading] = useState(false);
@@ -29,7 +28,6 @@ const Tags = (): JSX.Element => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const [showAssignmentModal, setShowassignmentModal] = useState<boolean>(false);
     const [alert, setAlert] = useState({
         type: "",
         message: "",
@@ -102,10 +100,6 @@ const Tags = (): JSX.Element => {
         setShowDeleteModal(show);
     };
 
-    const handleOpenAssigmentModal = (show: boolean) => {
-        setShowassignmentModal(show);
-    };
-
     return (
         <>
             <Sidebar />
@@ -115,11 +109,6 @@ const Tags = (): JSX.Element => {
                     className="main-button mb-4"
                     onClick={() => handleOpenModal(true)}
                 >Nueva etiqueta</button>
-
-                <button
-                    className="main-button mb-4 ms-2"
-                    onClick={() => handleOpenAssigmentModal(true)}
-                >Asignación masiva</button>
 
                 <div className="relative overflow-x-auto w-full rounded-md">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -269,19 +258,6 @@ const Tags = (): JSX.Element => {
                 </div>
             </Modal >
             {/* END: Delete Tag Modal */}
-
-            {/* START: Asignación Masiva Modal */}
-            <Modal
-                title="Asignación masiva de etiquetas"
-                onClose={() => handleOpenAssigmentModal(false)}
-                show={showAssignmentModal}
-                width="800px"
-            >
-                <div>
-                    <MassiveAssigment handleShowModal={handleOpenAssigmentModal} setAlert={setAlert} />
-                </div>
-            </Modal>
-            {/* END: Asignación Masiva Modal */}
 
             {/* {alert.show && */}
             <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
