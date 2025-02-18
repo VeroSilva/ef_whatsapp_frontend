@@ -18,14 +18,9 @@ const TemplateNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     const buttons = template ? template.components.find((item: any) => item.type === "BUTTONS") : [];
     const buttonsData = buttons && buttons.buttons ? buttons.buttons.filter((btn: any) => btn.type === "QUICK_REPLY") : []
 
-    const positionHandle = (index: number) => {
-        if (index === 1 || index === 2) {
-            return (dimensions.height / 3) * index
-        } else if (index === 3) {
-            return 0
-        } else if (index === 4) {
-            return dimensions.height
-        }
+    const positionHandle = (index: number, total: number) => {
+        const spacing = dimensions.width / (total + 1);
+        return spacing * (index + 1);
     }
 
     useEffect(() => {
@@ -45,25 +40,27 @@ const TemplateNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
     }, [readyToSend, templateToSend]);
 
     return (
-        <div className="text-updater-node">
+        <div className="text-updater-node relative">
             <Handle type="target" position={Position.Top} id={template.name} isConnectable={isConnectable} />
 
             <TemplateDetail template={template} setIsReadyToSend={setReadyToSend} setTemplateToSend={setTemplateToSend} />
 
-            {
-                buttonsData.map((button: any, index: number) => (
-                    <div className="group" key={`item-button-${index}`}>
-                        <Handle
-                            type="source"
-                            position={Position.Bottom}
-                            id={`${button.text.replace(/\s+/g, '')}`}
-                            isConnectable={isConnectable}
-                            style={{ left: positionHandle(index + 1) }}
-                        />
-                        <span className="z-50 whitespace-nowrap fixed bottom-2 scale-0 transition-all rounded bg-gray-800 p-1 text-xs text-white group-hover:scale-100">{button.text}</span>
-                    </div>
-                ))
-            }
+            <div className="flex justify-center overflow-x-auto">
+                {
+                    buttonsData.map((button: any, index: number) => (
+                        <div className="group" key={`item-button-${index}`}>
+                            <Handle
+                                type="source"
+                                position={Position.Bottom}
+                                id={`${button.text.replace(/\s+/g, '')}`}
+                                isConnectable={isConnectable}
+                                style={{ left: positionHandle(index, buttonsData.length) }}
+                            />
+                            <span className="z-50 whitespace-nowrap fixed bottom-2 scale-0 transition-all rounded bg-gray-800 p-5 text-xs text-white group-hover:scale-100">{button.text}</span>
+                        </div>
+                    ))
+                }
+            </div>
         </div>
     );
 };

@@ -27,6 +27,7 @@ const nextConfig = {
       "scontent-*.xx.fbcdn.net",
       "scontent.xx.fbcdn.net",
       "lacasadelperfumista.com",
+      "ferymar.pe",
     ],
     remotePatterns: [
       {
