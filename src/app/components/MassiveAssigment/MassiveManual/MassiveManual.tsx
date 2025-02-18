@@ -26,7 +26,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
         startDate: "",
         endDate: "",
         tags: "",
-        limit: "",
+        limit: "100",
         phone: "",
         search: "",
         unread: false
@@ -67,7 +67,8 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
         if (
             filters.phone !== "" &&
             filters.startDate !== "" &&
-            filters.endDate !== ""
+            filters.endDate !== "" &&
+            filters.limit !== ""
         ) return false
         else return true
     }
@@ -245,6 +246,7 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
                             <input
                                 type="number"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg input-sky block w-full p-2.5"
+                                value={filters?.limit ?? "100"}
                                 onChange={handleLimitChange}
                             />
                         </div>

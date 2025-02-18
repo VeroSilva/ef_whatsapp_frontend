@@ -246,7 +246,7 @@ const ChatComponent = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2 mt-2">
+                                    <div className="flex flex-wrap gap-2 mt-2">
                                         {activeConversationState && <SelectedTags tags={updatedTags} isInChat />}
                                     </div>
                                 </div>
