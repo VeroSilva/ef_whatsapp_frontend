@@ -111,7 +111,7 @@ export const SelectedTags = ({ tags, isInChat }: { tags: any, isInChat?: boolean
                 <span
                     key={`tag-${tag.id}`}
                     style={{ backgroundColor: tag.color }}
-                    className={`rounded-full px-2 py-1 text-xs font-bold ${tag.hasNestedForm ? "cursor-pointer" : "cursor-default"} flex gap-1 items-center ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
+                    className={`rounded-sm px-1 ${isInChat ? "text-[14px]" : "text-[12px]"} ${tag.hasNestedForm ? "cursor-pointer" : "cursor-default"} flex gap-1 items-center ${isColorDark(tag.color) ? "text-slate-200" : "text-gray-800"}`}
                     onClick={() => {
                         if (tag.hasNestedForm && tag.fields) handleShowTagInfo(tag)
                     }}
