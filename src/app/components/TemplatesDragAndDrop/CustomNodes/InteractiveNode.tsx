@@ -44,7 +44,7 @@ const InteractiveNode: FC<TextUpdaterNodeProps> = ({ data, isConnectable }) => {
 
             if (savedInteractive.type === "product_list") {
                 setActiveTab("multi")
-            } else if ("product") {
+            } else if (savedInteractive.type === "product") {
                 setActiveTab("single")
             }
         }
