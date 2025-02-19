@@ -307,12 +307,12 @@ export const MassiveManual = ({ handleShowModal, setAlert }: { handleShowModal: 
 
             {steps[2].current &&
                 <div className="mt-6">
-                    <h2>
+                    <h2 className="text-sm/8">
                         ¿Está seguro que desea asignar a
-                        {" "} <span className="font-semibold bg-green-200 text-green-500 p-2 rounded-full">{conversations.mount} {conversations.mount === 1 ? "conversación" : "conversaciones"}</span> {" "}
+                        <span className="bg-green-200 text-green-500 p-1 text-sm mx-2 rounded-md">{conversations.mount} {conversations.mount === 1 ? "conversación" : "conversaciones"}</span>
                         el tag
-                        {" "} <span
-                            className={`font-semibold p-2 rounded-full ${isColorDark(tagToAssign.color) ? "text-slate-200" : "text-gray-800"}`}
+                        <span
+                            className={`p-1 text-sm mx-2 rounded-md text-nowrap ${isColorDark(tagToAssign.color) ? "text-slate-200" : "text-gray-800"}`}
                             style={{ backgroundColor: tagToAssign.color }}
                         >{tagToAssign.label}</span>?
                     </h2>
