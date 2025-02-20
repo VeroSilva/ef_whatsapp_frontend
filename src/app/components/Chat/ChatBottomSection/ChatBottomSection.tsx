@@ -25,10 +25,10 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
     const { sendMessage, isLoading } = useMessage()
     const { userState } = useUser()
     const { setActiveConversation } = useActiveConversation()
-    const { activePhone } = useActivePhone();
-    const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply();
-    const [activeTemplateList, setActiveTemplateList] = useState(false);
-    const [templatesList, setTemplatesList] = useState<Template[]>([]);
+    const { activePhone } = useActivePhone()
+    const { activeMessageReply, setActiveMessageReply } = useActiveMessageReply()
+    const [activeTemplateList, setActiveTemplateList] = useState(false)
+    const [templatesList, setTemplatesList] = useState<Template[]>([])
 
     const handleSendMessage = async (type: string, data: any, resetData: Function) => {
         if (conversationId === -1) {
@@ -106,8 +106,12 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
                                     setAudio(null)
                                     handleResetActiveMessageReply()
                                 })}
+                                disabled={isLoading}
                             >
-                                <IconSend classes="w-8 h-8 text-slate-100 ease-in duration-100" />
+                                {isLoading ?
+                                    <Spinner aria-label="Default status example" /> :
+                                    <IconSend classes="w-8 h-8 text-slate-100 ease-in duration-100" />
+                                }
                             </button>
                         </div>
                     </div>
@@ -124,6 +128,7 @@ export const ChatBottomSection = ({ conversationId, setSelectedFile, newConversa
                                 setMessageToSend("")
                                 handleResetActiveMessageReply()
                             })}
+                            disabled={isLoading}
                         >
                             {isLoading ?
                                 <Spinner aria-label="Default status example" /> :

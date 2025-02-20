@@ -19,7 +19,7 @@ export const PreviewInteractive = ({ handleSendMessage, isLoading, handleClosePr
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            handleAccept();
+            if (!isLoading) handleAccept();
         }
     }
 
@@ -55,7 +55,7 @@ export const PreviewInteractive = ({ handleSendMessage, isLoading, handleClosePr
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
-    }, []);
+    }, [isLoading]);
 
     return (
         <>

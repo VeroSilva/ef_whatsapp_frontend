@@ -32,7 +32,7 @@ export const PreviewFile = ({ file, handleSendMessage, isLoading, handleClosePre
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            handleAccept();
+            if (!isLoading) handleAccept();
         }
     }
 
@@ -42,7 +42,7 @@ export const PreviewFile = ({ file, handleSendMessage, isLoading, handleClosePre
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
-    }, []);
+    }, [isLoading]);
 
     return (
         <>

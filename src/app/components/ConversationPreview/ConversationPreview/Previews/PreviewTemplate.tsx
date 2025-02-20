@@ -26,7 +26,7 @@ export const PreviewTemplate = ({ template, handleSendMessage, isLoading, handle
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            handleAccept();
+            if (!isLoading) handleAccept();
         }
     }
 
@@ -36,7 +36,7 @@ export const PreviewTemplate = ({ template, handleSendMessage, isLoading, handle
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
-    }, [templateToSend]);
+    }, [templateToSend, isLoading]);
 
     return (
         <>
