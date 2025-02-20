@@ -203,13 +203,15 @@ export const SelectedTags = ({ tags, isInChat }: { tags: any, isInChat?: boolean
                 </>
             </Modal>
             {/* END: Add info tag */}
-            <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 left-0 flex items-center transition transition-opacity duration-500 w-[200px] ${alert.show ? "opacity-1" : "opacity-0"} ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
-                {alert.type === "success" ?
-                    <span><IconCheckCircle classes="w-6 h-6 mr-2" /></span> :
-                    <span><IconInfo classes="w-6 h-6 mr-2" /></span>
-                }
-                <span>{alert.message}</span>
-            </div>
+            {alert.show ?
+                <div className={`p-4 m-4 text-sm font-bold rounded-lg absolute top-0 right-0 flex items-center transition transition-opacity duration-500 ${alert.type === "success" ? 'text-green-800 bg-green-200' : 'text-red-800 bg-red-200'}`} role="alert">
+                    {alert.type === "success" ?
+                        <span><IconCheckCircle classes="w-6 h-6 mr-2" /></span> :
+                        <span><IconInfo classes="w-6 h-6 mr-2" /></span>
+                    }
+                    <span>{alert.message}</span>
+                </div>
+            :null}
 
             <Modal
                 title="Confirmar Guardado"
