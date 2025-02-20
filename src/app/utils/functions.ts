@@ -15,3 +15,10 @@ export const uniqueIdGenerator = () => {
   const uniqueId = `${uniqueTime}-${random}`;
   return uniqueId;
 }
+
+export const getCountryCode = (id: number) => {
+  if (id === 1 || id === 10) return "PE"
+  if (id === 6 || id === 11) return "VE"
+  if (id === 12) return "PY"
+  else return undefined
+}

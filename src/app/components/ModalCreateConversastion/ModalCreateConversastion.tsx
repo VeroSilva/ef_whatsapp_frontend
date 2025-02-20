@@ -6,6 +6,9 @@ import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 // @ts-ignore
 import es from 'react-phone-number-input/locale/es'
+import "./styles.scss"
+import useActivePhone from '@/app/hooks/useActivePhone';
+import { getCountryCode } from '@/app/utils/functions';
 
 interface ModalProps {
     show: boolean;
@@ -15,6 +18,7 @@ interface ModalProps {
 export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show, handleOpenModal }) => {
     //@ts-ignore
     const { setActiveConversation } = useActiveConversation();
+    const { activePhone } = useActivePhone();
     const [newPhone, setNewPhone] = useState<string>("");
 
     const handleCreateConversation = useCallback(() => {
@@ -66,10 +70,13 @@ export const ModalCreateConversartion: React.FC<ModalProps> = React.memo(({ show
                     Número de teléfono:
                 </label>
                 <PhoneInput
-                    placeholder="Enter phone number"
+                    placeholder="Escriba número de teléfono"
                     value={newPhone}
                     onChange={handlePhoneInputChange}
-                    labels={es} />
+                    labels={es}
+                    inputClass='phone-input'
+                    defaultCountry={getCountryCode(activePhone)}
+                />
             </div>
 
             <div className="flex justify-end space-x-4 mt-4">

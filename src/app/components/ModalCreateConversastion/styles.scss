@@ -1,0 +1,12 @@
+.PhoneInputInput {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+
+    &:focus,
+    &:focus-visible {
+        outline: none !important;
+        border: none;
+        box-shadow: 0 0 0 2px #075985;
+    }
+}

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { IconMessages } from "../Icons/IconMessages";
 import { IconUsers } from "../Icons/IconUsers";
 import { IconTag } from "../Icons/IconTag";
-import { CompanyPhones } from "@/app/interfaces/user";
 import { IconHome } from "../Icons/IconHome";
 import { IconPhone } from "../Icons/IconPhone";
 import { IconFlow } from "../Icons/IconFlow";
