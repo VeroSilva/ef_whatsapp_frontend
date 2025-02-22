@@ -20,14 +20,15 @@ $border-color_2: #ff0072;
     }
 
     .dndnode {
-        height: 20px;
-        padding: 4px;
-        border: 1px solid #1a192b;
-        border-radius: 2px;
+        padding: 8px 4px;
+        border: 1px solid #0284c7;
+        color: #0c4a6e;
+        border-radius: 0.25rem;
         margin-bottom: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #e0f2fe;
         cursor: grab;
     }
 
@@ -96,7 +97,7 @@ $border-color_2: #ff0072;
 
         aside {
             width: 20%;
-            max-width: 250px;
+            max-width: 300px;
         }
     }
 }
